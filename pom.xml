@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>se.idsec.signservice.commons</groupId>
+  <artifactId>builder-pom</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <name>IDsec Solutions :: Builder POM for SignService :: Commons</name>
+  <description>Builder POM for SignService Commons</description>
+  <url>https://github.com/idsec-solutions/signservice-commons</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:https://github.com/idsec-solutions/signservice-commons.git</connection>
+    <developerConnection>scm:git:https://github.com/idsec-solutions/signservice-commons.git</developerConnection>
+    <url>https://github.com/idsec-solutions/signservice-commons/tree/master</url>
+  </scm>
+
+  <organization>
+    <name>IDsec Solutions AB</name>
+    <url>https://www.idsec.se</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <name>Martin Lindström</name>
+      <email>martin@idsec.se</email>
+      <organization>IDsec Solutions AB</organization>
+      <organizationUrl>https://www.idsec.se</organizationUrl>
+    </developer>
+
+    <developer>
+      <name>Stefan Santesson</name>
+      <email>stefan@idsec.se</email>
+      <organization>IDsec Solutions AB</organization>
+      <organizationUrl>https://www.idsec.se</organizationUrl>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>bom</module>
+    <module>commons</module>
+  </modules>
+
+</project>
