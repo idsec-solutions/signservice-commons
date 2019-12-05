@@ -138,37 +138,37 @@
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>saml-jaxb</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>oasis-dss-jaxb</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>etsi-xades-jaxb</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>etsi-xades-ext-jaxb</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
             
       <dependency>
         <groupId>se.swedenconnect.schemas.csig</groupId>
         <artifactId>dss-ext11-jaxb</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas.csig</groupId>
         <artifactId>sap10-jaxb</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
       </dependency>
 
       <!-- Spring -->
