@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TheRoot>
+  <Element>
+    <Data>Element one</Data>
+  </Element>
+  <Element>
+    <Data>Element two</Data>
+  </Element>
+</TheRoot>

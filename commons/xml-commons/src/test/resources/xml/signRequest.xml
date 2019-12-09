@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dss:SignRequest Profile="http://id.elegnamnden.se/csig/1.1/dss-ext/profile" RequestID="670c7831fcc984fe62a9b0f7a9b85cad" xmlns:dss="urn:oasis:names:tc:dss:1.0:core:schema">
+    <dss:OptionalInputs>
+        <ns:SignRequestExtension xmlns:ns="http://id.elegnamnden.se/csig/1.1/dss-ext/ns">
+            <ns:RequestTime>2019-12-06T10:24:17.032Z</ns:RequestTime>
+            <saml:Conditions NotBefore="2019-12-06T10:23:57.032Z" NotOnOrAfter="2019-12-06T10:33:17.032Z" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+                <saml:AudienceRestriction>
+                    <saml:Audience>https://sig.sandbox.swedenconnect.se/testsp/sigreturn</saml:Audience>
+                </saml:AudienceRestriction>
+            </saml:Conditions>
+            <ns:Signer>
+                <saml:Attribute Name="urn:oid:1.2.752.29.4.13" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+                    <saml:AttributeValue xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">197802031877</saml:AttributeValue>
+                </saml:Attribute>
+            </ns:Signer>
+            <ns:IdentityProvider Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://dev.test.swedenconnect.se/idp</ns:IdentityProvider>
+            <ns:SignRequester Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://eid2cssp.3xasecurity.com/sign</ns:SignRequester>
+            <ns:SignService Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://sandbox.swedenconnect.se/sig-instance/sigtest</ns:SignService>
+            <ns:RequestedSignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</ns:RequestedSignatureAlgorithm>
+            <ns:CertRequestProperties CertType="PKC">
+                <saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://id.elegnamnden.se/loa/1.0/loa3</saml:AuthnContextClassRef>
+                <ns:RequestedCertAttributes>
+                    <ns:RequestedCertAttribute CertAttributeRef="2.5.4.5" CertNameType="rdn" FriendlyName="serialNumber" Required="true">
+                        <ns:SamlAttributeName>urn:oid:1.2.752.29.4.13</ns:SamlAttributeName>
+                    </ns:RequestedCertAttribute>
+                    <ns:RequestedCertAttribute CertAttributeRef="2.5.4.6" CertNameType="rdn" DefaultValue="SE" FriendlyName="country" Required="true">
+                        <ns:SamlAttributeName>urn:oid:2.5.4.6</ns:SamlAttributeName>
+                    </ns:RequestedCertAttribute>
+                    <ns:RequestedCertAttribute CertAttributeRef="2.5.4.42" CertNameType="rdn" FriendlyName="givenName" Required="true">
+                        <ns:SamlAttributeName>urn:oid:2.5.4.42</ns:SamlAttributeName>
+                    </ns:RequestedCertAttribute>
+                    <ns:RequestedCertAttribute CertAttributeRef="2.5.4.4" CertNameType="rdn" FriendlyName="surname" Required="true">
+                        <ns:SamlAttributeName>urn:oid:2.5.4.4</ns:SamlAttributeName>
+                    </ns:RequestedCertAttribute>
+                    <ns:RequestedCertAttribute CertAttributeRef="2.5.4.3" CertNameType="rdn" FriendlyName="commonName" Required="false">
+                        <ns:SamlAttributeName Order="0">urn:oid:2.16.840.1.113730.3.1.241</ns:SamlAttributeName>
+                        <ns:SamlAttributeName Order="1">urn:oid:2.5.4.3</ns:SamlAttributeName>
+                    </ns:RequestedCertAttribute>
+                </ns:RequestedCertAttributes>
+            </ns:CertRequestProperties>
+            <ns:SignMessage DisplayEntity="http://dev.test.swedenconnect.se/idp" MimeType="text" MustShow="true">
+                <ns:EncryptedMessage>
+                    <xenc:EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+                        <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+                        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <xenc:EncryptedKey>
+                                <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+                                <xenc:CipherData>
+                                    <xenc:CipherValue>qqPSKN78wgkoYbKYp5Jpb3Y4SFUeip3dxzhWQsu+ngWCx+CR48/YhT0ywgY3/jb8ATNNGVd187iNs+PHWMFszQnEegJ5xKCgQeRvfU5tR5Tlrt3E6UrxQiptbF3LRIQvq3BVvLw+sJzjFG0Uq+TlQ7dfB4K6TqDJgKpjvpaKF5rU3CP7UUNCHKQRvHfTyYra3BEhyHK2hWsbWbwkceMa7EkrjQVuZhtkYRBcK/gmCnsSLsXSOZ2ayDgGywJMjbj9nIgjsq+wbDiqn3zhGzeyO2xALxtSOdiwXoQBTI5lT/9jYD3k6/dJKxkEbMgi0w9042Ni4Mz9KH0OnHlbazlpHTeRsA5IbmQyXR5Px9u3tXVpk4TTYdxv0k52RfwFG+E6X/CkDMiAk0tm9RNVmI0u7CloD3ZXCBa/n0P+1KaFNJyQGJ+lrGehrUJKtxeLdpbvNjL6X0NLDztl/yMBlDyWBvQWiE1Lum/yPC1jD76AqBLOpxwbwBZ/0zhcvzEWpIDKJUxl+nZKKazeAdSULP9TQ8udXbNUEbqJX4OGzuInPOCfsdAGdLiL6FPT1PvtE9a82jc50XJGqGHtyysgt3yO8c7HXCdo6kDHpu9nEqMWcfN7lQNOu8Iv6R6G5accO2TFNqAD1yLPBhSS70OovgVzaKfsOv/mshhBqAAXQDsZtp4=</xenc:CipherValue>
+                                </xenc:CipherData>
+                            </xenc:EncryptedKey>
+                            <ds:KeyValue>
+                                <ds:RSAKeyValue>
+                                    <ds:Modulus>tDht5oVPjeIQ34AAwPjvNMXk3njtRwdBOI+nK+8x2WUz7cmtElWYEeteO2nCQisI1K9dRRDRfvH6U9717Y1UKl7YwQ9HklCtUbr4G+Si4rBi+ql3jhBTbNQRwlXLZ7nixfkRcroI8Qvk8Cenzmld5kD/XdUjMo22HLwKCLx1q3JjrDABxSGrnGUTmgkj5B70L3I7gl8mS/Tda8sX2xcpuA4IQkc1o36XwAMZpa5IbEttrhD7heOchgilMHe2OaAaTLeruIiY2UQczUEyYBEfD6vqaBFa/685EdlDfuFAF8FZ+Q+oF+jpQ5YaHMzHda+vzqh344sQ98w15HFDvdd4lLGHW40O9HaCKQWRdm/VyZNukL3/lpmfWaUEBfSqseHFObGav1H2TswRCD1+WYKdAL4kzU37KRO+a6R3/21a87SLELhgMF5+/XNuFONCW9f4nzm7H4uNKzVFAG2f8YOVove1AlSPqMNZ2l68VVVnIf5XvBlsTsNt5hjGlEjkgnOP+NTr6H5gNR0Omip9Rgyaon0gIJ2VFqWwfM+cCasLu9U+/T9HHQU8OUL2sTJbQXv4JblzPGfk6tYyKOdprocAteU49wWwvadzM954rJ2KYFKKBfBJvjvukNC1siaUAWb7ZQTCB4Ws+rHjYXxvJm6Pw8bhAMZGfZA7j8QsnZ84B1s=</ds:Modulus>
+                                    <ds:Exponent>AQAB</ds:Exponent>
+                                </ds:RSAKeyValue>
+                            </ds:KeyValue>
+                        </ds:KeyInfo>
+                        <xenc:CipherData>
+                            <xenc:CipherValue>ccFFuEiFG1Rmymlam18AqCAwi3QCxkT8npSaHyV/YWX5pSM6cwUYzdOIz5X/5BHulc9sX74ZoCQ/hjeUMSgHibR4s+NUX1mvQpHEeKe6ASmkftyUCCEYZEpg61KgTLfRjPFU07itIVAmgsXq38v8Q0le+bQxQKXoJyAjvMN4gkYENvnX8ldGYTmcw7LozOvAx+A2l8IDL89gEsjFLm1BPmJpO0+ZLIS5m3pJNUsZIBJlvgMN8NfmGz+eJFrNsGDaP8eFxTBV5eBRaIMrhaEUscD2xMqxNvoYRczXdCHuc4ZJPGFqSx+HCvbDU87NOG84UNDn3inHEKzllC1yQvDMNg==</xenc:CipherValue>
+                        </xenc:CipherData>
+                    </xenc:EncryptedData>
+                </ns:EncryptedMessage>
+            </ns:SignMessage>
+        </ns:SignRequestExtension>
+    </dss:OptionalInputs>
+    <dss:InputDocuments>
+        <dss:Other>
+            <ns:SignTasks xmlns:ns="http://id.elegnamnden.se/csig/1.1/dss-ext/ns">
+                <ns:SignTaskData AdESType="None" SigType="XML" SignTaskId="doc-0">
+                    <ns:ToBeSignedBytes>PGRzOlNpZ25lZEluZm8geG1sbnM6ZHM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyMiPjxkczpDYW5vbmljYWxpemF0aW9uTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8xMC94bWwtZXhjLWMxNG4jIj48L2RzOkNhbm9uaWNhbGl6YXRpb25NZXRob2Q+PGRzOlNpZ25hdHVyZU1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMDQveG1sZHNpZy1tb3JlI3JzYS1zaGEyNTYiPjwvZHM6U2lnbmF0dXJlTWV0aG9kPjxkczpSZWZlcmVuY2UgVVJJPSIiPjxkczpUcmFuc2Zvcm1zPjxkczpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjZW52ZWxvcGVkLXNpZ25hdHVyZSI+PC9kczpUcmFuc2Zvcm0+PGRzOlRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyI+PC9kczpUcmFuc2Zvcm0+PGRzOlRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnL1RSLzE5OTkvUkVDLXhwYXRoLTE5OTkxMTE2Ij4KPGRzOlhQYXRoPm5vdChhbmNlc3Rvci1vci1zZWxmOjpkczpTaWduYXR1cmUpPC9kczpYUGF0aD4KPC9kczpUcmFuc2Zvcm0+PC9kczpUcmFuc2Zvcm1zPjxkczpEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGVuYyNzaGEyNTYiPjwvZHM6RGlnZXN0TWV0aG9kPjxkczpEaWdlc3RWYWx1ZT45MDd3cWdFQThVUmRMdmRPSXlpaEE0MXZSd1JTUWFmTXd6L1JONjdsWUNJPTwvZHM6RGlnZXN0VmFsdWU+PC9kczpSZWZlcmVuY2U+PC9kczpTaWduZWRJbmZvPg==</ns:ToBeSignedBytes>
+                </ns:SignTaskData>
+            </ns:SignTasks>
+        </dss:Other>
+    </dss:InputDocuments>
+</dss:SignRequest>
