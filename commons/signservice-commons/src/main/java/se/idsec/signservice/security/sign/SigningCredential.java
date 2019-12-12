@@ -16,10 +16,12 @@
 package se.idsec.signservice.security.sign;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface representing a signing credential.
@@ -33,9 +35,18 @@ public interface SigningCredential {
    * Gets the signing certificate.
    * 
    * @return the signing certificate
+   */  
+  @Nullable
+  X509Certificate getSigningCertificate();
+  
+  /**
+   * Gets the public key.
+   * 
+   * @return the public key
+   * @see X509Certificate#getPublicKey()
    */
   @Nonnull
-  X509Certificate getSigningCertificate();
+  PublicKey getPublicKey();
 
   /**
    * Gets the private key.
@@ -47,8 +58,11 @@ public interface SigningCredential {
 
   /**
    * Gets the certificate chain for the signing certificate. The signing certificate is included.
+   * <p>
+   * If no signing certificate is available and empty list is returned.
+   * </p>
    * 
-   * @return the certificate chain (at least one certificate is returned)
+   * @return the certificate chain
    */
   @Nonnull
   List<X509Certificate> getCertificateChain();

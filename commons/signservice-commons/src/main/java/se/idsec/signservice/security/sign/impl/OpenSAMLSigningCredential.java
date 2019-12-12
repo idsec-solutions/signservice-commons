@@ -16,6 +16,7 @@
 package se.idsec.signservice.security.sign.impl;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,12 @@ public class OpenSAMLSigningCredential implements SigningCredential {
   @Override
   public X509Certificate getSigningCertificate() {
     return this.credential.getEntityCertificate();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public PublicKey getPublicKey() {
+    return this.credential.getPublicKey();
   }
 
   /** {@inheritDoc} */

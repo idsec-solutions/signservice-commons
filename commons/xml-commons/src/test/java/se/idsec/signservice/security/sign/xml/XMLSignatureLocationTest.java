@@ -15,27 +15,18 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
-import java.io.InputStream;
-
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation.ChildPosition;
-import se.swedenconnect.opensaml.OpenSAMLInitializer;
-import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
-import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
-import se.swedenconnect.opensaml.xmlsec.config.SAML2IntSecurityConfiguration;
 
 /**
  * Tests for {@code XMLSignatureLocation}.
@@ -43,14 +34,7 @@ import se.swedenconnect.opensaml.xmlsec.config.SAML2IntSecurityConfiguration;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class XMLSignatureLocationTest {
-
-  @BeforeClass
-  public static void initializeOpenSAML() throws Exception {
-    OpenSAMLInitializer.getInstance().initialize(
-      new OpenSAMLSecurityDefaultsConfig(new SAML2IntSecurityConfiguration()),
-      new OpenSAMLSecurityExtensionConfig());
-  }
+public class XMLSignatureLocationTest extends XMLTestBase {
 
   @Test
   public void testDefault() throws Exception {
@@ -214,20 +198,6 @@ public class XMLSignatureLocationTest {
   private static String getLastElement(Document doc, String parent) {
     Node node = doc.getDocumentElement().getElementsByTagName(parent).item(0);
     return node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName();
-  }
-
-  private static Document getDocument(String path) throws Exception {
-    Resource resource = new ClassPathResource(path);
-    InputStream is = resource.getInputStream();
-    try {
-      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      dbf.setIgnoringComments(false);
-      DocumentBuilder builder = dbf.newDocumentBuilder();
-      return builder.parse(is);
-    }
-    finally {
-      is.close();
-    }
   }
 
   private static Element createSignatureElement() throws Exception {

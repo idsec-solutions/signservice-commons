@@ -1,4 +1,4 @@
 /**
- * Classes that provide operations on XML documents.
+ * Interfaces and classes for XML signing.
  */
-package se.idsec.signservice.commons.xml;
+package se.idsec.signservice.security.sign.xml;

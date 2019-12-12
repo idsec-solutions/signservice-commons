@@ -20,6 +20,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -126,6 +127,12 @@ public class KeyStoreSigningCredential implements SigningCredential {
     return (X509Certificate) this.keyEntry.getCertificate();
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public PublicKey getPublicKey() {
+    return this.getSigningCertificate().getPublicKey();
+  }
+  
   /** {@inheritDoc} */
   @Override
   public PrivateKey getPrivateKey() {

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TheRoot>
+<!-- simple.xml -->
+<TheRoot ID="12345678">
   <!-- A comment -->
   <ElementOne attributeOne="hello">
-    Element one
+    <Data>Element one</Data>
   </ElementOne>
   <ElementTwo>
-    Element two
+    <Data>Element two</Data>
   </ElementTwo>
   <!-- A comment -->
 </TheRoot>

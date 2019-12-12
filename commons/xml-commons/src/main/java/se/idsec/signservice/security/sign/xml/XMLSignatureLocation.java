@@ -137,4 +137,19 @@ public class XMLSignatureLocation {
     }
   }
 
+  /**
+   * Method that can be used to verify that the supplied XPath expression can be used for the supplied document.
+   * 
+   * @param document
+   *          the document to evaluate the XPath expression against
+   * @throws XPathExpressionException
+   *           if the XPath expression is incorrect (does not find a node)
+   */
+  public void test(@Nonnull final Document document) throws XPathExpressionException {
+    if (this.xPathExpression != null) {
+      Node parentNode = (Node) this.xPathExpression.evaluate(document, XPathConstants.NODE);
+      log.debug("XPath expression '{}' evaluated to node '{}'", this.xPath, parentNode.getLocalName());
+    }
+  }
+
 }

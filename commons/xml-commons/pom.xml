@@ -55,6 +55,17 @@
   </properties>
 
   <dependencies>
+  
+    <dependency>
+      <groupId>se.idsec.signservice.commons</groupId>
+      <artifactId>signservice-commons</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>se.swedenconnect.opensaml</groupId>
+      <artifactId>opensaml-security-ext</artifactId>
+    </dependency>    
 
     <dependency>
       <groupId>org.projectlombok</groupId>
