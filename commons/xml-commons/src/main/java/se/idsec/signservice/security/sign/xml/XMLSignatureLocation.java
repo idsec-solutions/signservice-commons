@@ -78,6 +78,10 @@ public class XMLSignatureLocation {
   /**
    * Constructor accepting an XPath expression for finding the parent element of where we should insert the signature
    * element. Note that the result of evaluating the XPath expression <b>MUST</b> be one single node.
+   * <p>
+   * <b>Note</b>: Beware of that the document supplied to {@link #insertSignature(Element, Document)} may be created
+   * using a namespace aware parser and you may want to use the {@code local-name()} XPath construct.
+   * </p>
    * 
    * @param parentXPath
    *          XPath expression for locating the parent node of the signature element

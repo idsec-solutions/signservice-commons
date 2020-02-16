@@ -79,6 +79,19 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- JAXB -->
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>2.3.2</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- Misc -->
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
@@ -95,9 +108,64 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!-- Test -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas</groupId>
+      <artifactId>xmlsec-jaxb-workaround</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas</groupId>
+      <artifactId>saml-jaxb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas</groupId>
+      <artifactId>oasis-dss-jaxb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas</groupId>
+      <artifactId>etsi-xades-jaxb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas</groupId>
+      <artifactId>etsi-xades-ext-jaxb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas.csig</groupId>
+      <artifactId>dss-ext11-jaxb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas.csig</groupId>
+      <artifactId>sap11-jaxb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas.cert</groupId>
+      <artifactId>authcontextinfo10-jaxb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>se.swedenconnect.schemas.cert</groupId>
+      <artifactId>ext-auth-info10-jaxb</artifactId>
       <scope>test</scope>
     </dependency>
 

@@ -16,8 +16,6 @@
 package se.idsec.signservice.security.sign.xml;
 
 import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Assert;
@@ -26,7 +24,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation.ChildPosition;
+import se.idsec.signservice.xml.DOMUtils;
 
 /**
  * Tests for {@code XMLSignatureLocation}.
@@ -172,17 +172,32 @@ public class XMLSignatureLocationTest extends XMLTestBase {
 
   @Test
   public void testXPathSignRequest() throws Exception {
-    XMLSignatureLocation location = new XMLSignatureLocation("/*/OptionalInputs", ChildPosition.LAST); 
+    XMLSignatureLocation location = new XMLSignatureLocation("/*/*[local-name()='OptionalInputs']", ChildPosition.LAST);
         
     Document signRequest = getDocument("xml/signRequest.xml");
     location.insertSignature(createSignatureElement(), signRequest);
     
-    // System.out.println(SerializeSupport.prettyPrintXML(signRequest));
+    System.out.println(SerializeSupport.prettyPrintXML(signRequest));
     
     Node node = signRequest.getDocumentElement().getElementsByTagName("dss:OptionalInputs").item(0);    
     Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName()); 
   }
   
+  @Test
+  public void testXPathSignRequestSameOwner() throws Exception {
+    XMLSignatureLocation location = new XMLSignatureLocation("/*/*[local-name()='OptionalInputs']", ChildPosition.LAST); 
+        
+    Document signRequest = getDocument("xml/signRequest2.xml");
+    Element signatureElement = (Element) signRequest.importNode(createSignatureElement(), true); 
+    
+    location.insertSignature(signatureElement, signRequest);
+    
+    System.out.println(SerializeSupport.prettyPrintXML(signRequest));
+    
+    Node node = signRequest.getDocumentElement().getElementsByTagName("OptionalInputs").item(0);    
+    Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName()); 
+  }
+    
   private static String getFirstElement(Document doc) {
     return doc.getDocumentElement().getChildNodes().item(0).getLocalName();
   }
@@ -201,9 +216,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
   }
 
   private static Element createSignatureElement() throws Exception {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder = dbf.newDocumentBuilder();
-    Document doc = builder.newDocument();
+    Document doc = DOMUtils.createDocumentBuilder().newDocument();
 
     Element element = doc.createElementNS(XMLSignature.XMLNS, "ds:Signature");
     doc.appendChild(element);

@@ -512,7 +512,7 @@ public class DefaultXMLSigner implements XMLSigner {
      * @return the builder
      */
     public DefaultXMLSignerBuilder setIncludeSignatureId(final boolean includeSignatureId) {
-      this.setIncludeSignatureId(includeSignatureId);
+      this.signer.setIncludeSignatureId(includeSignatureId);
       return this;
     }
 

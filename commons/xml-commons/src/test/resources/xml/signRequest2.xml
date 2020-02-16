@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<SignRequest xmlns="urn:oasis:names:tc:dss:1.0:core:schema" xmlns:ns2="http://www.w3.org/2000/09/xmldsig#" xmlns:ns3="urn:oasis:names:tc:SAML:1.0:assertion" Profile="http://id.elegnamnden.se/csig/1.1/dss-ext/profile" RequestID="1e9727ba-c66f-43d3-a6c7-1a629bc7ac57">
+  <OptionalInputs>
+    <SignRequestExtension xmlns="http://id.elegnamnden.se/csig/1.1/dss-ext/ns" xmlns:ns2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:ns5="http://www.w3.org/2004/08/xop/include" xmlns:ns6="urn:oasis:names:tc:dss:1.0:core:schema">
+      <RequestTime>2020-02-14T12:48:03.892+01:00</RequestTime>
+      <ns2:Conditions NotBefore="2020-02-14T11:47:03.891Z" NotOnOrAfter="2020-02-14T11:53:03.891Z">
+        <ns2:AudienceRestriction>
+          <ns2:Audience>https://localhost:9445/testmyeid/sign/response</ns2:Audience>
+        </ns2:AudienceRestriction>
+      </ns2:Conditions>
+      <Signer>
+        <ns2:Attribute Name="urn:oid:1.2.752.29.4.13" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <ns2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">192705178354</ns2:AttributeValue>
+        </ns2:Attribute>
+        <ns2:Attribute Name="urn:oid:2.5.4.42" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <ns2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">Per-Uno</ns2:AttributeValue>
+        </ns2:Attribute>
+        <ns2:Attribute Name="urn:oid:2.5.4.4" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <ns2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">Karlsson</ns2:AttributeValue>
+        </ns2:Attribute>
+        <ns2:Attribute Name="urn:oid:2.16.840.1.113730.3.1.241" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <ns2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">Per-Uno Karlsson</ns2:AttributeValue>
+        </ns2:Attribute>
+      </Signer>
+      <IdentityProvider Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://dev.test.swedenconnect.se/idp</IdentityProvider>
+      <SignRequester Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://sandbox.swedenconnect.se/testmyeid</SignRequester>
+      <SignService Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://eid2csig.konki.se/sign</SignService>
+      <RequestedSignatureAlgorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</RequestedSignatureAlgorithm>
+      <CertRequestProperties CertType="PKC">
+        <ns2:AuthnContextClassRef>http://id.elegnamnden.se/loa/1.0/loa3</ns2:AuthnContextClassRef>
+        <RequestedCertAttributes>
+          <RequestedCertAttribute CertAttributeRef="2.5.4.5" CertNameType="rdn" FriendlyName="serialNumber" Required="true">
+            <SamlAttributeName Order="0">urn:oid:1.2.752.29.4.13</SamlAttributeName>
+            <SamlAttributeName Order="1">urn:oid:1.2.752.201.3.4</SamlAttributeName>
+            <SamlAttributeName Order="2">urn:oid:1.2.752.201.3.7</SamlAttributeName>
+          </RequestedCertAttribute>
+          <RequestedCertAttribute CertAttributeRef="2.5.4.42" CertNameType="rdn" FriendlyName="GN" Required="true">
+            <SamlAttributeName>urn:oid:2.5.4.42</SamlAttributeName>
+          </RequestedCertAttribute>
+          <RequestedCertAttribute CertAttributeRef="2.5.4.4" CertNameType="rdn" FriendlyName="SN" Required="true">
+            <SamlAttributeName>urn:oid:2.5.4.4</SamlAttributeName>
+          </RequestedCertAttribute>
+          <RequestedCertAttribute CertAttributeRef="2.5.4.3" CertNameType="rdn" FriendlyName="CN" Required="false">
+            <SamlAttributeName Order="0">urn:oid:2.16.840.1.113730.3.1.241</SamlAttributeName>
+            <SamlAttributeName Order="1">urn:oid:2.5.4.3</SamlAttributeName>
+          </RequestedCertAttribute>
+          <RequestedCertAttribute CertAttributeRef="2.5.4.6" CertNameType="rdn" DefaultValue="SE" FriendlyName="C" Required="false">
+            <SamlAttributeName>urn:oid:2.5.4.6</SamlAttributeName>
+          </RequestedCertAttribute>
+        </RequestedCertAttributes>
+      </CertRequestProperties>
+      <SignMessage DisplayEntity="http://dev.test.swedenconnect.se/idp" MimeType="text" MustShow="true">
+        <EncryptedMessage>
+          <ns3:EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Element">
+            <ns3:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
+            <ns4:KeyInfo>
+              <ns3:EncryptedKey Recipient="http://dev.test.swedenconnect.se/idp">
+                <ns3:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p">
+                  <ns4:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                </ns3:EncryptionMethod>
+                <ns4:KeyInfo>
+                  <ns4:X509Data>
+                    <ns4:X509Certificate>MIIE+DCCAuCgAwIBAgIEXQvp7jANBgkqhkiG9w0BAQsFADA+MQswCQYDVQQGEwJTRTEXMBUGA1UECgwOU3dlZGVuIENvbm5lY3QxFjAUBgNVBAMMDVJlZmVyZW5jZSBJZFAwHhcNMTkwNjIwMjAxNzUwWhcNMjkwNjIwMjAxNzUwWjA+MQswCQYDVQQGEwJTRTEXMBUGA1UECgwOU3dlZGVuIENvbm5lY3QxFjAUBgNVBAMMDVJlZmVyZW5jZSBJZFAwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC0OG3mhU+N4hDfgADA+O80xeTeeO1HB0E4j6cr7zHZZTPtya0SVZgR6147acJCKwjUr11FENF+8fpT3vXtjVQqXtjBD0eSUK1Ruvgb5KLisGL6qXeOEFNs1BHCVctnueLF+RFyugjxC+TwJ6fOaV3mQP9d1SMyjbYcvAoIvHWrcmOsMAHFIaucZROaCSPkHvQvcjuCXyZL9N1ryxfbFym4DghCRzWjfpfAAxmlrkhsS22uEPuF45yGCKUwd7Y5oBpMt6u4iJjZRBzNQTJgER8Pq+poEVr/rzkR2UN+4UAXwVn5D6gX6OlDlhoczMd1r6/OqHfjixD3zDXkcUO913iUsYdbjQ70doIpBZF2b9XJk26Qvf+WmZ9ZpQQF9Kqx4cU5sZq/UfZOzBEIPX5Zgp0AviTNTfspE75rpHf/bVrztIsQuGAwXn79c24U40Jb1/ifObsfi40rNUUAbZ/xg5Wi97UCVI+ow1naXrxVVWch/le8GWxOw23mGMaUSOSCc4/41OvofmA1HQ6aKn1GDJqifSAgnZUWpbB8z5wJqwu71T79P0cdBTw5QvaxMltBe/gluXM8Z+Tq1jIo52muhwC15Tj3BbC9p3Mz3nisnYpgUooF8Em+O+6Q0LWyJpQBZvtlBMIHhaz6seNhfG8mbo/DxuEAxkZ9kDuPxCydnzgHWwIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQALqrwsqIZ8cpgJjJVzy51nLQJl4rTFycGv04hbW7jTRDleyTl3+RtGWApgqbJNmh13lffaPkroZe0CNei3zpsO/8ONatKoZ1BxuvYbOGoofOTDkjl1SjpQ6T0aWyryjc8NQSWsfro8SN6YvVa3ESsVLyEb+q0ir0SMsXWdpc1HoYABqLUjE2lh6V0SJ9FcpayJWKUjvOpr838l5hX48HOOl4xUU268L+ChEn+IZWuiqs/cThtzTW3uEL8IrM3d7hvuyH2bQy5rxHwHqwsH8byT7Q4UBr14cytOTKnpq6UKhIurPMppLamjUbudAAAObdfFJxKQ4RQylgCKL8G2wIH9WEJBjCEvZurn6Foy8DCeQZdj+VtCRyiv/dj2Ou6eEGDTwFJs2Vubf+kf8fcE6fDW5KZs6+7+d7w1zcZ7WFsByX5gsm83Zwnf7HgrMNFrs8lY40S0bqCENWKl1pdYw3UK31atwtm3KTgh4dFVsCzVgl98OWOsA16bCfz0PITbsZ5gVvOhh/coz3n3RKCQf0hTkR1SYKvVKvPT+MH+u6qoOnc1T4JUm4PRUHn8aHMvUUBJiZ7rSsid5q980G5HsK5wD0nnRihvHr7hG3sLovKVBH6o/KI4p9uBWZAVZye85rhJieWvKOiFPrQgpPE3VCI8UWjo0oMB1WeS+XkcUoSpWg==</ns4:X509Certificate>
+                  </ns4:X509Data>
+                </ns4:KeyInfo>
+                <ns3:CipherData>
+                  <ns3:CipherValue>l8nFykWn/KEVCEeqMsvS6Cxa/snIrcgpPA0mvahPV356el9OD4H2EzSmfwYbPyce32Z+rb6kMrsF&#13;
+x4pNAURho6Sp/IV4dGLh8kZOQY/ZWsZF5WarOPq4l038cqwBPDn+lPttrLHYz3ilbrIe9ZbDllfR&#13;
+9tzV9WjHjtBj4vGVTsYw2zjLMBQXHHQTfn8D7VUWZIWH1zHccRhSyQkUwPvDAXOC9XKAeSyHws40&#13;
+URNvu8HDp5sAWcDKctFZ9fE7/bxQMracybGgsC0JpH6aSFKCLumxqgM2OS4sNz7tcUIsq5Rs4NEW&#13;
+oTh58KHF4Dzekat1jZq8cswj+Hx4nmmmNQPVvy3E4PhuCDesAJnOdiBQsAmb7NvvkAPGNpJoJwPR&#13;
+UlT8O/76TPQkk9TTGE9134uz8y5bFqpy3jUzGYhSZe/JK2GSwebjhn7cU9SNQekVfn7+2E7/KFoV&#13;
+E17LX8SVO4n3REYxz8xOZX7K1Y/bFq1jKeXkayqJO8LOyHK3BaV7+Bl4jvopSjz05w+29BdvyNWR&#13;
+P77BrVMzX6Yt+wMZ8aHhk67yYW9V4MmJgwLkKDexNnZdd+ioTTahJAD95gnnood21nG8bKd7Girb&#13;
+07HFxbEoyx6KLxu5Y0sdBeKiK5t28Dm22OHaT/Es2+tiLi30+zI6ZVmUJyDy9vXmMgtDpqJgIIo=</ns3:CipherValue>
+                </ns3:CipherData>
+              </ns3:EncryptedKey>
+            </ns4:KeyInfo>
+            <ns3:CipherData>
+              <ns3:CipherValue>QpNjBAyfUYJQ55IOteODLPjw6C05+UjEYRJ3Qs5Xt7TbNjbrk3iX4vY00VMn5fWYFz6wk3xJ0rus&#13;
+hXu7cWqgiSlauy4ncOaI90+lAcQZk2VwfI9AS3f39TORBi0Y5YlTUZDKf2N1wRz9kzrfUV0o8KnF&#13;
+Zo4aLnu8NdnUHHdATYXK2t868J0RagQt5b7YKR1RRznwILLm+oXwDs5eBjRiPX5iQgz/3mREuNfl</ns3:CipherValue>
+            </ns3:CipherData>
+          </ns3:EncryptedData>
+        </EncryptedMessage>
+      </SignMessage>
+    </SignRequestExtension>
+  </OptionalInputs>
+  <InputDocuments>
+    <Other>
+      <SignTasks xmlns="http://id.elegnamnden.se/csig/1.1/dss-ext/ns" xmlns:ns2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:ns5="http://www.w3.org/2004/08/xop/include" xmlns:ns6="urn:oasis:names:tc:dss:1.0:core:schema">
+        <SignTaskData AdESType="None" SigType="XML" SignTaskId="sample-1">
+          <ToBeSignedBytes>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48ZHM6U2lnbmVkSW5mbyB4bWxuczpkcz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyI+CjxkczpDYW5vbmljYWxpemF0aW9uTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8xMC94bWwtZXhjLWMxNG4jIi8+CjxkczpTaWduYXR1cmVNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2Ii8+CjxkczpSZWZlcmVuY2UgVVJJPSIiPgo8ZHM6VHJhbnNmb3Jtcz4KPGRzOlRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNlbnZlbG9wZWQtc2lnbmF0dXJlIi8+CjxkczpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzEwL3htbC1leGMtYzE0biMiLz4KPGRzOlRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnL1RSLzE5OTkvUkVDLXhwYXRoLTE5OTkxMTE2Ij4KPGRzOlhQYXRoPm5vdChhbmNlc3Rvci1vci1zZWxmOjpkczpTaWduYXR1cmUpPC9kczpYUGF0aD4KPC9kczpUcmFuc2Zvcm0+CjwvZHM6VHJhbnNmb3Jtcz4KPGRzOkRpZ2VzdE1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMDQveG1sZW5jI3NoYTI1NiIvPgo8ZHM6RGlnZXN0VmFsdWU+QVBFTjlPek1TUEpibHR4TCtCUUY0M3R1aHB5K2UrbnJySGVpVEg5V1R5Zz08L2RzOkRpZ2VzdFZhbHVlPgo8L2RzOlJlZmVyZW5jZT4KPC9kczpTaWduZWRJbmZvPg==</ToBeSignedBytes>
+        </SignTaskData>
+      </SignTasks>
+    </Other>
+  </InputDocuments>
+</SignRequest>
