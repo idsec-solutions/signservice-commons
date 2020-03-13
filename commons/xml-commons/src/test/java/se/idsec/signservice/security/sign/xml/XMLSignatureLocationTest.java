@@ -44,19 +44,23 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     Document empty = getDocument("xml/empty.xml");
     location.insertSignature(createSignatureElement(), empty);
     Assert.assertEquals("Signature", getLastElement(empty));
+    Assert.assertTrue(location.getSignature(empty) != null);
 
     Document simple = getDocument("xml/simple.xml");
     location.insertSignature(createSignatureElement(), simple);
     Assert.assertEquals("Signature", getLastElement(simple));
+    Assert.assertTrue(location.getSignature(simple) != null);
 
     // Make sure it works even if signature has the same document owner
     Document simple2 = getDocument("xml/simple.xml");
     location.insertSignature((Element) simple2.importNode(createSignatureElement(), true), simple2);
     Assert.assertEquals("Signature", getLastElement(simple2));
+    Assert.assertTrue(location.getSignature(simple2) != null);
 
     Document signRequest = getDocument("xml/signRequest.xml");
     location.insertSignature(createSignatureElement(), signRequest);
     Assert.assertEquals("Signature", getLastElement(signRequest));
+    Assert.assertTrue(location.getSignature(signRequest) != null);
   }
 
   @Test
@@ -66,14 +70,17 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     Document empty = getDocument("xml/empty.xml");
     location.insertSignature(createSignatureElement(), empty);
     Assert.assertEquals("Signature", getFirstElement(empty));
+    Assert.assertTrue(location.getSignature(empty) != null);
 
     Document simple = getDocument("xml/simple.xml");
     location.insertSignature(createSignatureElement(), simple);
     Assert.assertEquals("Signature", getFirstElement(simple));
+    Assert.assertTrue(location.getSignature(simple) != null);
 
     Document signRequest = getDocument("xml/signRequest.xml");
     location.insertSignature(createSignatureElement(), signRequest);
     Assert.assertEquals("Signature", getFirstElement(signRequest));
+    Assert.assertTrue(location.getSignature(signRequest) != null);
   }
 
   @Test
@@ -88,6 +95,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       Assert.assertEquals(
         String.format("Document: empty.xml, xPath: %s", xpath),
         "Signature", getLastElement(doc));
+      Assert.assertTrue(location.getSignature(doc) != null);
     }
     for (String xpath : xpaths) {
       XMLSignatureLocation location = new XMLSignatureLocation(xpath, ChildPosition.FIRST);
@@ -97,6 +105,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       Assert.assertEquals(
         String.format("Document: empty.xml, xPath: %s", xpath),
         "Signature", getFirstElement(doc));
+      Assert.assertTrue(location.getSignature(doc) != null);
     }
 
     XMLSignatureLocation location = new XMLSignatureLocation("/NotElement", ChildPosition.LAST);
@@ -117,6 +126,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       Assert.assertEquals(
         String.format("Document: simple.xml, xPath: %s", xpath),
         "Signature", getLastElement(doc, "ElementOne"));
+      Assert.assertTrue(location.getSignature(doc) != null);
     }
     for (String xpath : xpaths) {
       location = new XMLSignatureLocation(xpath, ChildPosition.FIRST);
@@ -126,6 +136,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       Assert.assertEquals(
         String.format("Document: simple.xml, xPath: %s", xpath),
         "Signature", getFirstElement(doc, "ElementOne"));
+      Assert.assertTrue(location.getSignature(doc) != null);
     }
   }
 
@@ -141,6 +152,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       Assert.assertEquals(
         String.format("Document: multipleElements.xml, xPath: %s", xpath),
         "Signature", getLastElement(doc, "Element"));
+      Assert.assertTrue(location.getSignature(doc) != null);
     }
     // Select the second Element.
     //
@@ -155,6 +167,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       "Signature",
       doc.getDocumentElement().getElementsByTagName("Element").item(1).getChildNodes()
         .item(doc.getDocumentElement().getElementsByTagName("Element").item(1).getChildNodes().getLength() - 1).getLocalName());
+    Assert.assertTrue(location.getSignature(doc) != null);
 
     // Select fails
     //
@@ -177,10 +190,9 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     Document signRequest = getDocument("xml/signRequest.xml");
     location.insertSignature(createSignatureElement(), signRequest);
     
-    System.out.println(SerializeSupport.prettyPrintXML(signRequest));
-    
     Node node = signRequest.getDocumentElement().getElementsByTagName("dss:OptionalInputs").item(0);    
-    Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName()); 
+    Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName());
+    Assert.assertTrue(location.getSignature(signRequest) != null);
   }
   
   @Test

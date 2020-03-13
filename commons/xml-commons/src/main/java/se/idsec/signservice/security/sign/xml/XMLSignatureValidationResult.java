@@ -15,15 +15,23 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import se.idsec.signservice.security.sign.Signer;
+import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**
- * Interface for XML signatures.
+ * Signature validation result for validating XML signatures.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface XMLSigner extends Signer<Document, XMLSignerResult> {
+public interface XMLSignatureValidationResult extends SignatureValidationResult {
+
+  /**
+   * Gets the signature element.
+   * 
+   * @return the signature element
+   */
+  Element getSignatureElement();
+
 }

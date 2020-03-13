@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2020 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.xmlsec.SignatureSigningConfiguration;
 import org.opensaml.xmlsec.algorithm.AlgorithmDescriptor;
@@ -39,7 +38,6 @@ import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import lombok.extern.slf4j.Slf4j;
 import net.shibboleth.utilities.java.support.logic.Constraint;
@@ -48,6 +46,7 @@ import se.idsec.signservice.security.sign.SigningCredential;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 import se.idsec.signservice.security.sign.xml.XMLSigner;
 import se.idsec.signservice.security.sign.xml.XMLSignerResult;
+import se.idsec.signservice.xml.DOMUtils;
 
 /**
  * Default implementation of the {@link XMLSigner} interface.
@@ -162,7 +161,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
       // Get the ID reference.
       //
-      String signatureUriReference = this.processSignatureUriReference(document);
+      final String signatureUriReference = DOMUtils.registerIdAttributes(document); 
 
       // Add the document to sign to the signature
       //
@@ -219,33 +218,6 @@ public class DefaultXMLSigner implements XMLSigner {
   @Override
   public SigningCredential getSigningCredential() {
     return this.signingCredential;
-  }
-
-  /**
-   * Looks for an ID reference within the document, and if found, registers it using the
-   * {@link Element#setIdAttribute(String, boolean)} method.
-   * 
-   * @param document
-   *          the document
-   * @return the signature URI reference ("" if no ID is found)
-   */
-  private String processSignatureUriReference(final Document document) {
-    String signatureUriReference = null;
-    Element rootElement = document.getDocumentElement();
-
-    signatureUriReference = XMLUtils.getAttributeValue(rootElement, "ID");
-    if (StringUtils.hasText(signatureUriReference)) {
-      rootElement.setIdAttribute("ID", true);
-    }
-    else {
-      signatureUriReference = XMLUtils.getAttributeValue(rootElement, "Id");
-      if (StringUtils.hasText(signatureUriReference)) {
-        rootElement.setIdAttribute("Id", true);
-      }
-    }
-    return !StringUtils.hasText(signatureUriReference)
-        ? ""
-        : (signatureUriReference.trim().startsWith("#") ? signatureUriReference.trim() : "#" + signatureUriReference.trim());
   }
 
   /**

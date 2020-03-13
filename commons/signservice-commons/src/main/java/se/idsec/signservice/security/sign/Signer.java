@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2020 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import javax.annotation.Nullable;
  * 
  * @param <T>
  *          the type for the document that is signed
+ * @param <R>
+ *          the type of signing result
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)

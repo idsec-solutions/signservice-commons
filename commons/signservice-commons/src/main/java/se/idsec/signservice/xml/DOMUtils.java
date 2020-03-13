@@ -32,7 +32,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.xml.security.utils.XMLUtils;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -175,6 +178,31 @@ public class DOMUtils {
    */
   public static Document base64ToDocument(final String base64) {
     return bytesToDocument(Base64.getDecoder().decode(base64));
+  }
+  
+  /**
+   * Looks for an ID reference within the document, and if found, registers it using the
+   * {@link Element#setIdAttribute(String, boolean)} method.
+   * 
+   * @param document
+   *          the document
+   * @return the signature URI reference ("" if no ID is found)
+   */
+  public static String registerIdAttributes(final Document document) {
+    final Element rootElement = document.getDocumentElement();
+    String signatureUriReference = XMLUtils.getAttributeValue(rootElement, "ID");
+    if (StringUtils.hasText(signatureUriReference)) {
+      rootElement.setIdAttribute("ID", true);
+    }
+    else {
+      signatureUriReference = XMLUtils.getAttributeValue(rootElement, "Id");
+      if (StringUtils.hasText(signatureUriReference)) {
+        rootElement.setIdAttribute("Id", true);
+      }
+    }
+    return !StringUtils.hasText(signatureUriReference)
+        ? ""
+        : (signatureUriReference.trim().startsWith("#") ? signatureUriReference.trim() : "#" + signatureUriReference.trim());
   }
 
 }

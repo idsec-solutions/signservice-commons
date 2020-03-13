@@ -16,6 +16,7 @@
 package se.idsec.signservice.security.sign.xml;
 
 import java.io.InputStream;
+import java.security.cert.X509Certificate;
 
 import org.junit.BeforeClass;
 import org.springframework.core.io.ClassPathResource;
@@ -23,6 +24,7 @@ import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 
 import se.idsec.signservice.xml.DOMUtils;
+import se.litsec.opensaml.utils.X509CertificateUtils;
 import se.swedenconnect.opensaml.OpenSAMLInitializer;
 import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
 import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
@@ -52,6 +54,17 @@ public abstract class XMLTestBase {
     finally {
       is.close();
     }
+  }
+  
+  protected X509Certificate getCertificate(String path) throws Exception {
+    Resource resource = new ClassPathResource(path);
+    InputStream is = resource.getInputStream();
+    try {
+      return X509CertificateUtils.decodeCertificate(is);
+    }
+    finally {
+      is.close();
+    }    
   }
 
 }

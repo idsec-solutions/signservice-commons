@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2020 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -25,11 +28,12 @@ import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Tells where in an XML document the signature should be inserted.
+ * Tells where in an XML document the signature should be inserted or found.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -38,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class XMLSignatureLocation {
 
   /**
-   * Enum for indicating the insertion point within a selected parent node.
+   * Enum for indicating the point within a selected parent node.
    */
   public enum ChildPosition {
     FIRST, LAST
@@ -76,17 +80,19 @@ public class XMLSignatureLocation {
   }
 
   /**
-   * Constructor accepting an XPath expression for finding the parent element of where we should insert the signature
-   * element. Note that the result of evaluating the XPath expression <b>MUST</b> be one single node.
+   * Constructor accepting an XPath expression for finding the parent element of where we should insert/find the
+   * signature element. Note that the result of evaluating the XPath expression <b>MUST</b> be one single
+   * node.
    * <p>
-   * <b>Note</b>: Beware of that the document supplied to {@link #insertSignature(Element, Document)} may be created
-   * using a namespace aware parser and you may want to use the {@code local-name()} XPath construct.
+   * <b>Note</b>: Beware of that the document supplied to {@link #insertSignature(Element, Document)} or
+   * {@link #getSignature(Document)} may be created using a namespace aware parser and you may want to use the
+   * {@code local-name()} XPath construct.
    * </p>
    * 
    * @param parentXPath
    *          XPath expression for locating the parent node of the signature element
    * @param childPosition
-   *          whether to insert the signature as the first or last child of the given parent node
+   *          whether to insert/find the signature as the first or last child of the given parent node
    * @throws XPathExpressionException
    *           for illegal XPath expressions
    */
@@ -142,6 +148,71 @@ public class XMLSignatureLocation {
   }
 
   /**
+   * Finds a signature element based on this object's settings.
+   * 
+   * @param document
+   *          the document to locate the signature element
+   * @return the signature element or null if no Signature element is found
+   * @throws XPathExpressionException
+   *           for XPath selection errors
+   */
+  public Element getSignature(@Nonnull final Document document) throws XPathExpressionException {
+    List<Node> nodes = new ArrayList<>();
+    if (this.xPathExpression != null) {    
+      NodeList _nodes = (NodeList) this.xPathExpression.evaluate(document, XPathConstants.NODESET);
+      if (_nodes.getLength() == 0) {
+        return null;
+      }
+      for (int i = 0; i < _nodes.getLength(); i++) {
+        nodes.add(_nodes.item(i));
+      }
+    }
+    else {
+      nodes.add(document.getDocumentElement());
+    }
+    
+    // If we get more than one hit for the parent node, we fail if more than one holds a signature element.
+    //
+    Element signatureElement = null;
+    for (Node parentNode : nodes) {
+      if (parentNode.getNodeType() == Node.DOCUMENT_NODE) {
+        parentNode = ((Document) parentNode).getDocumentElement();
+      }
+      final NodeList childs = parentNode.getChildNodes();
+      if (childs.getLength() == 0) {
+        continue;
+      }
+      // Skip comments
+      int pos = ChildPosition.LAST == this.childPosition ? childs.getLength() - 1 : 0;
+      Node signatureNode = null;
+      while (signatureNode == null && pos >= 0 && pos < childs.getLength()) {
+        if (childs.item(pos).getNodeType() == Node.COMMENT_NODE) {
+          if (ChildPosition.LAST == this.childPosition) {
+            pos--;
+          }
+          else {
+            pos++;
+          }
+        }
+        else {
+          signatureNode = childs.item(pos);
+        }
+      }
+      if (signatureNode != null && signatureNode.getNodeType() == Node.ELEMENT_NODE) {
+        if (javax.xml.crypto.dsig.XMLSignature.XMLNS.equals(signatureNode.getNamespaceURI())
+            && "Signature".equals(signatureNode.getLocalName())) {
+          if (signatureElement != null) {
+            throw new XPathExpressionException("XPath expression found more than one Signature element");
+          }
+          signatureElement = (Element) signatureNode;
+        }
+      }
+    }
+    
+    return signatureElement;
+  }
+
+  /**
    * Method that can be used to verify that the supplied XPath expression can be used for the supplied document.
    * 
    * @param document
@@ -149,7 +220,7 @@ public class XMLSignatureLocation {
    * @throws XPathExpressionException
    *           if the XPath expression is incorrect (does not find a node)
    */
-  public void test(@Nonnull final Document document) throws XPathExpressionException {
+  public void testInsert(@Nonnull final Document document) throws XPathExpressionException {
     if (this.xPathExpression != null) {
       Node parentNode = (Node) this.xPathExpression.evaluate(document, XPathConstants.NODE);
       log.debug("XPath expression '{}' evaluated to node '{}'", this.xPath, parentNode.getLocalName());
