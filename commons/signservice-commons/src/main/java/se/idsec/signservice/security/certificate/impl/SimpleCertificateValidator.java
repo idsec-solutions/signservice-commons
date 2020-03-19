@@ -98,8 +98,12 @@ public class SimpleCertificateValidator implements CertificateValidator {
     final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
     PKIXCertPathValidatorResult result = (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
 
-    log.debug("Validation result: {}", result);
-    
+    log.debug("Successful validation of [{}]. Trust anchor: {}", CertificateUtils.toLogString(subjectCertificate),
+      result.getTrustAnchor() != null
+          ? (result.getTrustAnchor().getTrustedCert() != null ? CertificateUtils.toLogString(result.getTrustAnchor().getTrustedCert())
+              : "not-set")
+          : "not-set");
+
     return result;
   }
 
@@ -142,12 +146,13 @@ public class SimpleCertificateValidator implements CertificateValidator {
         log.error(msg);
         throw new CertPathBuilderException(msg);
       }
-    }    
+    }
   }
 
   /**
    * Gets the certificate stores that should be used during path building and validation. The default implementation
-   * builds one store holding the certificates supplied in {@code subjectCertificate} and {@code additionalCertificates}.
+   * builds one store holding the certificates supplied in {@code subjectCertificate} and
+   * {@code additionalCertificates}.
    * 
    * @param subjectCertificate
    *          the certificate to validate

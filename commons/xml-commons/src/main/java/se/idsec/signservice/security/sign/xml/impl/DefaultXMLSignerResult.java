@@ -15,11 +15,13 @@
  */
 package se.idsec.signservice.security.sign.xml.impl;
 
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import se.idsec.signservice.security.sign.xml.XMLSignerResult;
+import se.idsec.signservice.xml.InternalXMLException;
 
 /**
  * Default implementation of the {@link XMLSignerResult}.
@@ -68,6 +70,17 @@ public class DefaultXMLSignerResult implements XMLSignerResult {
   @Override
   public Element getSignedInfo() {
     return this.signature.getSignedInfo().getElement();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public byte[] getCanonicalizedSignedInfo() {
+    try {
+      return this.signature.getSignedInfo().getCanonicalizedOctetStream();
+    }
+    catch (XMLSecurityException e) {
+      throw new InternalXMLException("Failed to canonicalize SignedInfo", e);
+    }
   }
 
 }

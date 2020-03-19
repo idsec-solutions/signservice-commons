@@ -216,7 +216,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
     DefaultXMLSignatureValidationResult result = new DefaultXMLSignatureValidationResult();
     result.setSignatureElement(signature);
-
+        
     try {
       // Parse the signature element.
       XMLSignature xmlSignature = new XMLSignature(signature, "");
@@ -272,7 +272,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
         for (X509Certificate rc : this.requiredSignerCertificates) {
           try {
             if (xmlSignature.checkSignatureValue(rc)) {
-              log.debug("Certificate [{}] verified signature value successfully", CertificateUtils.toLogString(rc));
+              log.debug("Certificate [{}] verified signature successfully", CertificateUtils.toLogString(rc));
               result.setSignerCertificate(rc);
               result.setStatus(Status.SUCCESS);
               return result;
@@ -293,7 +293,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
         //
         try {
           if (!xmlSignature.checkSignatureValue(validationKey)) {
-            final String msg = "Signature is invalid - signature value did not validate correctly";
+            final String msg = "Signature is invalid - signature value did not validate correctly or reference digest comparison failed";
             log.info("{}", msg);
             result.setError(Status.ERROR_INVALID_SIGNATURE, msg);
             return result;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2020 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public interface XMLSignerResult extends SignerResult<Document> {
    * 
    * @return the Signature element
    */
-  public Element getSignatureElement();
+  Element getSignatureElement();
 
   /**
    * Gets the {@code ds:SignedInfo} element from the {@code ds:Signature} element of the signed document
@@ -41,6 +41,14 @@ public interface XMLSignerResult extends SignerResult<Document> {
    * 
    * @return the SignedInfo element
    */
-  public Element getSignedInfo();
+  Element getSignedInfo();
+
+  /**
+   * Gets the canonicalized bytes of the {@code ds:SignedInfo} element from the {@code ds:Signature} element of the
+   * signed document ({@link #getSignedDocument()}).
+   * 
+   * @return a byte array
+   */
+  byte[] getCanonicalizedSignedInfo();
 
 }

@@ -75,12 +75,14 @@ public class DOMUtils {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       prettyPrintTransformer = transformerFactory.newTransformer();
       prettyPrintTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+      prettyPrintTransformer.setOutputProperty(OutputKeys.STANDALONE, "yes");      
       prettyPrintTransformer.setOutputProperty(OutputKeys.METHOD, "xml");
       prettyPrintTransformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
       prettyPrintTransformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
       prettyPrintTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
       transformer = transformerFactory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
     }
     catch (TransformerConfigurationException e) {
       throw new InternalXMLException(e);

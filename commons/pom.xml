@@ -78,8 +78,8 @@
 
   <modules>
     <module>signservice-commons</module>
-    <module>xades-support</module>
     <module>xml-commons</module>
+    <module>pdf-commons</module>
   </modules>
 
   <dependencyManagement>

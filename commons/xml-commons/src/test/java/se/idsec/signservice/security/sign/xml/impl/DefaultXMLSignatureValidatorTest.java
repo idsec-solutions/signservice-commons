@@ -44,6 +44,18 @@ public class DefaultXMLSignatureValidatorTest extends XMLTestBase {
     Assert.assertEquals(1, result.size());
     Assert.assertTrue(result.get(0).isSuccess());
   }
+  
+  @Test
+  public void testValidateBadDigest() throws Exception {
+    final Document document = getDocument("signResponse-badsign.xml");
+    
+    DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(Arrays.asList(getCertificate("konki-sign.crt")));
+    validator.setXadesProcessing(false);
+    
+    List<SignatureValidationResult> result = validator.validate(document);
+    Assert.assertEquals(1, result.size());
+    Assert.assertFalse(result.get(0).isSuccess());
+  }
 
 
 }
