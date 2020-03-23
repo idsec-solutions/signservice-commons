@@ -16,6 +16,7 @@
 package se.idsec.signservice.xml;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -44,7 +45,13 @@ public class JAXBUnmarshaller {
     JAXBContext context = JAXBContextUtils.createJAXBContext(clazz);
     Unmarshaller unmarshaller = context.createUnmarshaller();
     Object jaxbObject = unmarshaller.unmarshal(node);
-    return clazz.cast(jaxbObject);
+    if (JAXBElement.class.isInstance(jaxbObject)) {
+      JAXBElement<?> jaxbElm = JAXBElement.class.cast(jaxbObject);
+      return clazz.cast(jaxbElm.getValue());
+    }
+    else {
+      return clazz.cast(jaxbObject);
+    }
   }
 
 }

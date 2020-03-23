@@ -16,6 +16,7 @@
 package se.idsec.signservice.xml;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -30,12 +31,16 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public class JAXBMarshaller {
-  
+
   /** Namespace prefix mapper. */
   private static NamespacePrefixMapper namespacePrefixMapper = new CustomNamespaceMapper();
 
   /**
    * Marshalls the supplied JAXB object into a DOM document.
+   * <p>
+   * Note: elements not having the {@code XmlRootElement} annotation will not be possible to marshall using this method.
+   * Instead use the {@link #marshallNonRootElement(JAXBElement)}.
+   * </p>
    * 
    * @param jaxbObject
    *          the object to marshall
@@ -49,6 +54,25 @@ public class JAXBMarshaller {
     Marshaller marshaller = context.createMarshaller();
     marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", namespacePrefixMapper);
     marshaller.marshal(jaxbObject, document);
+    return document;
+  }
+
+  /**
+   * Marshalls a JAXB object that is not an XML root element (i.e. it is not annotated with {@code XmlRootElement}). In
+   * order to get a {@code JAXBElement} for the object use the {@code ObjectFactory}'s create method.
+   * 
+   * @param jaxbElement
+   *          the element to marshall
+   * @return the DOM document
+   * @throws JAXBException
+   *           for marshalling errors
+   */
+  public static Document marshallNonRootElement(final JAXBElement<?> jaxbElement) throws JAXBException {
+    Document document = DOMUtils.createDocumentBuilder().newDocument();
+    JAXBContext context = JAXBContextUtils.createJAXBContext(jaxbElement.getDeclaredType());
+    Marshaller marshaller = context.createMarshaller();
+    marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", namespacePrefixMapper);
+    marshaller.marshal(jaxbElement, document);
     return document;
   }
 
