@@ -18,6 +18,7 @@ package se.idsec.signservice.xml;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Base64;
 
@@ -75,7 +76,7 @@ public class DOMUtils {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       prettyPrintTransformer = transformerFactory.newTransformer();
       prettyPrintTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-      prettyPrintTransformer.setOutputProperty(OutputKeys.STANDALONE, "yes");      
+      prettyPrintTransformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
       prettyPrintTransformer.setOutputProperty(OutputKeys.METHOD, "xml");
       prettyPrintTransformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
       prettyPrintTransformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -156,6 +157,22 @@ public class DOMUtils {
   }
 
   /**
+   * Parses an input stream into a DOM document.
+   * 
+   * @param stream
+   *          the stream
+   * @return a DOM document
+   */
+  public static Document inputStreamToDocument(final InputStream stream) {
+    try {
+      return createDocumentBuilder().parse(stream);
+    }
+    catch (SAXException | IOException e) {
+      throw new InternalXMLException("Failed to decode bytes into DOM document", e);
+    }
+  }
+
+  /**
    * Parses a byte array into a DOM document.
    * 
    * @param bytes
@@ -163,12 +180,7 @@ public class DOMUtils {
    * @return a DOM document
    */
   public static Document bytesToDocument(final byte[] bytes) {
-    try {
-      return createDocumentBuilder().parse(new ByteArrayInputStream(bytes));
-    }
-    catch (SAXException | IOException e) {
-      throw new InternalXMLException("Failed to decode bytes into DOM document", e);
-    }
+    return inputStreamToDocument(new ByteArrayInputStream(bytes));
   }
 
   /**
@@ -181,7 +193,7 @@ public class DOMUtils {
   public static Document base64ToDocument(final String base64) {
     return bytesToDocument(Base64.getDecoder().decode(base64));
   }
-  
+
   /**
    * Looks for an ID reference within the document, and if found, registers it using the
    * {@link Element#setIdAttribute(String, boolean)} method.
