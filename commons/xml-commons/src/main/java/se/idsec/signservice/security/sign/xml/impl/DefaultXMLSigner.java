@@ -99,9 +99,9 @@ public class DefaultXMLSigner implements XMLSigner {
   private boolean includeCertificateChain = false;
 
   /**
-   * Should an ID attribute be written to the resulting ds:Signature element. Default is {@code true}.
+   * Should an ID attribute be written to the resulting ds:Signature element. Default is {@code false}.
    */
-  private boolean includeSignatureId = true;
+  private boolean includeSignatureId = false;
 
   /** For generating ID:s. */
   private static SecureRandom random =
