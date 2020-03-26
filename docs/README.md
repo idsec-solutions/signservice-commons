@@ -1,6 +1,4 @@
-![Logo](https://github.com/idsec-solutions/idsec-solutions.github.io/blob/master/img/idsec.png)
-
-# signservice-commons
+![Logo](https://idsec-solutions.github.io/signservice-integration-api/img/idsec.png)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
