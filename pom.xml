@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>builder-pom</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <name>IDsec Solutions :: Builder POM for SignService :: Commons</name>
   <description>Builder POM for SignService Commons</description>
