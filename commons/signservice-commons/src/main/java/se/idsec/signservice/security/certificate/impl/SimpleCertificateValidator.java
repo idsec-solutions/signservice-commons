@@ -70,8 +70,10 @@ public class SimpleCertificateValidator implements CertificateValidator {
 
   /** {@inheritDoc} */
   @Override
-  public PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate, final List<X509Certificate> additionalCertificates,
-      final List<X509CRL> crls, final List<X509Certificate> trustAnchors)
+  public PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate,
+      final List<X509Certificate> additionalCertificates,
+      final List<X509CRL> crls,
+      final List<X509Certificate> trustAnchors)
       throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException {
 
     log.debug("Validating certificate: {}", CertificateUtils.toLogString(subjectCertificate));
@@ -98,12 +100,7 @@ public class SimpleCertificateValidator implements CertificateValidator {
     final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
     PKIXCertPathValidatorResult result = (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
 
-    log.debug("Successful validation of [{}]. Trust anchor: {}", CertificateUtils.toLogString(subjectCertificate),
-      result.getTrustAnchor() != null
-          ? (result.getTrustAnchor().getTrustedCert() != null ? CertificateUtils.toLogString(result.getTrustAnchor().getTrustedCert())
-              : "not-set")
-          : "not-set");
-
+    log.debug("Successful validation of [{}]", CertificateUtils.toLogString(subjectCertificate));
     return result;
   }
 
@@ -228,13 +225,13 @@ public class SimpleCertificateValidator implements CertificateValidator {
   /** {@inheritDoc} */
   @Override
   public List<X509Certificate> getDefaultTrustAnchors() {
-    return this.defaultTrustAnchors;
+    return this.defaultTrustAnchors != null ? this.defaultTrustAnchors : Collections.emptyList();
   }
 
   /**
    * Assigns the default trust anchors for this validator.
    * 
-   * @param trustAnchors
+   * @param defaultTrustAnchors
    *          trusted root certificates
    */
   public void setDefaultTrustAnchors(final List<X509Certificate> defaultTrustAnchors) {

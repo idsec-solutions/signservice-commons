@@ -18,9 +18,6 @@ package se.idsec.signservice.security.sign;
 import java.security.cert.PKIXCertPathValidatorResult;
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
  * Interface representing the (sucessful) result of a signature validation operation.
  * 
@@ -63,7 +60,6 @@ public interface SignatureValidationResult {
    * 
    * @return the validation status
    */
-  @Nonnull
   Status getStatus();
 
   /**
@@ -81,7 +77,6 @@ public interface SignatureValidationResult {
    * 
    * @return status message
    */
-  @Nullable
   String getStatusMessage();
 
   /**
@@ -90,7 +85,6 @@ public interface SignatureValidationResult {
    * 
    * @return an exception describing the underlying error or null
    */
-  @Nullable
   Exception getException();
 
   /**
@@ -102,7 +96,6 @@ public interface SignatureValidationResult {
    * 
    * @return the signature certificate
    */
-  @Nullable
   X509Certificate getSignerCertificate();
 
   /**
@@ -110,7 +103,6 @@ public interface SignatureValidationResult {
    * 
    * @return the certificate path validation result
    */
-  @Nullable
   PKIXCertPathValidatorResult getCertificateValidationResult();
 
 }

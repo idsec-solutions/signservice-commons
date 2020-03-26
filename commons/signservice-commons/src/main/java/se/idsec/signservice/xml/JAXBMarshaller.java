@@ -75,5 +75,9 @@ public class JAXBMarshaller {
     marshaller.marshal(jaxbElement, document);
     return document;
   }
+  
+  // Hidden constructor
+  private JAXBMarshaller() {    
+  }
 
 }

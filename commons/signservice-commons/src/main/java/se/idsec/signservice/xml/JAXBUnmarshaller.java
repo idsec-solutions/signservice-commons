@@ -53,5 +53,9 @@ public class JAXBUnmarshaller {
       return clazz.cast(jaxbObject);
     }
   }
-
+  
+  // Hidden constructor
+  private JAXBUnmarshaller() {    
+  }
+ 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2020 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import net.shibboleth.utilities.java.support.logic.Constraint;
 import se.idsec.signservice.security.sign.SigningCredential;
@@ -50,24 +48,29 @@ public class DefaultSigningCredential implements SigningCredential {
   /**
    * Constructor.
    * 
-   * @param name the name of the credential
-   * @param keyPair the key pair (private/public key)
+   * @param name
+   *          the name of the credential
+   * @param keyPair
+   *          the key pair (private/public key)
    */
-  public DefaultSigningCredential(@Nonnull final String name, @Nonnull final KeyPair keyPair) {
+  public DefaultSigningCredential(final String name, final KeyPair keyPair) {
     this.name = Constraint.isNotEmpty(name, "name must be set");
     Constraint.isNotNull(keyPair, "keyPair must not be null");
     this.privateKey = keyPair.getPrivate();
     this.publicKey = keyPair.getPublic();
   }
-  
+
   /**
    * Constructor.
    * 
-   * @param name the name of the credential
-   * @param privateKey the private key
-   * @param publicKey the public key
+   * @param name
+   *          the name of the credential
+   * @param privateKey
+   *          the private key
+   * @param publicKey
+   *          the public key
    */
-  public DefaultSigningCredential(@Nonnull final String name, @Nonnull final PrivateKey privateKey, @Nonnull final PublicKey publicKey) {
+  public DefaultSigningCredential(final String name, final PrivateKey privateKey, final PublicKey publicKey) {
     this.name = Constraint.isNotEmpty(name, "name must be set");
     this.privateKey = Constraint.isNotNull(privateKey, "privateKey must not be null");
     this.publicKey = Constraint.isNotNull(publicKey, "publicKey must not be null");
@@ -76,12 +79,15 @@ public class DefaultSigningCredential implements SigningCredential {
   /**
    * Constructor.
    * 
-   * @param name the name of the credential
-   * @param privateKey the private key
-   * @param signingCertificate the signing certificate
+   * @param name
+   *          the name of the credential
+   * @param privateKey
+   *          the private key
+   * @param signingCertificate
+   *          the signing certificate
    */
   public DefaultSigningCredential(
-      @Nonnull final String name, @Nonnull final PrivateKey privateKey, @Nonnull final X509Certificate signingCertificate) {
+      final String name, final PrivateKey privateKey, final X509Certificate signingCertificate) {
     this.name = Constraint.isNotEmpty(name, "name must be set");
     this.privateKey = Constraint.isNotNull(privateKey, "privateKey must not be null");
     this.signingCertificate = Constraint.isNotNull(signingCertificate, "signingCertificate must not be null");
@@ -113,7 +119,7 @@ public class DefaultSigningCredential implements SigningCredential {
   public List<X509Certificate> getCertificateChain() {
     return this.signingCertificate != null ? Collections.singletonList(this.signingCertificate) : Collections.emptyList();
   }
-  
+
   /** {@inheritDoc} */
   @Override
   public String getName() {

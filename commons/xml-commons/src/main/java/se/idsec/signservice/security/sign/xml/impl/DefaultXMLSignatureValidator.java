@@ -45,7 +45,6 @@ import se.idsec.signservice.security.sign.SignatureValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult.Status;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 import se.idsec.signservice.security.sign.xml.XMLSignatureValidator;
-import se.idsec.signservice.xml.DOMUtils;
 
 /**
  * Default implementation of the {@link XMLSignatureValidator} interface.
@@ -165,7 +164,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
     // Get the document ID attribute (and register the ID attributes).
     //
-    final String signatureUriReference = DOMUtils.registerIdAttributes(document);
+    final String signatureUriReference = DefaultXMLSigner.registerIdAttributes(document);
 
     // Register ID nodes for XAdES ...
     //

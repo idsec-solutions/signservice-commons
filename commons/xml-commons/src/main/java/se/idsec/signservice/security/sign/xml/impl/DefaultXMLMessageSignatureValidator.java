@@ -19,9 +19,6 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.w3c.dom.Document;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,16 +35,15 @@ import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 @Slf4j
 public class DefaultXMLMessageSignatureValidator implements XMLMessageSignatureValidator {
 
-
   /** {@inheritDoc} */
   @Override
-  public void validate(@Nonnull final Document document,
-      @Nullable final List<X509Certificate> expectedSignerCertificates,
-      @Nullable XMLSignatureLocation signatureLocation) throws SignatureException {
-    
+  public void validate(final Document document,
+      final List<X509Certificate> expectedSignerCertificates,
+      final XMLSignatureLocation signatureLocation) throws SignatureException {
+
     DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(expectedSignerCertificates);
     validator.setXadesProcessing(false);
-    
+
     List<SignatureValidationResult> result = validator.validate(document, signatureLocation);
     if (result.size() > 1) {
       throw new SignatureException("Document contains multiple Signature elements - use XPath expression");
@@ -59,7 +55,7 @@ public class DefaultXMLMessageSignatureValidator implements XMLMessageSignatureV
       log.info("Signature validation on XML message failed: {}", result.get(0));
       throw new SignatureException(result.get(0).getStatusMessage());
     }
-    
+
   }
 
 }

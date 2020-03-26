@@ -19,9 +19,6 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.w3c.dom.Document;
 
 /**
@@ -53,8 +50,8 @@ public interface XMLMessageSignatureValidator {
    * @throws SignatureException
    *           for validation errors
    */
-  void validate(@Nonnull final Document document,
-      @Nullable final List<X509Certificate> expectedSignerCertificates,
-      @Nullable XMLSignatureLocation signatureLocation) throws SignatureException;
+  void validate(final Document document,
+      final List<X509Certificate> expectedSignerCertificates,
+      XMLSignatureLocation signatureLocation) throws SignatureException;
 
 }

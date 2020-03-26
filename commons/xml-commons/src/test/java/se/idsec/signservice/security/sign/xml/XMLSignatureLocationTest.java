@@ -24,7 +24,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation.ChildPosition;
 import se.idsec.signservice.xml.DOMUtils;
 
@@ -44,12 +43,14 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     Document empty = getDocument("xml/empty.xml");
     location.insertSignature(createSignatureElement(), empty);
     Assert.assertEquals("Signature", getLastElement(empty));
-    Assert.assertTrue(location.getSignature(empty) != null);
+    Assert.assertTrue(location.getSignature(empty) != null);    
+    location.testInsert(empty);
 
     Document simple = getDocument("xml/simple.xml");
     location.insertSignature(createSignatureElement(), simple);
     Assert.assertEquals("Signature", getLastElement(simple));
     Assert.assertTrue(location.getSignature(simple) != null);
+    location.testInsert(simple);
 
     // Make sure it works even if signature has the same document owner
     Document simple2 = getDocument("xml/simple.xml");
@@ -112,6 +113,12 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     Document doc = getDocument("xml/empty.xml");
     try {
       location.insertSignature(createSignatureElement(), doc);
+      Assert.fail("Expected XPathExpressionException");
+    }
+    catch (XPathExpressionException e) {
+    }
+    try {
+      location.testInsert(doc);
       Assert.fail("Expected XPathExpressionException");
     }
     catch (XPathExpressionException e) {
@@ -181,6 +188,12 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     }
     catch (XPathExpressionException e) {
     }
+    try {
+      location.testInsert(doc);
+      Assert.fail("Expected XPathExpressionException");
+    }
+    catch (XPathExpressionException e) {
+    }
   }
 
   @Test
@@ -203,8 +216,6 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     Element signatureElement = (Element) signRequest.importNode(createSignatureElement(), true); 
     
     location.insertSignature(signatureElement, signRequest);
-    
-    System.out.println(SerializeSupport.prettyPrintXML(signRequest));
     
     Node node = signRequest.getDocumentElement().getElementsByTagName("OptionalInputs").item(0);    
     Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName()); 

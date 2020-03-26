@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Litsec AB
+ * Copyright 2019-2020 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package se.idsec.signservice.security.sign.impl;
 
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -42,16 +43,43 @@ import se.idsec.signservice.security.sign.SigningCredential;
 @Slf4j
 public class StaticCredentials {
 
+  /** The default number of bits for RSA keys. */
+  public static final int DEFAULT_RSA_KEY_SIZE = 2048;
+
+  /** The default curve to use for EC keys. */
+  public static final String DEFAULT_EC_CURVE = "P-256";
+
   /** Pre-generated RSA key pair. */
   private KeyPair rsaKeyPair;
 
   /** Pre-generated EC key pair. */
   private KeyPair ecKeyPair;
-  
+
+  /** The number of bits for the generated RSA keys - default is {@value #DEFAULT_RSA_KEY_SIZE}. */
+  private int rsaKeySize = DEFAULT_RSA_KEY_SIZE;
+
+  /** The curve to use for EC keys - default is {@value #DEFAULT_EC_CURVE}. */
+  private String ecCurve = DEFAULT_EC_CURVE;
+
   /**
    * Constructor.
    */
-  public StaticCredentials() {    
+  public StaticCredentials() {
+  }
+
+  /**
+   * Constructor setting the key size for RSA and curve for EC to use.
+   * 
+   * @param rsaKeySize
+   *          RSA key size in bits (default is {@value #DEFAULT_RSA_KEY_SIZE})
+   * @param ecCurve
+   *          identifier for EC curve to use (default is {@value #DEFAULT_EC_CURVE})
+   */
+  public StaticCredentials(final int rsaKeySize, final String ecCurve) {
+    this.rsaKeySize = rsaKeySize;
+    if (ecCurve != null) {
+      this.ecCurve = ecCurve;
+    }
   }
 
   /**
@@ -75,47 +103,98 @@ public class StaticCredentials {
       log.error("{}", msg);
       throw new NoSuchAlgorithmException(msg);
     }
-    final String algoKey = ((SignatureAlgorithm) descriptor).getKey();
-    if (JCAConstants.KEY_ALGO_RSA.equals(algoKey)) {
-      synchronized (this) {
-        return new DefaultSigningCredential("RSA", this.getRsaKeyPair());
-      }      
+    try {
+      final String algoKey = ((SignatureAlgorithm) descriptor).getKey();
+      if (JCAConstants.KEY_ALGO_RSA.equals(algoKey)) {
+        synchronized (this) {
+          return new DefaultSigningCredential("RSA", this.getRsaKeyPair());
+        }
+      }
+      else if (JCAConstants.KEY_ALGO_EC.equals(algoKey)) {
+        synchronized (this) {
+          return new DefaultSigningCredential("EC", this.getEcKeyPair());
+        }
+      }
+      else {
+        final String msg = String.format("Algorithm '%s' is not supported - could not generate key pair", algorithmUri);
+        log.error("{}", msg);
+        throw new NoSuchAlgorithmException(msg);
+      }
     }
-    else if (JCAConstants.KEY_ALGO_EC.equals(algoKey)) {
-      synchronized (this) {
-        return new DefaultSigningCredential("EC", this.getEcKeyPair());
-      }      
-    }
-    else {
-      final String msg = String.format("Algorithm '%s' is not supported - could not generate key pair", algorithmUri);
-      log.error("{}", msg);
-      throw new NoSuchAlgorithmException(msg);
+    catch (InvalidParameterException | InvalidAlgorithmParameterException e) {
+      throw new NoSuchAlgorithmException("Invalid parameter", e);
     }
   }
 
-  private synchronized KeyPair getRsaKeyPair() throws NoSuchAlgorithmException {
+  /**
+   * Gets the generated RSA key pair.
+   * 
+   * @return the RSA key pair.
+   * @throws InvalidParameterException
+   *           if the keysize is incorrect
+   */
+  public synchronized KeyPair getRsaKeyPair() throws InvalidParameterException {
     if (this.rsaKeyPair == null) {
-      log.debug("Generating RSA key pair ...");
-      KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-      generator.initialize(2048);
-      this.rsaKeyPair = generator.generateKeyPair();
+      this.rsaKeyPair = this.generateRsaKeyPair(this.rsaKeySize);
     }
     return this.rsaKeyPair;
   }
 
-  private synchronized KeyPair getEcKeyPair() throws NoSuchAlgorithmException {
+  /**
+   * Gets the generated EC key pair.
+   * 
+   * @return the EC key pair
+   * @throws InvalidAlgorithmParameterException
+   *           for unsupported curve
+   */
+  public synchronized KeyPair getEcKeyPair() throws InvalidAlgorithmParameterException {
     if (this.ecKeyPair == null) {
-      log.debug("Generating EC key pair ...");
-      KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
-      try {
-        generator.initialize(new ECGenParameterSpec("P-256"), new SecureRandom());
-      }
-      catch (InvalidAlgorithmParameterException e) {
-        throw new NoSuchAlgorithmException("P-256", e);
-      }
-      this.ecKeyPair = generator.generateKeyPair();
+      this.ecKeyPair = this.generateEcKeyPair(this.ecCurve);
     }
     return this.ecKeyPair;
+  }
+
+  /**
+   * Generates a RSA key pair.
+   * 
+   * @param keysize
+   *          the keysize in bits
+   * @return RSA key pair
+   * @throws InvalidParameterException
+   *           if the bit size is incorrect
+   */
+  private KeyPair generateRsaKeyPair(final int keysize) throws InvalidParameterException {
+    log.debug("Generating RSA key pair ...");
+    try {
+      KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+      generator.initialize(keysize);
+      return generator.generateKeyPair();
+    }
+    catch (NoSuchAlgorithmException e) {
+      // RSA not supported? That's not happening.
+      throw new SecurityException(e);
+    }
+  }
+
+  /**
+   * Generates an EC keypair.
+   * 
+   * @param ecCurve
+   *          the curve
+   * @return EC keypair
+   * @throws InvalidAlgorithmParameterException
+   *           for invalid curve
+   */
+  private KeyPair generateEcKeyPair(final String ecCurve) throws InvalidAlgorithmParameterException {
+    log.debug("Generating EC key pair ...");
+    try {
+      KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
+      generator.initialize(new ECGenParameterSpec(ecCurve), new SecureRandom());
+      return generator.generateKeyPair();
+    }
+    catch (NoSuchAlgorithmException e) {
+      throw new SecurityException(e);
+    }
   }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2020 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,9 +114,13 @@ public class KeyStoreSigningCredential implements SigningCredential {
     try {
       keystore.load(resource.getInputStream(), password);
       this.keyEntry = (KeyStore.PrivateKeyEntry) keystore.getEntry(alias, new KeyStore.PasswordProtection(keyPassword));
+      if (this.keyEntry == null) {
+        log.error("No entry for alias '{}' found", alias);
+        throw new KeyStoreException("No entry found for alias " + alias);
+      }
     }
     catch (IOException | UnrecoverableEntryException | NoSuchAlgorithmException | CertificateException e) {
-      KeyStoreSigningCredential.log.error("Failed to load keystore {}", e.getMessage(), e);
+      log.error("Failed to load keystore {}", e.getMessage(), e);
       throw new KeyStoreException(e.getMessage(), e);
     }
   }

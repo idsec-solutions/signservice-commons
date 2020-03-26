@@ -18,9 +18,6 @@ package se.idsec.signservice.security.sign.xml;
 import java.security.SignatureException;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.w3c.dom.Document;
 
 import se.idsec.signservice.security.sign.SignatureValidationResult;
@@ -50,8 +47,7 @@ public interface XMLSignatureValidator extends SignatureValidator<Document> {
    *           for errors during the validation process (pure signature validation errors are reported in the returned
    *           result)
    */
-  @Nonnull
-  List<SignatureValidationResult> validate(@Nonnull final Document document, @Nullable XMLSignatureLocation signatureLocation)
+  List<SignatureValidationResult> validate(final Document document, final XMLSignatureLocation signatureLocation)
       throws SignatureException;
 
 }

@@ -17,9 +17,11 @@ package se.idsec.signservice.security.certificate.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.cert.CRLException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
 import java.security.cert.PKIXCertPathValidatorResult;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -52,8 +54,11 @@ public class SimpleCertificateValidatorTest {
 
   // Test certs (Let's encrypt)
   private X509Certificate dstRoot;
+  
+  // Dummy CRL (not used)
+  private X509CRL crl;
 
-  public SimpleCertificateValidatorTest() throws CertificateException, IOException {
+  public SimpleCertificateValidatorTest() throws CertificateException, CRLException, IOException {
 
     // Set validation date
     Calendar c = Calendar.getInstance();
@@ -69,6 +74,8 @@ public class SimpleCertificateValidatorTest {
     byte[] nistEncoding = FileUtils.readFileToByteArray((new ClassPathResource("certs/nvd.nist.gov.crt")).getFile());
     nistEncoding[nistEncoding.length - 1] = (byte) ~nistEncoding[nistEncoding.length - 1];
     this.nistBadSignature = CertificateUtils.decodeCertificate(new ByteArrayInputStream(nistEncoding));
+    
+    this.crl = CertificateUtils.decodeCrl((new ClassPathResource("certs/sample.crl")).getInputStream());
   }
 
   @Test
@@ -76,8 +83,11 @@ public class SimpleCertificateValidatorTest {
     SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.digiCertRoot));
+    
+    Assert.assertFalse(validator.isRevocationCheckingActive());
+    Assert.assertEquals(1, validator.getDefaultTrustAnchors().size());
 
-    PKIXCertPathValidatorResult result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null);
+    PKIXCertPathValidatorResult result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), Arrays.asList(crl));
     Assert.assertEquals(this.digiCertRoot, result.getTrustAnchor().getTrustedCert());
     
     // The same with several roots in trust
@@ -101,13 +111,43 @@ public class SimpleCertificateValidatorTest {
   }
 
   @Test
-  public void testSuccessTrustAnyRootNotFound() throws Exception {
+  public void testRootNotFound() throws Exception {
     SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.dstRoot));
 
     try {
       validator.validate(this.nist, Arrays.asList(this.digiCertRoot, this.digiCertIntermediate), null, null);
+      Assert.fail("Expected CertPathBuilderException");
+    }
+    catch (CertPathBuilderException e) {
+    }
+  }
+    
+  @Test
+  public void testNoTrustAnchorsAvailable() throws Exception {
+    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+    validator.setValidationDate(this.validationDate);
+    
+    Assert.assertTrue(validator.getDefaultTrustAnchors().isEmpty());
+    Assert.assertEquals(this.validationDate, validator.getValidationDate());
+    
+    try {
+      validator.validate(this.nist, null, null, null);
+      Assert.fail("Expected CertPathBuilderException");
+    }
+    catch (CertPathBuilderException e) {
+    }
+    
+    try {
+      validator.validate(this.nist, Collections.emptyList(), null, null);
+      Assert.fail("Expected CertPathBuilderException");
+    }
+    catch (CertPathBuilderException e) {
+    }
+    
+    try {
+      validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null, null);
       Assert.fail("Expected CertPathBuilderException");
     }
     catch (CertPathBuilderException e) {
@@ -165,6 +205,13 @@ public class SimpleCertificateValidatorTest {
 
     try {
       validator.validate(this.nist, Collections.emptyList(), null);
+      Assert.fail("Expected CertPathBuilderException");
+    }
+    catch (CertPathBuilderException e) {
+    }
+    
+    try {
+      validator.validate(this.nist, null, null);
       Assert.fail("Expected CertPathBuilderException");
     }
     catch (CertPathBuilderException e) {

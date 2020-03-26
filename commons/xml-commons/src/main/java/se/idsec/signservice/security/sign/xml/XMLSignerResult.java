@@ -21,10 +21,11 @@ import org.w3c.dom.Element;
 import se.idsec.signservice.security.sign.SignerResult;
 
 /**
- * Represents the result from an XML signature operation ({@link XMLSigner#sign(Document)}).
+ * Represents the result from an XML signature operation.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
+ * @see XMLSigner
  */
 public interface XMLSignerResult extends SignerResult<Document> {
 

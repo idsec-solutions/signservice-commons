@@ -17,8 +17,10 @@ package se.idsec.signservice.security.certificate;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 
 /**
@@ -68,6 +70,32 @@ public class CertificateUtils {
   }
 
   /**
+   * Decodes a {@link X509CRL} from its encoding.
+   * 
+   * @param encoding
+   *          the CRL encoding
+   * @return a X509CRL object
+   * @throws CRLException
+   *           for decoding errors
+   */
+  public static X509CRL decodeCrl(final byte[] encoding) throws CRLException {
+    return decodeCrl(new ByteArrayInputStream(encoding));
+  }
+
+  /**
+   * Decodes a {@link X509CRL} from an input stream.
+   * 
+   * @param stream
+   *          the stream to read
+   * @return a X509CRL object
+   * @throws CRLException
+   *           for decoding errors
+   */
+  public static X509CRL decodeCrl(final InputStream stream) throws CRLException {
+    return (X509CRL) factory.generateCRL(stream);
+  }
+
+  /**
    * The {@link X509Certificate#toString()} prints way too much for a normal log entry. This method displays the
    * subject, issuer and serial number.
    * 
@@ -76,6 +104,9 @@ public class CertificateUtils {
    * @return a log string
    */
   public static String toLogString(final X509Certificate certificate) {
+    if (certificate == null) {
+      return "null";
+    }
     StringBuffer sb = new StringBuffer();
     sb.append("subject='").append(certificate.getSubjectX500Principal().getName()).append("',");
     sb.append("issuer='").append(certificate.getIssuerX500Principal().getName()).append("',");

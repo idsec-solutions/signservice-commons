@@ -17,9 +17,6 @@ package se.idsec.signservice.security.sign;
 
 import java.security.SignatureException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
  * Interface that represents a signer, i.e. an instance that given a set of signature properties signs documents.
  * 
@@ -42,27 +39,13 @@ public interface Signer<T, R extends SignerResult<T>> {
    * @throws SignatureException
    *           for signature errors
    */
-  R sign(@Nonnull final T document) throws SignatureException;
-
-  /**
-   * Signs the document using the installed signing credential ({@link #getSigningCredential()}).
-   * 
-   * @param document
-   *          the document to sign
-   * @param adesRequirement
-   *          optional AdES requirements
-   * @return a signature result (including the signed document)
-   * @throws SignatureException
-   *           for signature errors
-   */
-  R sign(@Nonnull final T document, @Nullable final EtsiAdesRequirement adesRequirement) throws SignatureException;
+  R sign(final T document) throws SignatureException;
 
   /**
    * Gets the signing credential that is used for the signing operation.
    * 
    * @return the signing credential
    */
-  @Nonnull
   SigningCredential getSigningCredential();
 
 }

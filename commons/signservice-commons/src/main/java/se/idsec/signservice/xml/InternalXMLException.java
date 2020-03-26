@@ -38,16 +38,6 @@ public class InternalXMLException extends RuntimeException {
 
   /**
    * Constructor.
-   * 
-   * @param cause
-   *          the cause of the error
-   */
-  public InternalXMLException(final Throwable cause) {
-    super(cause);
-  }
-
-  /**
-   * Constructor.
    *
    * @param message
    *          the error message

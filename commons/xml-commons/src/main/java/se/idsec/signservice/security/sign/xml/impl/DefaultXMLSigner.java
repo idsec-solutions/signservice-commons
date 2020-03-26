@@ -30,6 +30,7 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.xmlsec.SignatureSigningConfiguration;
 import org.opensaml.xmlsec.algorithm.AlgorithmDescriptor;
@@ -38,15 +39,14 @@ import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import lombok.extern.slf4j.Slf4j;
 import net.shibboleth.utilities.java.support.logic.Constraint;
-import se.idsec.signservice.security.sign.EtsiAdesRequirement;
 import se.idsec.signservice.security.sign.SigningCredential;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 import se.idsec.signservice.security.sign.xml.XMLSigner;
 import se.idsec.signservice.security.sign.xml.XMLSignerResult;
-import se.idsec.signservice.xml.DOMUtils;
 
 /**
  * Default implementation of the {@link XMLSigner} interface.
@@ -131,12 +131,6 @@ public class DefaultXMLSigner implements XMLSigner {
   /** {@inheritDoc} */
   @Override
   public XMLSignerResult sign(final Document document) throws SignatureException {
-    return this.sign(document, null);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public XMLSignerResult sign(final Document document, final EtsiAdesRequirement adesRequirement) throws SignatureException {
 
     try {
       // Create Signature ...
@@ -161,20 +155,15 @@ public class DefaultXMLSigner implements XMLSigner {
 
       // Get the ID reference.
       //
-      final String signatureUriReference = DOMUtils.registerIdAttributes(document); 
+      final String signatureUriReference = registerIdAttributes(document); 
 
       // Add the document to sign to the signature
       //
       signature.addDocument(signatureUriReference, transforms, this.getDigestAlgorithm());
 
-      // XAdES
-      //
-      
-      // TODO: XAdES
-      
       // Add signature ID.
       //
-      if (this.includeSignatureId || adesRequirement != null) {
+      if (this.includeSignatureId) {
         signature.setId("id-" + (new BigInteger(128, random)).toString(16));
       }
 
@@ -383,6 +372,32 @@ public class DefaultXMLSigner implements XMLSigner {
   public void setIncludeSignatureId(final boolean includeSignatureId) {
     this.includeSignatureId = includeSignatureId;
   }
+  
+  /**
+   * Looks for an ID reference in the root element, and if found, registers it using the
+   * {@link Element#setIdAttribute(String, boolean)} method.
+   * 
+   * @param document
+   *          the document
+   * @return the signature URI reference ("" if no ID is found)
+   */
+  public static String registerIdAttributes(final Document document) {
+    final Element rootElement = document.getDocumentElement();
+    String signatureUriReference = XMLUtils.getAttributeValue(rootElement, "ID");
+    if (StringUtils.hasText(signatureUriReference)) {
+      rootElement.setIdAttribute("ID", true);
+    }
+    else {
+      signatureUriReference = XMLUtils.getAttributeValue(rootElement, "Id");
+      if (StringUtils.hasText(signatureUriReference)) {
+        rootElement.setIdAttribute("Id", true);
+      }
+    }
+    return !StringUtils.hasText(signatureUriReference)
+        ? ""
+        : (signatureUriReference.trim().startsWith("#") ? signatureUriReference.trim() : "#" + signatureUriReference.trim());
+  }
+  
 
   /**
    * Builder for {@link DefaultXMLSigner} objects.

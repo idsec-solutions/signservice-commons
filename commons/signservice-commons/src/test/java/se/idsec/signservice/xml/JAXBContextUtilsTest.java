@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.jaxb;
+package se.idsec.signservice.xml;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import se.idsec.signservice.xml.JAXBContextUtils;
 
 /**
  * Test cases for {@code JAXBContextUtils}.
@@ -81,6 +82,30 @@ public class JAXBContextUtilsTest {
     Assert.assertEquals(buildPackageString("se.swedenconnect.schemas.csig.sap_1_1",
       se.swedenconnect.schemas.csig.sap_1_1.JAXBContextFactory.getDependentPackages()),
       JAXBContextUtils.getPackageNames(se.swedenconnect.schemas.csig.sap_1_1.SADRequest.class));
+    
+    // Verify that caching works
+    String d1 = JAXBContextUtils.getPackageNames(se.swedenconnect.schemas.csig.sap_1_1.SADRequest.class);
+    String d2 = JAXBContextUtils.getPackageNames(se.swedenconnect.schemas.csig.sap_1_1.SADRequest.class);
+    Assert.assertTrue(d1 == d2);
+    
+    // No registered dependent package names ...
+    String e = JAXBContextUtils.getPackageNames(java.lang.Integer.class);
+    Assert.assertEquals("java.lang", e);
+  }
+  
+  @Test
+  public void testCreateJAXBContext() throws Exception {
+    JAXBContext c = JAXBContextUtils.createJAXBContext(se.swedenconnect.schemas.saml_2_0.assertion.AttributeStatement.class);
+    Assert.assertNotNull(c);
+    Assert.assertNotNull(c.createMarshaller());
+    Assert.assertNotNull(c.createUnmarshaller());
+    
+    try {
+      JAXBContextUtils.createJAXBContext(Integer.class);
+      Assert.fail("Expected JAXBException");
+    }
+    catch (JAXBException e) {      
+    }
   }
 
   private static String buildPackageString(final String pkg, final String[] dependencies) {

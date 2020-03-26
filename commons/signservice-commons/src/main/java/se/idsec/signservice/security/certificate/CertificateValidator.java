@@ -23,9 +23,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
  * An interface for verifying a certificate up until a trusted root.
  * 
@@ -55,9 +52,9 @@ public interface CertificateValidator {
    * @throws GeneralSecurityException
    *           for general errors
    */
-  PKIXCertPathValidatorResult validate(@Nonnull final X509Certificate subjectCertificate,
-      @Nullable final List<X509Certificate> additionalCertificates,
-      @Nullable final List<X509CRL> crls)
+  PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate,
+      final List<X509Certificate> additionalCertificates, 
+      final List<X509CRL> crls)
       throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException;
 
   /**
@@ -80,10 +77,10 @@ public interface CertificateValidator {
    * @throws GeneralSecurityException
    *           for general errors
    */
-  PKIXCertPathValidatorResult validate(@Nonnull final X509Certificate subjectCertificate,
-      @Nullable final List<X509Certificate> additionalCertificates,
-      @Nullable final List<X509CRL> crls,
-      @Nullable final List<X509Certificate> trustAnchors)
+  PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate,
+      final List<X509Certificate> additionalCertificates,
+      final List<X509CRL> crls,
+      final List<X509Certificate> trustAnchors)
       throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException;
 
   /**
@@ -102,7 +99,6 @@ public interface CertificateValidator {
    * 
    * @return trusted certificates
    */
-  @Nonnull
   List<X509Certificate> getDefaultTrustAnchors();
 
 }

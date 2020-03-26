@@ -20,10 +20,11 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import se.idsec.signservice.security.sign.SignerResult;
 
 /**
- * Represents the result from an PDF signature operation ({@link PDFSigner#sign(PDDocument)}).
+ * Represents the result from an PDF signature operation.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
+ * @see PDFSigner
  */
 public interface PDFSignerResult extends SignerResult<PDDocument> {
 

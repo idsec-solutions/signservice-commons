@@ -12,7 +12,7 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>IDsec Solutions :: SignService :: Commons :: Utilities and types definitions</name>
+  <name>IDsec Solutions :: SignService :: Commons :: Utilities</name>
   <description>SignService XML Commons</description>
   <url>https://github.com/idsec-solutions/signservice-commons</url>
 
@@ -91,7 +91,7 @@
       <version>2.3.2</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <!-- Misc -->
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
@@ -114,7 +114,7 @@
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>se.swedenconnect.schemas</groupId>
       <artifactId>oasis-dss-jaxb</artifactId>
@@ -124,8 +124,8 @@
     <dependency>
       <groupId>se.swedenconnect.schemas.csig</groupId>
       <artifactId>dss-ext11-jaxb</artifactId>
-      <scope>test</scope>      
-    </dependency>        
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>se.swedenconnect.schemas</groupId>
@@ -165,17 +165,11 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <doctitle>SignService Commons - ${project.version}</doctitle>
+          <windowtitle>SignService Commons - ${project.version}</windowtitle>
+        </configuration>
       </plugin>
 
     </plugins>

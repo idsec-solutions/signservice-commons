@@ -18,7 +18,6 @@ package se.idsec.signservice.security.sign.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -75,14 +74,13 @@ public class XMLSignatureLocation {
    * @param childPosition
    *          first of last child of the document root element
    */
-  public XMLSignatureLocation(@Nonnull final ChildPosition childPosition) {
+  public XMLSignatureLocation(final ChildPosition childPosition) {
     this.childPosition = childPosition;
   }
 
   /**
    * Constructor accepting an XPath expression for finding the parent element of where we should insert/find the
-   * signature element. Note that the result of evaluating the XPath expression <b>MUST</b> be one single
-   * node.
+   * signature element. Note that the result of evaluating the XPath expression <b>MUST</b> be one single node.
    * <p>
    * <b>Note</b>: Beware of that the document supplied to {@link #insertSignature(Element, Document)} or
    * {@link #getSignature(Document)} may be created using a namespace aware parser and you may want to use the
@@ -96,8 +94,7 @@ public class XMLSignatureLocation {
    * @throws XPathExpressionException
    *           for illegal XPath expressions
    */
-  public XMLSignatureLocation(@Nonnull final String parentXPath, @Nonnull final ChildPosition childPosition)
-      throws XPathExpressionException {
+  public XMLSignatureLocation(final String parentXPath, final ChildPosition childPosition) throws XPathExpressionException {
     this.childPosition = childPosition;
     this.xPath = parentXPath;
     this.xPathExpression = XPathFactory.newInstance().newXPath().compile(parentXPath);
@@ -117,7 +114,7 @@ public class XMLSignatureLocation {
    * @throws XPathExpressionException
    *           for XPath selection errors
    */
-  public void insertSignature(@Nonnull final Element signature, @Nonnull final Document document) throws XPathExpressionException {
+  public void insertSignature(final Element signature, final Document document) throws XPathExpressionException {
 
     // If the signature element comes from a different document, import it.
     final boolean sameOwner = XMLUtils.getOwnerDocument(signature) == document;
@@ -156,9 +153,9 @@ public class XMLSignatureLocation {
    * @throws XPathExpressionException
    *           for XPath selection errors
    */
-  public Element getSignature(@Nonnull final Document document) throws XPathExpressionException {
+  public Element getSignature(final Document document) throws XPathExpressionException {
     List<Node> nodes = new ArrayList<>();
-    if (this.xPathExpression != null) {    
+    if (this.xPathExpression != null) {
       NodeList _nodes = (NodeList) this.xPathExpression.evaluate(document, XPathConstants.NODESET);
       if (_nodes.getLength() == 0) {
         return null;
@@ -170,7 +167,7 @@ public class XMLSignatureLocation {
     else {
       nodes.add(document.getDocumentElement());
     }
-    
+
     // If we get more than one hit for the parent node, we fail if more than one holds a signature element.
     //
     Element signatureElement = null;
@@ -208,7 +205,7 @@ public class XMLSignatureLocation {
         }
       }
     }
-    
+
     return signatureElement;
   }
 
@@ -220,9 +217,12 @@ public class XMLSignatureLocation {
    * @throws XPathExpressionException
    *           if the XPath expression is incorrect (does not find a node)
    */
-  public void testInsert(@Nonnull final Document document) throws XPathExpressionException {
+  public void testInsert(final Document document) throws XPathExpressionException {
     if (this.xPathExpression != null) {
       Node parentNode = (Node) this.xPathExpression.evaluate(document, XPathConstants.NODE);
+      if (parentNode == null) {
+        throw new XPathExpressionException(String.format("Could not find XML node for insertion of Signature - XPath: %s", xPath));
+      }
       log.debug("XPath expression '{}' evaluated to node '{}'", this.xPath, parentNode.getLocalName());
     }
   }

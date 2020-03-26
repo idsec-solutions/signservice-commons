@@ -19,9 +19,6 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import se.idsec.signservice.security.certificate.CertificateValidator;
 
 /**
@@ -46,8 +43,7 @@ public interface SignatureValidator<T> {
    *           for errors during the validation process (pure signature validation errors are reported in the returned
    *           result)
    */
-  @Nonnull
-  List<SignatureValidationResult> validate(@Nonnull final T document) throws SignatureException;
+  List<SignatureValidationResult> validate(final T document) throws SignatureException;
 
   /**
    * Predicate that tells if the supplied document is signed.
@@ -58,7 +54,7 @@ public interface SignatureValidator<T> {
    * @throws IllegalArgumentException
    *           if the document can not be parsed
    */
-  boolean isSigned(@Nonnull final T document) throws IllegalArgumentException;
+  boolean isSigned(final T document) throws IllegalArgumentException;
 
   /**
    * Gets a list of "required signer certificates", meaning that we require the signature to be signed with a
@@ -71,7 +67,6 @@ public interface SignatureValidator<T> {
    * 
    * @return a (possibly empty) list of "accepted" certificates
    */
-  @Nonnull
   List<X509Certificate> getRequiredSignerCertificates();
 
   /**
@@ -88,7 +83,6 @@ public interface SignatureValidator<T> {
    * 
    * @return the certificate validator or null
    */
-  @Nullable
   CertificateValidator getCertificateValidator();
 
 }
