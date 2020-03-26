@@ -12,9 +12,35 @@ The [Swedish eID Framework](https://docs.swedenconnect.se/technical-framework/) 
 
 The **signservice-commons** repository comprises of:
 
-* Core functionality for creating and parsing OASIS DSS messages and the extensions for the Swedish eID Framework.
+* A Maven BOM to be used by those including the signservice-commons artifacts.
 
-* TODO
+* signservice-commons - A library containing utilities for JAXB and XML processing, certificate utilities and interfaces for signing and signature validation.
 
+* signservice-xml-commons - Classes for XML signing and validation of XML signatures.
 
----Copyright &copy; 2019, [IDsec Solutions AB](http://www.idsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+* signservice-pdf-commons - Classes for PDF signing and validation of PDF signatures. *Work is ongoing*
+
+### API documentation
+
+* Java API documentation for [signservice-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/signservice-commons).
+* Java API documentation for [signservice-xml-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/xml-commons).
+
+### Maven
+
+All artifacts from the **signservice-commons** repository are published to Maven central.
+
+```
+<dependency>
+  <groupId>se.idsec.signservice.commons</groupId>
+  <artifactId>signservice-commons</artifactId>
+  <version>${signservice-commons.version}</version>
+</dependency>
+
+<dependency>
+  <groupId>se.idsec.signservice.commons</groupId>
+  <artifactId>signservice-xml-commons</artifactId>
+  <version>${signservice-xml-commons.version}</version>
+</dependency>
+```
+
+---Copyright &copy; 2019-2020, [IDsec Solutions AB](http://www.idsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
