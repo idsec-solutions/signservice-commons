@@ -102,6 +102,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <!-- Temporory here. Just so that Stefan writes correct Javadoc, and Martin doesn't have to fix it afterwards ;-) -->
+        <executions>
+          <execution>
+            <id>attach-javadoc</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>        
         <configuration>
           <doctitle>SignService PDF Commons - ${project.version}</doctitle>
           <windowtitle>SignService PDF Commons - ${project.version}</windowtitle>
