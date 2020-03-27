@@ -65,7 +65,7 @@ public class DefaultXMLSigner implements XMLSigner {
   public static final String DEFAULT_CANONICALIZATION_TRANSFORM = Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS;
 
   /** The default XPath transform (don't include Signature elements). */
-  public static final String DEFAULT_XPATH_TRANSFORM = "not(ancestor-or-self::ds:Signature)";
+  public static final String DEFAULT_XPATH_TRANSFORM = "not(ancestor-or-self::*[local-name()='Signature' and namespace-uri()='http://www.w3.org/2000/09/xmldsig#'])";
 
   /** The signing credential. */
   private final SigningCredential signingCredential;
