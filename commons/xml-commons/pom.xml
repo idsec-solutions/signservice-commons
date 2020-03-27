@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.idsec.signservice.commons</groupId>
     <artifactId>signservice-commons-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
   <name>IDsec Solutions :: SignService :: Commons :: XML Commons</name>
@@ -107,6 +107,9 @@
         <configuration>
           <doctitle>SignService XML Commons - ${project.version}</doctitle>
           <windowtitle>SignService XML Commons - ${project.version}</windowtitle>
+          <links>
+            <link>https://idsec-solutions.github.io/signservice-commons/javadoc/signservice-commons/</link>
+          </links>
         </configuration>
       </plugin>
 

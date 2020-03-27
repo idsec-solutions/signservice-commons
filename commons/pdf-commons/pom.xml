@@ -5,12 +5,11 @@
 
   <artifactId>signservice-pdf-commons</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0-SNAPSHOT</version>
 
   <parent>
     <groupId>se.idsec.signservice.commons</groupId>
     <artifactId>signservice-commons-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
   <name>IDsec Solutions :: SignService :: Commons :: PDF Commons</name>
@@ -106,6 +105,9 @@
         <configuration>
           <doctitle>SignService PDF Commons - ${project.version}</doctitle>
           <windowtitle>SignService PDF Commons - ${project.version}</windowtitle>
+          <links>
+            <link>https://idsec-solutions.github.io/signservice-commons/javadoc/signservice-commons/</link>
+          </links>          
         </configuration>
       </plugin>
 
