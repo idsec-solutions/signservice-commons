@@ -462,7 +462,7 @@ public class DefaultXMLSigner implements XMLSigner {
      *          canonicalization method URI
      * @return the builder
      */
-    public DefaultXMLSignerBuilder setCanonicalizationTransform(final String canonicalizationTransform) {
+    public DefaultXMLSignerBuilder canonicalizationTransform(final String canonicalizationTransform) {
       this.signer.setCanonicalizationTransform(canonicalizationTransform);
       return this;
     }
@@ -498,7 +498,7 @@ public class DefaultXMLSigner implements XMLSigner {
      *          whether an ID attribute should be written to the Signature element
      * @return the builder
      */
-    public DefaultXMLSignerBuilder setIncludeSignatureId(final boolean includeSignatureId) {
+    public DefaultXMLSignerBuilder includeSignatureId(final boolean includeSignatureId) {
       this.signer.setIncludeSignatureId(includeSignatureId);
       return this;
     }
