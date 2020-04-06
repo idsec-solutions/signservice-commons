@@ -237,6 +237,20 @@
         <groupId>se.litsec.opensaml</groupId>
         <artifactId>opensaml3-ext</artifactId>
         <version>1.4.4</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
