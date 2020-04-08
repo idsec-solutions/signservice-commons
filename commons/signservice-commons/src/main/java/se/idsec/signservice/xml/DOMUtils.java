@@ -80,7 +80,7 @@ public class DOMUtils {
       prettyPrintTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
       transformer = transformerFactory.newTransformer();
-      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
     }
     catch (TransformerConfigurationException e) {
       throw new InternalXMLException("Failed to setup transformer", e);
