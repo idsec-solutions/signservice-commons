@@ -15,8 +15,6 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
-import java.security.cert.PKIXCertPathValidatorResult;
-import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
@@ -25,6 +23,7 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.certificate.impl.DefaultCertificateValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**
@@ -35,7 +34,6 @@ import se.idsec.signservice.security.sign.SignatureValidationResult;
  */
 public class DefaultSignatureValidationResultTest {
 
-  // Simple tests - mainly to get good code coverage
   @Test
   public void testSignatureValidationResult() throws Exception {
 
@@ -46,7 +44,7 @@ public class DefaultSignatureValidationResultTest {
     result = new DefaultSignatureValidationResult();
     result.setStatus(SignatureValidationResult.Status.SUCCESS);
     Assert.assertTrue(result.isSuccess());
-    Assert.assertTrue(result.getAdditionalCertificates().isEmpty());
+//    Assert.assertTrue(result.getAdditionalCertificates().isEmpty());
     Assert.assertNotNull(result.toString());
 
     result = new DefaultSignatureValidationResult();
@@ -68,13 +66,12 @@ public class DefaultSignatureValidationResultTest {
     result = new DefaultSignatureValidationResult();
     result.setStatus(SignatureValidationResult.Status.SUCCESS);
     X509Certificate root = CertificateUtils.decodeCertificate((new ClassPathResource("certs/DigiCert-Global-Root-CA.crt")).getInputStream());
-    X509Certificate cert = CertificateUtils.decodeCertificate((new ClassPathResource("certs/idsec.se.cer")).getInputStream()); 
-    result.setCertificateValidationResult(new PKIXCertPathValidatorResult(new TrustAnchor(root, null), null, cert.getPublicKey())); 
-    result.setAdditionalCertificates(Arrays.asList(cert));
+    X509Certificate cert = CertificateUtils.decodeCertificate((new ClassPathResource("certs/idsec.se.cer")).getInputStream());
+    result.setCertificateValidationResult(new DefaultCertificateValidationResult(Arrays.asList(cert, root)));
     result.setSignerCertificate(cert);
 
     Assert.assertNotNull(result.getCertificateValidationResult());
-    Assert.assertEquals(1, result.getAdditionalCertificates().size());
+    //Assert.assertEquals(1, result.getAdditionalCertificates().size());
     Assert.assertNotNull(result.getSignerCertificate());
     Assert.assertNotNull(result.toString());
   }

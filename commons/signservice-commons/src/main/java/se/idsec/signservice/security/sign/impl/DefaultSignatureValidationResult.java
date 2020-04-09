@@ -15,12 +15,12 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
-import java.security.cert.PKIXCertPathValidatorResult;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**
@@ -47,7 +47,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
   private List<X509Certificate> additionalCertificates;
 
   /** The certificate validation result. */
-  private PKIXCertPathValidatorResult certificateValidationResult;
+  private CertificateValidationResult certificateValidationResult;
 
   /**
    * Default constructor.
@@ -155,6 +155,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Gets the certificates that are above the signer certificate in the chain (if received in the signature).
+   * 
    * @return a list of additional certificates
    */
   public List<X509Certificate> getAdditionalCertificates() {
@@ -173,7 +174,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /** {@inheritDoc} */
   @Override
-  public PKIXCertPathValidatorResult getCertificateValidationResult() {
+  public CertificateValidationResult getCertificateValidationResult() {
     return this.certificateValidationResult;
   }
 
@@ -183,7 +184,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
    * @param certificateValidationResult
    *          validation result
    */
-  public void setCertificateValidationResult(final PKIXCertPathValidatorResult certificateValidationResult) {
+  public void setCertificateValidationResult(final CertificateValidationResult certificateValidationResult) {
     this.certificateValidationResult = certificateValidationResult;
   }
 
@@ -197,8 +198,10 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
     }
     if (this.exception != null) {
       sb.append("exception=[")
-        .append(exception.getClass().getSimpleName()).append(":")
-        .append(exception.getMessage()).append("],");
+        .append(exception.getClass().getSimpleName())
+        .append(":")
+        .append(exception.getMessage())
+        .append("],");
     }
     if (this.signerCertificate != null) {
       sb.append("signerCertificate=[").append(CertificateUtils.toLogString(this.signerCertificate)).append("],");

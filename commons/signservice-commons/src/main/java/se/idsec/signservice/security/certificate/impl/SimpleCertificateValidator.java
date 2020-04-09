@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
 import se.idsec.signservice.security.certificate.CertificateValidator;
 
 /**
@@ -63,14 +64,14 @@ public class SimpleCertificateValidator implements CertificateValidator {
 
   /** {@inheritDoc} */
   @Override
-  public PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate, final List<X509Certificate> additionalCertificates,
+  public CertificateValidationResult validate(final X509Certificate subjectCertificate, final List<X509Certificate> additionalCertificates,
       final List<X509CRL> crls) throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException {
     return this.validate(subjectCertificate, additionalCertificates, crls, this.defaultTrustAnchors);
   }
 
   /** {@inheritDoc} */
   @Override
-  public PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate,
+  public CertificateValidationResult validate(final X509Certificate subjectCertificate,
       final List<X509Certificate> additionalCertificates,
       final List<X509CRL> crls,
       final List<X509Certificate> trustAnchors)
@@ -98,8 +99,12 @@ public class SimpleCertificateValidator implements CertificateValidator {
     // Finally, validate the path ...
     //
     final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
-    PKIXCertPathValidatorResult result = (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
+    PKIXCertPathValidatorResult pkixResult = (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
 
+    DefaultCertificateValidationResult result = new DefaultCertificateValidationResult(
+      builderResult.getCertPath().getCertificates().stream().map(X509Certificate.class::cast).collect(Collectors.toList()));
+    result.setPkixCertPathValidatorResult(pkixResult);
+    
     log.debug("Successful validation of [{}]", CertificateUtils.toLogString(subjectCertificate));
     return result;
   }
