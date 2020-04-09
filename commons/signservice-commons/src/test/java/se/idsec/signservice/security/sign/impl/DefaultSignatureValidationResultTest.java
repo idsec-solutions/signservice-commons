@@ -69,7 +69,7 @@ public class DefaultSignatureValidationResultTest {
     result.setStatus(SignatureValidationResult.Status.SUCCESS);
     X509Certificate root = CertificateUtils.decodeCertificate((new ClassPathResource("certs/DigiCert-Global-Root-CA.crt")).getInputStream());
     X509Certificate cert = CertificateUtils.decodeCertificate((new ClassPathResource("certs/idsec.se.cer")).getInputStream()); 
-    result.setCertificateValidationResult(new PKIXCertPathValidatorResult(new TrustAnchor(root, null), null, cert.getPublicKey())); 
+    result.setCertificateValidationResult(new DefaultCertificateValidationResult());
     result.setAdditionalCertificates(Arrays.asList(cert));
     result.setSignerCertificate(cert);
 

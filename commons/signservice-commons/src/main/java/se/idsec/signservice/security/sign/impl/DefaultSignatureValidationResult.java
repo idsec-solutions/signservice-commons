@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.sign.CertificateValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**
@@ -47,7 +48,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
   private List<X509Certificate> additionalCertificates;
 
   /** The certificate validation result. */
-  private PKIXCertPathValidatorResult certificateValidationResult;
+  private CertificateValidationResult certificateValidationResult;
 
   /**
    * Default constructor.
@@ -173,7 +174,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /** {@inheritDoc} */
   @Override
-  public PKIXCertPathValidatorResult getCertificateValidationResult() {
+  public CertificateValidationResult getCertificateValidationResult() {
     return this.certificateValidationResult;
   }
 
@@ -183,7 +184,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
    * @param certificateValidationResult
    *          validation result
    */
-  public void setCertificateValidationResult(final PKIXCertPathValidatorResult certificateValidationResult) {
+  public void setCertificateValidationResult(final CertificateValidationResult certificateValidationResult) {
     this.certificateValidationResult = certificateValidationResult;
   }
 

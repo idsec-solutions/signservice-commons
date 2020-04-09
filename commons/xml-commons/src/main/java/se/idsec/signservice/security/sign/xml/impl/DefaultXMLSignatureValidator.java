@@ -41,6 +41,7 @@ import org.w3c.dom.NodeList;
 import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.certificate.CertificateUtils;
 import se.idsec.signservice.security.certificate.CertificateValidator;
+import se.idsec.signservice.security.sign.CertificateValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult.Status;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
@@ -182,7 +183,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
       //
       if (result.isSuccess() && this.certificateValidator != null) {
         try {
-          PKIXCertPathValidatorResult validatorResult = this.certificateValidator.validate(result.getSignerCertificate(), result.getAdditionalCertificates(), null);
+          CertificateValidationResult validatorResult = this.certificateValidator.validate(result.getSignerCertificate(), result.getAdditionalCertificates(), null);
           result.setCertificateValidationResult(validatorResult);
         }
         catch (CertPathBuilderException e) {

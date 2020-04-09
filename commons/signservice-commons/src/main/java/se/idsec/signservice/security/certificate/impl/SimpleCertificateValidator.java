@@ -15,20 +15,11 @@
  */
 package se.idsec.signservice.security.certificate.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.security.cert.CertPathBuilder;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.CertPathBuilderResult;
-import java.security.cert.CertPathValidator;
-import java.security.cert.CertPathValidatorException;
-import java.security.cert.CertStore;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.PKIXCertPathValidatorResult;
-import java.security.cert.TrustAnchor;
-import java.security.cert.X509CRL;
-import java.security.cert.X509CertSelector;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -39,6 +30,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.certificate.CertificateUtils;
 import se.idsec.signservice.security.certificate.CertificateValidator;
+import se.idsec.signservice.security.sign.CertificateValidationResult;
+import se.idsec.signservice.security.sign.impl.DefaultCertificateValidationResult;
 
 /**
  * A simple validator that does not perform revocation checking and only relies upon the supplied certificates when
@@ -63,14 +56,14 @@ public class SimpleCertificateValidator implements CertificateValidator {
 
   /** {@inheritDoc} */
   @Override
-  public PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate, final List<X509Certificate> additionalCertificates,
+  public CertificateValidationResult validate(final X509Certificate subjectCertificate, final List<X509Certificate> additionalCertificates,
       final List<X509CRL> crls) throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException {
     return this.validate(subjectCertificate, additionalCertificates, crls, this.defaultTrustAnchors);
   }
 
   /** {@inheritDoc} */
   @Override
-  public PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate,
+  public CertificateValidationResult validate(final X509Certificate subjectCertificate,
       final List<X509Certificate> additionalCertificates,
       final List<X509CRL> crls,
       final List<X509Certificate> trustAnchors)
@@ -98,10 +91,37 @@ public class SimpleCertificateValidator implements CertificateValidator {
     // Finally, validate the path ...
     //
     final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
-    PKIXCertPathValidatorResult result = (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
+    CertificateValidationResult result = new DefaultCertificateValidationResult();
+    List<X509Certificate> certificatePath = builderResult.getCertPath().getCertificates().stream()
+      .map(certificate -> {
+        try {
+          return getCertificate(certificate);
+        }
+        catch (Exception ex) {
+          return null;
+        }
+      })
+      .collect(Collectors.toList());
+    ((DefaultCertificateValidationResult) result).setValidatedCertificatePath(certificatePath);
+    ((DefaultCertificateValidationResult) result).setPkixCertPathValidatorResult((PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params));
 
     log.debug("Successful validation of [{}]", CertificateUtils.toLogString(subjectCertificate));
     return result;
+  }
+
+  private X509Certificate getCertificate(Certificate certificate) throws CertificateException, IOException {
+    InputStream inputStream = null;
+    try {
+      inputStream = new ByteArrayInputStream(certificate.getEncoded());
+      CertificateFactory cf = CertificateFactory.getInstance("X.509");
+      X509Certificate cert = (X509Certificate)cf.generateCertificate(inputStream);
+      return cert;
+    }
+    finally {
+      if (inputStream != null) {
+          inputStream.close();
+      }
+    }
   }
 
   /**

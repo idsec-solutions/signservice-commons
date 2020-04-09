@@ -15,10 +15,11 @@
  */
 package se.idsec.signservice.security.certificate;
 
+import se.idsec.signservice.security.sign.CertificateValidationResult;
+
 import java.security.GeneralSecurityException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertPathValidatorException;
-import java.security.cert.PKIXCertPathValidatorResult;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -52,7 +53,7 @@ public interface CertificateValidator {
    * @throws GeneralSecurityException
    *           for general errors
    */
-  PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate,
+  CertificateValidationResult validate(final X509Certificate subjectCertificate,
       final List<X509Certificate> additionalCertificates, 
       final List<X509CRL> crls)
       throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException;
@@ -77,7 +78,7 @@ public interface CertificateValidator {
    * @throws GeneralSecurityException
    *           for general errors
    */
-  PKIXCertPathValidatorResult validate(final X509Certificate subjectCertificate,
+  CertificateValidationResult validate(final X509Certificate subjectCertificate,
       final List<X509Certificate> additionalCertificates,
       final List<X509CRL> crls,
       final List<X509Certificate> trustAnchors)

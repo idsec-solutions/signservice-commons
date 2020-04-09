@@ -19,7 +19,7 @@ import java.security.cert.PKIXCertPathValidatorResult;
 import java.security.cert.X509Certificate;
 
 /**
- * Interface representing the (sucessful) result of a signature validation operation.
+ * Interface representing the (successful) result of a signature validation operation.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -99,10 +99,10 @@ public interface SignatureValidationResult {
   X509Certificate getSignerCertificate();
 
   /**
-   * In case a successful certificate path validation was performed, this method returns the result from this operation.
+   * In case a successful certificate validation was performed, this method returns the result from this operation.
    * 
-   * @return the certificate path validation result
+   * @return the certificate validation result
    */
-  PKIXCertPathValidatorResult getCertificateValidationResult();
+  CertificateValidationResult getCertificateValidationResult();
 
 }
