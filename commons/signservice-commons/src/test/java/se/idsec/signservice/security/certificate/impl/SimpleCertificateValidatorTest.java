@@ -96,7 +96,7 @@ public class SimpleCertificateValidatorTest {
     validator.setDefaultTrustAnchors(Arrays.asList(this.dstRoot, this.digiCertRoot));
 
     result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null);
-    //Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
   }
 
   @Test

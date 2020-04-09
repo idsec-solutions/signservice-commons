@@ -104,7 +104,7 @@ public class SimpleCertificateValidator implements CertificateValidator {
     DefaultCertificateValidationResult result = new DefaultCertificateValidationResult(
       builderResult.getCertPath().getCertificates().stream().map(X509Certificate.class::cast).collect(Collectors.toList()));
     result.setPkixCertPathValidatorResult(pkixResult);
-
+    
     log.debug("Successful validation of [{}]", CertificateUtils.toLogString(subjectCertificate));
     return result;
   }
