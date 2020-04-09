@@ -27,10 +27,29 @@ public class DefaultCertificateValidationResult implements CertificateValidation
   public DefaultCertificateValidationResult() {
   }
 
+  /**
+   * Constructor
+   * @param validatedCertificatePath validated certificate path
+   * @param pkixCertPathValidatorResult PKIX validation result
+   */
+  public DefaultCertificateValidationResult(List<X509Certificate> validatedCertificatePath,
+    PKIXCertPathValidatorResult pkixCertPathValidatorResult) {
+    this.validatedCertificatePath = validatedCertificatePath;
+    this.pkixCertPathValidatorResult = pkixCertPathValidatorResult;
+  }
+  /**
+   * Constructor
+   * @param validatedCertificatePath validated certificate path
+   */
+  public DefaultCertificateValidationResult(List<X509Certificate> validatedCertificatePath) {
+    this.validatedCertificatePath = validatedCertificatePath;
+    this.pkixCertPathValidatorResult = null;
+  }
+
   /** {@inheritDoc} */
   @Override
   public List<X509Certificate> getValidatedCertificatePath() {
-    return null;
+    return validatedCertificatePath;
   }
 
   /**
@@ -44,7 +63,7 @@ public class DefaultCertificateValidationResult implements CertificateValidation
   /** {@inheritDoc} */
   @Override
   public PKIXCertPathValidatorResult getPKIXCertPathValidatorResult() {
-    return null;
+    return pkixCertPathValidatorResult;
   }
 
   /**

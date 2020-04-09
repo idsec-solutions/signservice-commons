@@ -91,37 +91,17 @@ public class SimpleCertificateValidator implements CertificateValidator {
     // Finally, validate the path ...
     //
     final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
-    CertificateValidationResult result = new DefaultCertificateValidationResult();
-    List<X509Certificate> certificatePath = builderResult.getCertPath().getCertificates().stream()
-      .map(certificate -> {
-        try {
-          return getCertificate(certificate);
-        }
-        catch (Exception ex) {
-          return null;
-        }
-      })
-      .collect(Collectors.toList());
-    ((DefaultCertificateValidationResult) result).setValidatedCertificatePath(certificatePath);
-    ((DefaultCertificateValidationResult) result).setPkixCertPathValidatorResult((PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params));
+    PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
+
+    List<? extends Certificate> certificates = builderResult.getCertPath().getCertificates();
+    List<X509Certificate> certificatePath = new ArrayList<>();
+    for (Certificate cert : certificates){
+      certificatePath.add(CertificateUtils.decodeCertificate(cert.getEncoded()));
+    }
+    CertificateValidationResult result = new DefaultCertificateValidationResult(certificatePath, pkixCertPathValidatorResult);
 
     log.debug("Successful validation of [{}]", CertificateUtils.toLogString(subjectCertificate));
     return result;
-  }
-
-  private X509Certificate getCertificate(Certificate certificate) throws CertificateException, IOException {
-    InputStream inputStream = null;
-    try {
-      inputStream = new ByteArrayInputStream(certificate.getEncoded());
-      CertificateFactory cf = CertificateFactory.getInstance("X.509");
-      X509Certificate cert = (X509Certificate)cf.generateCertificate(inputStream);
-      return cert;
-    }
-    finally {
-      if (inputStream != null) {
-          inputStream.close();
-      }
-    }
   }
 
   /**

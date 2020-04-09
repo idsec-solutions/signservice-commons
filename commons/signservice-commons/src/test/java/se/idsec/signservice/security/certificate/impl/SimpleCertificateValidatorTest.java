@@ -89,7 +89,7 @@ public class SimpleCertificateValidatorTest {
     Assert.assertEquals(1, validator.getDefaultTrustAnchors().size());
 
     CertificateValidationResult result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), Arrays.asList(crl));
-    //Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
     
     // The same with several roots in trust
     validator = new SimpleCertificateValidator();
@@ -97,7 +97,7 @@ public class SimpleCertificateValidatorTest {
     validator.setDefaultTrustAnchors(Arrays.asList(this.dstRoot, this.digiCertRoot));
 
     result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null);
-    //Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
   }
 
   @Test
@@ -108,7 +108,7 @@ public class SimpleCertificateValidatorTest {
 
     CertificateValidationResult result =
         validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate, this.digiCertRoot), null, null);
-    //Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
   }
 
   @Test
