@@ -15,8 +15,9 @@
  */
 package se.idsec.signservice.security.sign;
 
-import java.security.cert.PKIXCertPathValidatorResult;
 import java.security.cert.X509Certificate;
+
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
 
 /**
  * Interface representing the (successful) result of a signature validation operation.

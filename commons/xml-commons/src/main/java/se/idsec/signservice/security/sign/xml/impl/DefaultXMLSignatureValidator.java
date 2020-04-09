@@ -20,7 +20,6 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
-import java.security.cert.PKIXCertPathValidatorResult;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +39,8 @@ import org.w3c.dom.NodeList;
 
 import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
 import se.idsec.signservice.security.certificate.CertificateValidator;
-import se.idsec.signservice.security.sign.CertificateValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult.Status;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;

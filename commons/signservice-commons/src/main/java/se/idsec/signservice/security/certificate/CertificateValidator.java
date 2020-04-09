@@ -15,8 +15,6 @@
  */
 package se.idsec.signservice.security.certificate;
 
-import se.idsec.signservice.security.sign.CertificateValidationResult;
-
 import java.security.GeneralSecurityException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertPathValidatorException;

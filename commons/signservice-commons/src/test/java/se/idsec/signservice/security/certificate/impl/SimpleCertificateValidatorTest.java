@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
-import java.security.cert.PKIXCertPathValidatorResult;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -34,7 +33,7 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
-import se.idsec.signservice.security.sign.CertificateValidationResult;
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
 
 /**
  * Test cases for SimpleCertificateValidator.
@@ -89,7 +88,7 @@ public class SimpleCertificateValidatorTest {
     Assert.assertEquals(1, validator.getDefaultTrustAnchors().size());
 
     CertificateValidationResult result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), Arrays.asList(crl));
-    //Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
     
     // The same with several roots in trust
     validator = new SimpleCertificateValidator();
@@ -108,7 +107,7 @@ public class SimpleCertificateValidatorTest {
 
     CertificateValidationResult result =
         validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate, this.digiCertRoot), null, null);
-    //Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
   }
 
   @Test
