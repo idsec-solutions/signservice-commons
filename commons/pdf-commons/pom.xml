@@ -52,6 +52,7 @@
   </developers>
 
   <properties>
+    <signservice-integration-api.version>1.0.1</signservice-integration-api.version>
   </properties>
 
   <dependencies>
@@ -61,7 +62,7 @@
       <artifactId>signservice-commons</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
@@ -70,17 +71,42 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
+      <version>1.63</version>
     </dependency>
 
     <dependency>
-      <groupId>se.swedenconnect.opensaml</groupId>
-      <artifactId>opensaml-security-ext</artifactId>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-transcoder</artifactId>
+      <version>1.12</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-codec</artifactId>
+      <version>1.12</version>
     </dependency>
 
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
+
+    <!--
+        <dependency>
+          <groupId>se.swedenconnect.opensaml</groupId>
+          <artifactId>opensaml-security-ext</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </dependency>
+    -->
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -104,10 +130,11 @@
 
     <plugins>
 
+<!-- Temporary commented away during dev
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <!-- Temporory here. Just so that Stefan writes correct Javadoc, and Martin doesn't have to fix it afterwards ;-) -->
+        &lt;!&ndash; Temporory here. Just so that Stefan writes correct Javadoc, and Martin doesn't have to fix it afterwards ;-) &ndash;&gt;
         <executions>
           <execution>
             <id>attach-javadoc</id>
@@ -115,15 +142,16 @@
               <goal>jar</goal>
             </goals>
           </execution>
-        </executions>        
+        </executions>
         <configuration>
           <doctitle>SignService PDF Commons - ${project.version}</doctitle>
           <windowtitle>SignService PDF Commons - ${project.version}</windowtitle>
           <links>
             <link>https://idsec-solutions.github.io/signservice-commons/javadoc/signservice-commons/</link>
-          </links>          
+          </links>
         </configuration>
       </plugin>
+-->
 
     </plugins>
 

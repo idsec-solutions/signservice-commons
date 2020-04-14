@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.operator.AlgorithmNameFinder;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
@@ -15,13 +17,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Registry for SVT supported algorithms. This class adds support for the minimum supported set of algorithms and allows new algorithms
  * to be added. By default only RSA and ECDSA with SHA 245, 384 and 512 are supported.
  */
 public class PDFAlgoRegistry {
-  private static Map<String, AlgoProperties> supportedAlgoMap;
+  private static Map<String, PDFSignatureAlgorithmProperties> supportedAlgoMap;
   private static AlgorithmNameFinder algorithmNameFinder = new DefaultAlgorithmNameFinder();
 
   public static final String ALGO_ID_SIGNATURE_ECDSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
@@ -46,21 +49,21 @@ public class PDFAlgoRegistry {
   static {
     supportedAlgoMap = new HashMap<>();
     // Standard RSA
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA256)
       .sigAlgoOID(PKCSObjectIdentifiers.sha256WithRSAEncryption)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha256)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA384)
       .sigAlgoOID(PKCSObjectIdentifiers.sha384WithRSAEncryption)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA512)
       .sigAlgoOID(PKCSObjectIdentifiers.sha512WithRSAEncryption)
       .algoType(JCAConstants.KEY_ALGO_RSA)
@@ -68,21 +71,21 @@ public class PDFAlgoRegistry {
       .digestAlgoOID(NISTObjectIdentifiers.id_sha512)
       .build());
     // Standard RSA-PSS
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA256_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha256)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA384_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA512)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
       .algoType(JCAConstants.KEY_ALGO_RSA)
@@ -90,21 +93,21 @@ public class PDFAlgoRegistry {
       .digestAlgoOID(NISTObjectIdentifiers.id_sha512)
       .build());
     // SHA 3 with RSA
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA3_256_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA3_256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_256)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA3_384_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA3_384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_384)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA3_512_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
       .algoType(JCAConstants.KEY_ALGO_RSA)
@@ -112,21 +115,21 @@ public class PDFAlgoRegistry {
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_512)
       .build());
     // ECDSA
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA256)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA256)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA3_256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_256)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA384)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA384)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA3_384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_384)
       .build());
-    putDefaultAlgo(AlgoProperties.builder()
+    putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA512)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA384)
       .algoType(JCAConstants.KEY_ALGO_RSA)
@@ -146,13 +149,49 @@ public class PDFAlgoRegistry {
   }
 
   /**
+   * Get the URI identifier for a registered signature algorithm specified by an ASN.1 algorithm identifier
+   * @param algorithmIdentifier the ASN.1 algorithm identifier
+   * @return URI identifier for the specified signature algorithm
+   * @throws NoSuchAlgorithmException if the specified algorithm is not supported or has illegal parameters
+   */
+  public static String getAlgorithmURI(AlgorithmIdentifier algorithmIdentifier) throws NoSuchAlgorithmException {
+    ASN1ObjectIdentifier algorithmOID = algorithmIdentifier.getAlgorithm();
+    if (algorithmOID.equals(PKCSObjectIdentifiers.id_RSASSA_PSS)){
+      try {
+        RSASSAPSSparams rsaPssParams = RSASSAPSSparams.getInstance(algorithmIdentifier.getParameters());
+        AlgorithmIdentifier hashAlgorithm = rsaPssParams.getHashAlgorithm();
+        Optional<PDFSignatureAlgorithmProperties> algoOptional = supportedAlgoMap.keySet().stream()
+          .map(s -> supportedAlgoMap.get(s))
+          .filter(
+            algoProp -> algoProp.getSigAlgoOID().equals(algorithmOID) && algoProp.getDigestAlgoOID().equals(hashAlgorithm.getAlgorithm()))
+          .findFirst();
+        if (algoOptional.isPresent()){
+          return algoOptional.get().sigAlgoId;
+        }
+        throw new NoSuchAlgorithmException("Non supported RSA PSS algorithm parameters");
+      } catch (Exception ex){
+        throw new NoSuchAlgorithmException("Illegal RSA PSS parameters");
+      }
+    }
+    Optional<PDFSignatureAlgorithmProperties> algoOptional = supportedAlgoMap.keySet().stream()
+      .map(s -> supportedAlgoMap.get(s))
+      .filter(
+        algoProp -> algoProp.getSigAlgoOID().equals(algorithmOID))
+      .findFirst();
+    if (algoOptional.isPresent()){
+      return algoOptional.get().sigAlgoId;
+    }
+    throw new NoSuchAlgorithmException("Non supported signature algorithm");
+  }
+
+  /**
    * Returns the algorithm parameters for a supported algorithm
    *
    * @param algorithm algorithm
    * @return algorithm properties
    * @throws IllegalArgumentException if the algorithm is not supported
    */
-  public static AlgoProperties getAlgorithmProperties(String algorithm) throws IllegalArgumentException {
+  public static PDFSignatureAlgorithmProperties getAlgorithmProperties(String algorithm) throws IllegalArgumentException {
     if (!isAlgoSupported(algorithm)) {
       throw new IllegalArgumentException("Unsupported Algorithm");
     }
@@ -177,7 +216,6 @@ public class PDFAlgoRegistry {
   /**
    * Get the algorithm name for the digest algorithm of the signature algorithm
    * @param algorithm
-   * @return Name of the digest algorithm
    * @throws NoSuchAlgorithmException if the algorithm is not supported
    */
   public static String getDigestName(String algorithm) throws NoSuchAlgorithmException {
@@ -189,7 +227,6 @@ public class PDFAlgoRegistry {
   /**
    * Get the algorithm name for the digest algorithm of the signature algorithm
    * @param algorithm
-   * @return Name of the digest algorithm
    * @throws NoSuchAlgorithmException if the algorithm is not supported
    */
   public static String getSigAlgoName(String algorithm) throws NoSuchAlgorithmException {
@@ -202,11 +239,11 @@ public class PDFAlgoRegistry {
   /**
    * Register a new supported JWS algorithm for signing the SVT
    *
-   * @param algoProperties  The The algorithm name used to identify the algorithm in CMS
+   * @param pdfSignatureAlgorithmProperties  The The algorithm name used to identify the algorithm in CMS
    * @return true if the algorithm registration was successful
    */
-  public static boolean registerSupportedJWSAlgorithm(AlgoProperties algoProperties) {
-    supportedAlgoMap.put(algoProperties.getDigestAlgoId(), algoProperties);
+  public static boolean registerSupportedAlgorithm(PDFSignatureAlgorithmProperties pdfSignatureAlgorithmProperties) {
+    supportedAlgoMap.put(pdfSignatureAlgorithmProperties.getDigestAlgoId(), pdfSignatureAlgorithmProperties);
     return true;
   }
 
@@ -220,8 +257,8 @@ public class PDFAlgoRegistry {
   public static String getAlgoFamilyFromAlgo(String algorithm) throws IllegalArgumentException {
     String type = null;
     if (supportedAlgoMap.containsKey(algorithm)){
-      AlgoProperties algoProperties = supportedAlgoMap.get(algorithm);
-      return algoProperties.getAlgoType();
+      PDFSignatureAlgorithmProperties PDFSignatureAlgorithmProperties = supportedAlgoMap.get(algorithm);
+      return PDFSignatureAlgorithmProperties.getAlgoType();
     }
 
     throw new IllegalArgumentException("Unsupported JWS Algorithm family");
@@ -231,9 +268,9 @@ public class PDFAlgoRegistry {
   private PDFAlgoRegistry() {
   }
 
-  private static void putDefaultAlgo(AlgoProperties algoProperties)
+  private static void putDefaultAlgo(PDFSignatureAlgorithmProperties pdfSignatureAlgorithmProperties)
     throws IllegalArgumentException {
-    supportedAlgoMap.put(algoProperties.getDigestAlgoId(), algoProperties);
+    supportedAlgoMap.put(pdfSignatureAlgorithmProperties.getSigAlgoId(), pdfSignatureAlgorithmProperties);
   }
 
   /**
@@ -242,7 +279,7 @@ public class PDFAlgoRegistry {
   @Builder
   @Getter
   @AllArgsConstructor
-  public static class AlgoProperties {
+  public static class PDFSignatureAlgorithmProperties {
     /** XML UIR identifier for the signature algorithm */
     String sigAlgoId;
     /** Algorithm Object Identifier */

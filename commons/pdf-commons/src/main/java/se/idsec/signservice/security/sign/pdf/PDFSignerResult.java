@@ -15,9 +15,12 @@
  */
 package se.idsec.signservice.security.sign.pdf;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-
+import org.bouncycastle.cms.CMSSignedData;
+import se.idsec.signservice.pdf.sign.PDFSignTaskDocument;
 import se.idsec.signservice.security.sign.SignerResult;
+
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * Represents the result from an PDF signature operation.
@@ -26,8 +29,44 @@ import se.idsec.signservice.security.sign.SignerResult;
  * @author Stefan Santesson (stefan@idsec.se)
  * @see PDFSigner
  */
-public interface PDFSignerResult extends SignerResult<PDDocument> {
+public interface PDFSignerResult extends SignerResult<PDFSignTaskDocument> {
 
-  // TODO
-  
+  /**
+   * Gets the CMS ContentInfo ASN1 object that contains the CMS SignedData structure
+   * @return {@link CMSSignedData}
+   */
+  CMSSignedData getSignedData();
+
+  /**
+   * Gets the signed attributes bytes signed by the generated signature.
+   * These are the bytes sent to an external signature service as the to be signed bytes.
+   * These bytes may be manipulated from the signed bytes in the CMSSignedData after adapting the result to requirements by the signing service.
+   * One such example is if the signature is a PAdES signature, where the signing time attribute must be removed before being sent to the signing service.
+   * @return signed attributes bytes
+   */
+  byte[] getSignedAttributes();
+
+  /**
+   * Gets the signer certificates
+   * @return signer certificate
+   */
+  X509Certificate getSignerCertificate();
+
+  /**
+   * Gets the signer certificate chain
+   * @return signer certificate chain
+   */
+  List<X509Certificate> getSignerCertificateChain();
+
+  /**
+   * @return true if the signing process was successful
+   */
+  boolean isSuccess();
+
+  /**
+   * Gets an exception thrown during the signing process which caused the signing process to fail
+   * @return exception
+   */
+  Exception getException();
+
 }

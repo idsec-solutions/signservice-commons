@@ -85,6 +85,12 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Bouncycastle -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <version>1.63</version>
+    </dependency>
     <!-- JAXB -->
     <dependency>
       <groupId>javax.xml.bind</groupId>

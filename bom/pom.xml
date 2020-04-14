@@ -52,7 +52,7 @@
     <opensaml.version>3.4.5</opensaml.version>
     <pdfbox.version>2.0.17</pdfbox.version>
     <slf4j.version>1.7.29</slf4j.version>
-    <bouncycastle.version>1.65</bouncycastle.version>
+    <bouncycastle.version>1.63</bouncycastle.version>
   </properties>
 
   <repositories>
