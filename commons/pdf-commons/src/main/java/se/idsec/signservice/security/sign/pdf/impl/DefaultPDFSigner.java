@@ -7,7 +7,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import se.idsec.signservice.pdf.general.PDFAlgoRegistry;
 import se.idsec.signservice.pdf.general.PdfObjectIds;
-import se.idsec.signservice.pdf.sign.DefaultSignatureInterfaceImpl;
 import se.idsec.signservice.pdf.sign.PDFSignTaskDocument;
 import se.idsec.signservice.pdf.utils.PdfBoxSigUtil;
 import se.idsec.signservice.security.sign.SigningCredential;
@@ -83,6 +82,27 @@ public class DefaultPDFSigner implements PDFSigner {
   @Override public PDFSignerResult sign(PDFSignTaskDocument document) throws SignatureException {
     try {
       PDDocument pdfDocument = PDDocument.load(document.getPdfDocument());
+      List<X509Certificate> signingCertChain = includeCertificateChain
+        ? signingCredential.getCertificateChain()
+        : Arrays.asList(signingCredential.getSigningCertificate());
+
+      DefaultSignatureInterfaceImpl defaultSigner = new DefaultSignatureInterfaceImpl(
+        signingCredential.getPrivateKey(),
+        signingCertChain,
+        signatureAlgorithm
+      );
+
+      PDFSigningProcessor pdfSigningProcessor = PDFSigningProcessor.builder()
+        .chain(signingCertChain)
+        .document(document)
+        .pdfDocument(pdfDocument)
+        .signTimeAndID(System.currentTimeMillis())
+        .signatureInterface(defaultSigner)
+        .build();
+
+      DefaultPDFSignerResult result = pdfSigningProcessor.signPdf();
+
+/*      defaultSigner.setPades(pades);
 
       boolean pades = false;
       String adesRequirement = document.getAdesType();
@@ -100,16 +120,6 @@ public class DefaultPDFSigner implements PDFSigner {
         signature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_DETACHED);
       }
 
-      List<X509Certificate> signingCertChain = includeCertificateChain
-        ? signingCredential.getCertificateChain()
-        : Arrays.asList(signingCredential.getSigningCertificate());
-
-      DefaultSignatureInterfaceImpl defaultSigner = new DefaultSignatureInterfaceImpl(
-        signingCredential.getPrivateKey(),
-        signingCertChain,
-        signatureAlgorithm
-      );
-      defaultSigner.setPades(pades);
       long signTimeAndID = System.currentTimeMillis();
       Calendar signingTime = Calendar.getInstance();
       signingTime.setTime(new Date(signTimeAndID));
@@ -139,21 +149,22 @@ public class DefaultPDFSigner implements PDFSigner {
         .pdfDocument(pdfDocumentBytes)
         .adesType(document.getAdesType())
         .signTimeAndId(signTimeAndID)
-        .cmsSignedData(defaultSigner.getResultSignedData().getEncoded())
+        .cmsSignedData(defaultSigner.getUpdatedCmsSignedData())
         .build());
       result.setSignerCertificate(signingCredential.getSigningCertificate());
       result.setSignerCertificateChain(signingCertChain);
       // Prepare and store the signed attributes
-      byte[] cmsSignedAttributes = PdfBoxSigUtil.getCmsSignedAttributes(defaultSigner.getResultSignedData());
+      byte[] cmsSignedAttributes = PdfBoxSigUtil.getCmsSignedAttributes(defaultSigner.getUpdatedCmsSignedData());
       if (pades){
         // Signing time is not allowed in PAdES signatures
         cmsSignedAttributes = PdfBoxSigUtil.removeSignedAttr(cmsSignedAttributes, new ASN1ObjectIdentifier[]{new ASN1ObjectIdentifier(PdfObjectIds.ID_SIGNING_TIME)});
       }
-      result.setSignedAttributes(cmsSignedAttributes);
+      result.setSignedAttributes(cmsSignedAttributes);*/
+
 
       return result;
     }
-    catch (IOException | NoSuchAlgorithmException | CertificateException e) {
+    catch (IOException e) {
       DefaultPDFSignerResult result = new DefaultPDFSignerResult();
       result.setSuccess(false);
       result.setException(e);

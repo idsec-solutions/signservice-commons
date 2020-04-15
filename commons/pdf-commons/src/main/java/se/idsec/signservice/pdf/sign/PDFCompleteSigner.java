@@ -2,17 +2,13 @@ package se.idsec.signservice.pdf.sign;
 
 import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
-import se.idsec.signservice.pdf.utils.PdfBoxSigUtil;
 import se.idsec.signservice.security.sign.pdf.PDFSignerResult;
 import se.idsec.signservice.security.sign.pdf.impl.DefaultPDFSignerResult;
+import se.idsec.signservice.security.sign.pdf.impl.PDFSigningProcessor;
+import se.idsec.signservice.security.sign.pdf.impl.ReplaceSignatureInterfaceImpl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class PDFCompleteSigner {
@@ -44,13 +40,26 @@ public class PDFCompleteSigner {
 
     try {
       ReplaceSignatureInterfaceImpl replaceSignatureInterface = new ReplaceSignatureInterfaceImpl(
-        document.cmsSignedData,
+        document.getCmsSignedData(),
         signedAttributes,
         signatureValue,
         chain
       );
 
       PDDocument pdfDocument = validateDocument(document);
+
+      PDFSigningProcessor pdfSigningProcessor = PDFSigningProcessor.builder()
+        .chain(chain)
+        .document(document)
+        .pdfDocument(pdfDocument)
+        .signTimeAndID(document.getSignTimeAndId())
+        .signatureInterface(replaceSignatureInterface)
+        .build();
+
+      DefaultPDFSignerResult result = pdfSigningProcessor.signPdf();
+
+/*
+
 
       boolean pades = false;
       String adesRequirement = document.getAdesType();
@@ -107,7 +116,7 @@ public class PDFCompleteSigner {
         .build());
       result.setSignerCertificate(chain.get(0));
       result.setSignerCertificateChain(chain);
-      result.setSignedAttributes(PdfBoxSigUtil.getCmsSignedAttributes(replaceSignatureInterface.getUpdatedCmsSignedData()));
+      result.setSignedAttributes(PdfBoxSigUtil.getCmsSignedAttributes(replaceSignatureInterface.getUpdatedCmsSignedData()));*/
 
       return result;
 

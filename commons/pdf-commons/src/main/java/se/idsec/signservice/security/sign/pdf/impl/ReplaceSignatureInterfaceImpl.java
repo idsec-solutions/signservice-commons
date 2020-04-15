@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.pdf.sign;
+package se.idsec.signservice.security.sign.pdf.impl;
 
 import lombok.Getter;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
 import se.idsec.signservice.pdf.utils.PdfBoxSigUtil;
+import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * Implementation of the SignatureInterface where the
  */
-public class ReplaceSignatureInterfaceImpl implements SignatureInterface {
+public class ReplaceSignatureInterfaceImpl implements SignserviceSignatureInterface {
 
     /** The original ContentInfo bytes holding SignedInfo from the original pre-signing process */
     private byte[] originalSignedData;
@@ -43,9 +44,12 @@ public class ReplaceSignatureInterfaceImpl implements SignatureInterface {
     /** The signer certificate chain provided by the signature service */
     private List<X509Certificate> signerCertchain;
 
-    @Getter
     /** The updated Content Info holding SignedData */
-      byte[] updatedCmsSignedData;
+    private byte[] updatedCmsSignedData;
+
+    /** The CMS Signed attributes */
+    private byte[] cmsSignedAttributes;
+
 
     /**
      * Constructor for the replace signature interface implementation
@@ -60,6 +64,21 @@ public class ReplaceSignatureInterfaceImpl implements SignatureInterface {
         this.newSignedAttributesData = newSignedAttributesData;
         this.newSignatureValue = newSignatureValue;
         this.signerCertchain = signerCertchain;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override public byte[] getCmsSignedData() {
+        return updatedCmsSignedData;
+    }
+
+    /** {@inheritDoc} */
+    @Override public byte[] getCmsSignedAttributes() {
+        return cmsSignedAttributes;
+    }
+
+    /** This value is not set as it has no function in this implementation of the interface */
+    @Override public void setPades(boolean pades) {
     }
 
     /**
@@ -83,9 +102,11 @@ public class ReplaceSignatureInterfaceImpl implements SignatureInterface {
     public byte[] sign(InputStream content) throws IOException {
         try {
             updatedCmsSignedData = PdfBoxSigUtil.updatePdfPKCS7(originalSignedData, newSignedAttributesData, newSignatureValue, signerCertchain);
+            cmsSignedAttributes = PdfBoxSigUtil.getCmsSignedAttributes(updatedCmsSignedData);
             return updatedCmsSignedData;
         } catch (Exception e) {
             throw new IOException(e);
         }
     }
+
 }

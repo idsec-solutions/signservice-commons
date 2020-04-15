@@ -19,17 +19,17 @@ public class PDFSignTaskDocument {
   public static final String ADES_PROFILE_NONE = "None";
 
   /** The bytes of the PDF document */
-  byte[] pdfDocument;
+  private byte[] pdfDocument;
 
   /** The bytes of CMS Content Info holding the SignedData */
-  byte[] cmsSignedData;
+  private byte[] cmsSignedData;
 
   /** Time and signature ID in milliseconds. */
-  Long signTimeAndId;
+  private Long signTimeAndId;
 
   /** ETSI AdES signature type (BES, EPES or None) */
-  String adesType;
+  private String adesType;
 
   /** A Visible sign image to be included in the signature context. This object is not resent in result data */
-  VisibleSigImage visibleSigImage;
+  private VisibleSigImage visibleSigImage;
 }
