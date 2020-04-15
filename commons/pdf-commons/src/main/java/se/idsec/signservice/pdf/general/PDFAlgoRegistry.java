@@ -119,22 +119,22 @@ public class PDFAlgoRegistry {
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA256)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA256)
       .algoType(JCAConstants.KEY_ALGO_RSA)
-      .digestAlgoId(ALGO_ID_DIGEST_SHA3_256)
-      .digestAlgoOID(NISTObjectIdentifiers.id_sha3_256)
+      .digestAlgoId(ALGO_ID_DIGEST_SHA256)
+      .digestAlgoOID(NISTObjectIdentifiers.id_sha256)
       .build());
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA384)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA384)
       .algoType(JCAConstants.KEY_ALGO_RSA)
-      .digestAlgoId(ALGO_ID_DIGEST_SHA3_384)
-      .digestAlgoOID(NISTObjectIdentifiers.id_sha3_384)
+      .digestAlgoId(ALGO_ID_DIGEST_SHA384)
+      .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
       .build());
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA512)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA384)
       .algoType(JCAConstants.KEY_ALGO_RSA)
-      .digestAlgoId(ALGO_ID_DIGEST_SHA3_512)
-      .digestAlgoOID(NISTObjectIdentifiers.id_sha3_512)
+      .digestAlgoId(ALGO_ID_DIGEST_SHA512)
+      .digestAlgoOID(NISTObjectIdentifiers.id_sha512)
       .build());
   }
 
