@@ -9,19 +9,12 @@ import java.util.List;
 
 public class DefaultPDFSignerResult implements PDFSignerResult {
 
-  private CMSSignedData signedData;
   private byte[] signedAttributes;
   private X509Certificate signerCertificate;
   private List<X509Certificate> signerCertificateChain;
   private PDFSignTaskDocument pdfSignTaskDocument;
   private boolean success;
   private Exception exception;
-
-
-  /** {@inheritDoc} */
-  @Override public CMSSignedData getSignedData() {
-    return signedData;
-  }
 
   /** {@inheritDoc} */
   @Override public byte[] getSignedAttributes() {
@@ -58,14 +51,6 @@ public class DefaultPDFSignerResult implements PDFSignerResult {
     return this.pdfSignTaskDocument.getSignTimeAndId();
   }
 
-
-  /**
-   * Assigns CMS Signed data
-   * @param signedData CMS signed data
-   */
-  public void setSignedData(CMSSignedData signedData) {
-    this.signedData = signedData;
-  }
 
   /**
    * Assigns signer certificate

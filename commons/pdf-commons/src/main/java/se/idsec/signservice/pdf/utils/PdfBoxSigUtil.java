@@ -4,10 +4,19 @@
  */
 package se.idsec.signservice.pdf.utils;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.asn1.ess.ESSCertID;
+import org.bouncycastle.asn1.ess.ESSCertIDv2;
+import org.bouncycastle.asn1.ess.SigningCertificate;
+import org.bouncycastle.asn1.ess.SigningCertificateV2;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -39,16 +48,41 @@ public class PdfBoxSigUtil {
    * This method extracts signed attribute data from a CMS signature
    *
    * @param signedData
-   * @return
-   * @throws IllegalArgumentException If the provided input has no signed attribute data
+   * @return The signed attributes of a PDF signature
+   * @throws IOException If the provided input has no signed attribute data
    */
-  public static byte[] getCmsSignedAttributes(CMSSignedData signedData) throws IllegalArgumentException {
+  public static byte[] getCmsSignedAttributes(CMSSignedData signedData) throws IOException {
     try {
       return signedData.getSignerInfos().iterator().next().getEncodedSignedAttributes();
     } catch (Exception ex){
-      throw new IllegalArgumentException("No CMS signed attributes are available");
+      throw new IOException("No CMS signed attributes are available");
     }
   }
+
+  /**
+   * This method extracts signed attribute data from a CMS signature
+   *
+   * @param contentInfoBytes the CMS Content info bytes holding CMSSignedData content
+   * @return The signed attributes of a PDF signature
+   * @throws IllegalArgumentException If the provided input has no signed attribute data
+   */
+  public static byte[] getCmsSignedAttributes(byte[] contentInfoBytes) throws IOException {
+    try {
+      ContentInfo contentInfo = ContentInfo.getInstance(contentInfoBytes);
+      ASN1ObjectIdentifier contentType = contentInfo.getContentType();
+      if (!contentType.getId().equals(PdfObjectIds.ID_PKCS7_SIGNED_DATA)){
+        throw new IOException("No SignedData present in input");
+      }
+      SignedData signedData = SignedData.getInstance(contentInfo.getContent());
+      SignerInfo signerInfo = SignerInfo.getInstance(signedData.getSignerInfos().getObjectAt(0));
+      return signerInfo.getAuthenticatedAttributes().getEncoded("DER");
+    } catch (Exception ex){
+      throw new IOException("No CMS signed attributes are available");
+    }
+  }
+
+
+
 
   /**
    * A method that updates the PDF SignedData object (Actually a CMS ContentInfo) with a new
@@ -70,7 +104,7 @@ public class PdfBoxSigUtil {
    * @param chain
    * @return
    */
-  public static byte[] updatePdfPKCS7(CMSSignedData cmsSignedData,byte[] newTbsBytes, byte[] newSigValue, List<X509Certificate> chain) {
+  public static byte[] updatePdfPKCS7(byte[] cmsSignedData,byte[] newTbsBytes, byte[] newSigValue, List<X509Certificate> chain) {
 
     //New variables
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -80,7 +114,7 @@ public class PdfBoxSigUtil {
     ASN1EncodableVector nsi = new ASN1EncodableVector();
 
     try {
-      ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(cmsSignedData.getEncoded()));
+      ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(cmsSignedData));
 
       //
       // Basic checks to make sure it's a PKCS#7 SignedData Object
@@ -498,6 +532,49 @@ public class PdfBoxSigUtil {
     dout.close();
     bout.close();
     return newSigAttr;
+  }
+
+
+  public static SignedCertRef getSignedCertRefAttribute(byte[] signedAttrBytes) throws IOException {
+    try {
+      ASN1Set inAttrSet = ASN1Set.getInstance(new ASN1InputStream(signedAttrBytes).readObject());
+      for (int i = 0; i < inAttrSet.size(); i++) {
+        Attribute attr = Attribute.getInstance(inAttrSet.getObjectAt(i));
+
+        if (attr.getAttrType().equals(new ASN1ObjectIdentifier(PdfObjectIds.ID_AA_SIGNING_CERTIFICATE_V2))) {
+          ASN1Encodable[] attributeValues = attr.getAttributeValues();
+          SigningCertificateV2 signingCertificateV2 = SigningCertificateV2.getInstance(attributeValues[0]);
+          ESSCertIDv2[] certsRefs= signingCertificateV2.getCerts();
+          ESSCertIDv2 certsRef = certsRefs[0];
+          return SignedCertRef.builder()
+            .hashAlgorithm(certsRef.getHashAlgorithm().getAlgorithm())
+            .signedCertHash(certsRef.getCertHash())
+            .build();
+        }
+        if (attr.getAttrType().equals(new ASN1ObjectIdentifier(PdfObjectIds.ID_AA_SIGNING_CERTIFICATE_V1))) {
+          ASN1Encodable[] attributeValues = attr.getAttributeValues();
+          SigningCertificate signingCertificate = SigningCertificate.getInstance(attributeValues[0]);
+          ESSCertID[] certsRefs= signingCertificate.getCerts();
+          ESSCertID certsRef = certsRefs[0];
+          return SignedCertRef.builder()
+            .hashAlgorithm(OIWObjectIdentifiers.idSHA1)
+            .signedCertHash(certsRef.getCertHash())
+            .build();
+        }
+      }
+    } catch (Exception ex){
+      throw new IOException("Error parsing PAdES signed attributes - " + ex.getMessage());
+    }
+    return null;
+  }
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Builder
+  public static class SignedCertRef {
+    private byte[] signedCertHash;
+    private ASN1ObjectIdentifier hashAlgorithm;
   }
 
 }

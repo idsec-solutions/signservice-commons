@@ -18,6 +18,7 @@ package se.idsec.signservice.pdf.sign;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
@@ -114,7 +115,7 @@ public class DefaultSignatureInterfaceImpl implements SignatureInterface {
       CMSProcessableInputStream msg = new CMSProcessableInputStream(content);
       resultSignedData = gen.generate(msg, false);
 
-      return resultSignedData.getEncoded();
+      return resultSignedData.toASN1Structure().getEncoded(ASN1Encoding.DL);
     }
     catch (GeneralSecurityException | CMSException | OperatorCreationException e) {
       throw new IOException(e);

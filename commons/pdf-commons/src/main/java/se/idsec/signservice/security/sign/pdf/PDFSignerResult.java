@@ -32,12 +32,6 @@ import java.util.List;
 public interface PDFSignerResult extends SignerResult<PDFSignTaskDocument> {
 
   /**
-   * Gets the CMS ContentInfo ASN1 object that contains the CMS SignedData structure
-   * @return {@link CMSSignedData}
-   */
-  CMSSignedData getSignedData();
-
-  /**
    * Gets the signed attributes bytes signed by the generated signature.
    * These are the bytes sent to an external signature service as the to be signed bytes.
    * These bytes may be manipulated from the signed bytes in the CMSSignedData after adapting the result to requirements by the signing service.

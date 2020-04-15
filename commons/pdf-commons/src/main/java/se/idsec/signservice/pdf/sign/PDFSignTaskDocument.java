@@ -19,7 +19,10 @@ public class PDFSignTaskDocument {
   public static final String ADES_PROFILE_NONE = "None";
 
   /** The bytes of the PDF document */
-  byte[] pdfDocumentBytes;
+  byte[] pdfDocument;
+
+  /** The bytes of CMS Content Info holding the SignedData */
+  byte[] cmsSignedData;
 
   /** Time and signature ID in milliseconds. */
   Long signTimeAndId;

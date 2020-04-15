@@ -43,15 +43,6 @@ public class DefaultPDFSigner implements PDFSigner {
    */
   private boolean includeCertificateChain = false;
 
-  /**
-   * Default max time offset from current time used to generate the PDF signature.
-   * This value is generated at presign and is reused at completesign
-   * The value at completesign must not deviate from current time with more milliseconds than set by this parameter.
-   * <p>
-   * Default value set to 10 minutes
-   * </p>
-   */
-  private int signTimeAllowedOffsetMillisec = 1000 * 60 * 60 * 10;
 
   /**
    * Constructor.
@@ -91,7 +82,7 @@ public class DefaultPDFSigner implements PDFSigner {
   /** {@inheritDoc} */
   @Override public PDFSignerResult sign(PDFSignTaskDocument document) throws SignatureException {
     try {
-      PDDocument pdfDocument = validateDocument(document, false);
+      PDDocument pdfDocument = PDDocument.load(document.getPdfDocument());
 
       boolean pades = false;
       String adesRequirement = document.getAdesType();
@@ -145,11 +136,11 @@ public class DefaultPDFSigner implements PDFSigner {
       DefaultPDFSignerResult result = new DefaultPDFSignerResult();
       result.setSuccess(true);
       result.setPdfSignTaskDocument(PDFSignTaskDocument.builder()
-        .pdfDocumentBytes(pdfDocumentBytes)
+        .pdfDocument(pdfDocumentBytes)
         .adesType(document.getAdesType())
         .signTimeAndId(signTimeAndID)
+        .cmsSignedData(defaultSigner.getResultSignedData().getEncoded())
         .build());
-      result.setSignedData(defaultSigner.getResultSignedData());
       result.setSignerCertificate(signingCredential.getSigningCertificate());
       result.setSignerCertificateChain(signingCertChain);
       // Prepare and store the signed attributes
@@ -170,26 +161,6 @@ public class DefaultPDFSigner implements PDFSigner {
     }
   }
 
-  private PDDocument validateDocument(PDFSignTaskDocument document, boolean completeSign) throws IOException, IllegalArgumentException {
-    if (completeSign) {
-      try {
-        long signTimeAndID = document.getSignTimeAndId();
-        if (System.currentTimeMillis() - signTimeAndID > signTimeAllowedOffsetMillisec) {
-          throw new IllegalArgumentException("The basic sign request is too old");
-        }
-      }
-      catch (Exception ex) {
-        throw new IllegalArgumentException("Missing signing time and ID extension in the to be signed document");
-      }
-    }
-    return PDDocument.load(document.getPdfDocumentBytes());
-  }
-
-  /** {@inheritDoc} */
-  @Override public PDFSignerResult completeSign(PDFSignTaskDocument document, byte[] signedAttributes, byte[] signatureValue,
-    List<X509Certificate> chain) {
-    return null;
-  }
 
   /**
    * Sets whether the certificate chain/path be included in the signature (if available from
