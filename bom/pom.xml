@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <name>IDsec Solutions :: BOM for SignService</name>
   <description>BOM for SignService</description>
@@ -51,6 +51,7 @@
     <jackson.version>2.10.0</jackson.version>
     <opensaml.version>3.4.5</opensaml.version>
     <pdfbox.version>2.0.17</pdfbox.version>
+    <bouncy-castle.version>1.65</bouncy-castle.version>
     <slf4j.version>1.7.29</slf4j.version>
     <bouncycastle.version>1.63</bouncycastle.version>
   </properties>
@@ -230,6 +231,25 @@
         <artifactId>ext-auth-info10-jaxb</artifactId>
         <version>1.0.1</version>     
       </dependency>
+      
+      <!-- Bouncy Castle -->
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${bouncy-castle.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk15on</artifactId>
+        <version>${bouncy-castle.version}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcmail-jdk15on</artifactId>
+        <version>${bouncy-castle.version}</version>
+      </dependency>      
 
       <!-- OpenSAML -->
       <dependency>
