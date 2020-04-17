@@ -55,12 +55,6 @@
   </properties>
 
   <dependencies>
-
-    <!-- Spring -->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-    </dependency>
     
     <!-- XML Security -->
     <dependency>
@@ -73,6 +67,14 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
     </dependency>
+    
+    <!-- Spring -->
+    <!-- Optional dependency - Only needed if KeyStoreSigningCredential is used -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <optional>true</optional>
+    </dependency>    
 
     <!-- OpenSAML -->
     <dependency>
@@ -88,12 +90,6 @@
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-xmlsec-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>se.swedenconnect.opensaml</groupId>
-      <artifactId>opensaml-security-ext</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <!-- JAXB -->
@@ -114,6 +110,12 @@
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.4</version>
+    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -125,7 +127,13 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- Test -->
+    <!-- Test -->    
+    <dependency>
+      <groupId>se.swedenconnect.opensaml</groupId>
+      <artifactId>opensaml-security-ext</artifactId>
+      <scope>test</scope>
+    </dependency>    
+    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>

@@ -24,6 +24,7 @@ import java.security.cert.X509Certificate;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.signature.XMLSignature;
@@ -37,7 +38,6 @@ import org.opensaml.xmlsec.algorithm.AlgorithmDescriptor;
 import org.opensaml.xmlsec.algorithm.AlgorithmRegistry;
 import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -146,7 +146,7 @@ public class DefaultXMLSigner implements XMLSigner {
       Transforms transforms = new Transforms(document);
       transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
       transforms.addTransform(this.canonicalizationTransform);
-      if (StringUtils.hasText(this.xPathTransform)) {
+      if (StringUtils.isNotEmpty(this.xPathTransform)) {
         XPathContainer xpath = new XPathContainer(document);
         xpath.setXPathNamespaceContext(XMLSignature.getDefaultPrefix(Constants.SignatureSpecNS), Constants.SignatureSpecNS);
         xpath.setXPath(this.xPathTransform);
@@ -335,7 +335,7 @@ public class DefaultXMLSigner implements XMLSigner {
    *          canonicalization method URI
    */
   public void setCanonicalizationTransform(final String canonicalizationTransform) {
-    if (StringUtils.hasText(canonicalizationTransform)) {
+    if (StringUtils.isNotEmpty(canonicalizationTransform)) {
       this.canonicalizationTransform = canonicalizationTransform;
     }
   }
@@ -384,16 +384,16 @@ public class DefaultXMLSigner implements XMLSigner {
   public static String registerIdAttributes(final Document document) {
     final Element rootElement = document.getDocumentElement();
     String signatureUriReference = XMLUtils.getAttributeValue(rootElement, "ID");
-    if (StringUtils.hasText(signatureUriReference)) {
+    if (StringUtils.isNotEmpty(signatureUriReference)) {
       rootElement.setIdAttribute("ID", true);
     }
     else {
       signatureUriReference = XMLUtils.getAttributeValue(rootElement, "Id");
-      if (StringUtils.hasText(signatureUriReference)) {
+      if (StringUtils.isNotEmpty(signatureUriReference)) {
         rootElement.setIdAttribute("Id", true);
       }
     }
-    return !StringUtils.hasText(signatureUriReference)
+    return StringUtils.isEmpty(signatureUriReference)
         ? ""
         : (signatureUriReference.trim().startsWith("#") ? signatureUriReference.trim() : "#" + signatureUriReference.trim());
   }
