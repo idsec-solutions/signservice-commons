@@ -7,12 +7,12 @@ import java.util.Set;
 /**
  * Implements a Sweden Connect test image as PDF visible signature.
  */
-public class ConfigurableSignImage extends VisibleSigImage {
+public class ConfigurableSignImageAbstract extends AbstractVisibleSigImage {
 
   private int pixelImageWidth;
   private int pixelImageHeight;
   private boolean includeDate;
-  private String imageTemplateLocation;
+  private String svgImage;
 
   /**
    * Creates a visible image object which has the capability to generate a personalized PDF visible signature image
@@ -23,20 +23,16 @@ public class ConfigurableSignImage extends VisibleSigImage {
    * @param pixelImageWidth width of the final pixel image
    * @param pixelImageHeight height of the final pixel image
    * @param includeDate true if the image can take date input
-   * @param imageTemplateLocation true if the image can take date input
+   * @param svgImage the SVG image as XML string
    * @param personalizationParams Personalization parameters
    */
-  public ConfigurableSignImage(String imageTemplateLocation, int pixelImageWidth, int pixelImageHeight, boolean includeDate,
-    int page, int xOffset, int yOffset, int zoomPercent, Map<String, String> personalizationParams) {
+  public ConfigurableSignImageAbstract(int page, int xOffset, int yOffset, int zoomPercent, Map<String, String> personalizationParams,
+    int pixelImageWidth, int pixelImageHeight, boolean includeDate, String svgImage) {
     super(page, xOffset, yOffset, zoomPercent, personalizationParams);
-    this.imageTemplateLocation = imageTemplateLocation;
+    this.svgImage = svgImage;
     this.pixelImageWidth = pixelImageWidth;
     this.pixelImageHeight = pixelImageHeight;
     this.includeDate = includeDate;
-  }
-
-  @Override protected String getImageLocation() {
-    return imageTemplateLocation;
   }
 
   @Override protected int getImageWidth() {
@@ -45,6 +41,10 @@ public class ConfigurableSignImage extends VisibleSigImage {
 
   @Override protected int getImageHeight() {
     return pixelImageHeight;
+  }
+
+  @Override protected String getSVGImage() {
+    return svgImage;
   }
 
   @Override protected String getPersonalizedSvgImage(String svg, Date signingTime) {
@@ -60,4 +60,5 @@ public class ConfigurableSignImage extends VisibleSigImage {
     }
     return personalizedJson;
   }
+
 }
