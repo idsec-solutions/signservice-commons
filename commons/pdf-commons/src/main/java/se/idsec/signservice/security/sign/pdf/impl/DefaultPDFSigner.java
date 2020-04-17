@@ -2,8 +2,9 @@ package se.idsec.signservice.security.sign.pdf.impl;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import se.idsec.signservice.pdf.general.PDFAlgoRegistry;
-import se.idsec.signservice.pdf.sign.PDFSignTaskDocument;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
+import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
+import se.idsec.signservice.security.sign.pdf.signprocess.PDFSigningProcessor;
 import se.idsec.signservice.security.sign.SigningCredential;
 import se.idsec.signservice.security.sign.pdf.PDFSigner;
 import se.idsec.signservice.security.sign.pdf.PDFSignerResult;

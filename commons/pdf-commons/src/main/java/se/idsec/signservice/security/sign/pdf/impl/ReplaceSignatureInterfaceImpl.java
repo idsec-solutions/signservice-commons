@@ -15,11 +15,9 @@
  */
 package se.idsec.signservice.security.sign.pdf.impl;
 
-import lombok.Getter;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.tsp.TSPException;
-import se.idsec.signservice.pdf.utils.PdfBoxSigUtil;
+import se.idsec.signservice.security.sign.pdf.signprocess.PdfBoxSigUtil;
 import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
 
 import java.io.IOException;

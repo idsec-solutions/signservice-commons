@@ -31,10 +31,10 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.util.Store;
-import se.idsec.signservice.pdf.general.CMSProcessableInputStream;
-import se.idsec.signservice.pdf.general.PDFAlgoRegistry;
-import se.idsec.signservice.pdf.general.PdfObjectIds;
-import se.idsec.signservice.pdf.utils.PdfBoxSigUtil;
+import se.idsec.signservice.security.sign.pdf.signprocess.CMSProcessableInputStream;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
+import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
+import se.idsec.signservice.security.sign.pdf.signprocess.PdfBoxSigUtil;
 import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
 
 import java.io.IOException;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package se.idsec.signservice.pdf.general;
+package se.idsec.signservice.security.sign.pdf.configuration;
 
 /**
  *

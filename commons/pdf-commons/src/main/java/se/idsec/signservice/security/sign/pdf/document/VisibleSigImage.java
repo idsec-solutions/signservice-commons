@@ -1,4 +1,4 @@
-package se.idsec.signservice.pdf.sign;
+package se.idsec.signservice.security.sign.pdf.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VisibleSigImage {
-  public static final Logger LOG = Logger.getLogger(AbstractVisibleSigImage.class.getName());
+  public static final Logger LOG = Logger.getLogger(VisibleSigImage.class.getName());
   public static final SimpleDateFormat BASIC_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
   public static final int FIRST_PAGE = 1;
   public static final int LAST_PAGE = 0;
@@ -93,7 +93,7 @@ public class VisibleSigImage {
     return new ByteArrayInputStream(bos.toByteArray());
   }
 
-  protected String getPersonalizedSvgImage(String svg, Date signingTime) {
+  private String getPersonalizedSvgImage(String svg, Date signingTime) {
 
     String personalizedJson = svg;
     Set<String> keySet = personalizationParams.keySet();

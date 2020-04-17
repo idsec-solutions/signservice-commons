@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package se.idsec.signservice.pdf.utils;
+package se.idsec.signservice.security.sign.pdf.signprocess;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,6 @@ import org.bouncycastle.asn1.ess.ESSCertID;
 import org.bouncycastle.asn1.ess.ESSCertIDv2;
 import org.bouncycastle.asn1.ess.SigningCertificate;
 import org.bouncycastle.asn1.ess.SigningCertificateV2;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -26,8 +25,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
-import se.idsec.signservice.pdf.general.PdfObjectIds;
-import se.idsec.signservice.pdf.general.SubjectDnAttribute;
+import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

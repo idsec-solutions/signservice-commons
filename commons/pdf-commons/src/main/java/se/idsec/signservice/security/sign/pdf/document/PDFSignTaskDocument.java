@@ -1,4 +1,4 @@
-package se.idsec.signservice.pdf.sign;
+package se.idsec.signservice.security.sign.pdf.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

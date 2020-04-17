@@ -15,7 +15,7 @@
  */
 package se.idsec.signservice.security.sign.pdf;
 
-import se.idsec.signservice.pdf.sign.PDFSignTaskDocument;
+import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
 import se.idsec.signservice.security.sign.Signer;
 
 /**

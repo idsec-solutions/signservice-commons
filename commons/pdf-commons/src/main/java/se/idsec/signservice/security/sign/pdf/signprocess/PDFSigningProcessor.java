@@ -1,4 +1,4 @@
-package se.idsec.signservice.security.sign.pdf.impl;
+package se.idsec.signservice.security.sign.pdf.signprocess;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,8 +6,9 @@ import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
-import se.idsec.signservice.pdf.sign.PDFSignTaskDocument;
 import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
+import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
+import se.idsec.signservice.security.sign.pdf.impl.DefaultPDFSignerResult;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

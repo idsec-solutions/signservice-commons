@@ -1,9 +1,11 @@
-package se.idsec.signservice.security.sign.pdf.impl;
+package se.idsec.signservice.security.sign.pdf;
 
 import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import se.idsec.signservice.pdf.sign.PDFSignTaskDocument;
-import se.idsec.signservice.security.sign.pdf.PDFSignerResult;
+import se.idsec.signservice.security.sign.pdf.impl.DefaultPDFSignerResult;
+import se.idsec.signservice.security.sign.pdf.impl.ReplaceSignatureInterfaceImpl;
+import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
+import se.idsec.signservice.security.sign.pdf.signprocess.PDFSigningProcessor;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -33,7 +35,7 @@ public class PDFCompleteSigner {
    * @param chain            The signer certificate chain where the signer certificate is the first certificate in the chain
    * @return Signature result
    */
-  public PDFSignerResult completeSign(final PDFSignTaskDocument document, byte[] signedAttributes, byte[] signatureValue,
+  public PDFSignerResult completeSign(final PDFSignTaskDocument   document, byte[] signedAttributes, byte[] signatureValue,
     List<X509Certificate> chain) {
 
     try {

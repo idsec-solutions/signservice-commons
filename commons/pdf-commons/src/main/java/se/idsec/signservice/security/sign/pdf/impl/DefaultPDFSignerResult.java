@@ -1,7 +1,6 @@
 package se.idsec.signservice.security.sign.pdf.impl;
 
-import org.bouncycastle.cms.CMSSignedData;
-import se.idsec.signservice.pdf.sign.PDFSignTaskDocument;
+import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
 import se.idsec.signservice.security.sign.pdf.PDFSignerResult;
 
 import java.security.cert.X509Certificate;
