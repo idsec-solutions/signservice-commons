@@ -15,6 +15,7 @@ import org.bouncycastle.asn1.ess.ESSCertID;
 import org.bouncycastle.asn1.ess.ESSCertIDv2;
 import org.bouncycastle.asn1.ess.SigningCertificate;
 import org.bouncycastle.asn1.ess.SigningCertificateV2;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -25,6 +26,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
 import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
 
 import java.io.ByteArrayInputStream;
@@ -544,8 +546,12 @@ public class PdfBoxSigUtil {
           SigningCertificateV2 signingCertificateV2 = SigningCertificateV2.getInstance(attributeValues[0]);
           ESSCertIDv2[] certsRefs= signingCertificateV2.getCerts();
           ESSCertIDv2 certsRef = certsRefs[0];
+          AlgorithmIdentifier hashAlgorithm = certsRef.getHashAlgorithm();
+          // According to CMS, the hash algorithm is optional and defaults to SHA256
+          ASN1ObjectIdentifier hashAlgoOid = hashAlgorithm == null ? NISTObjectIdentifiers.id_sha256 : hashAlgorithm.getAlgorithm();
+
           return SignedCertRef.builder()
-            .hashAlgorithm(certsRef.getHashAlgorithm().getAlgorithm())
+            .hashAlgorithm(hashAlgoOid)
             .signedCertHash(certsRef.getCertHash())
             .build();
         }

@@ -185,6 +185,28 @@ public class PDFAlgoRegistry {
   }
 
   /**
+   * Get the URI identifier for a registered signature algorithm based on signature algorithm identifier and hash algorithm identifier
+   * @param sigAlgoOid signature algorithm object identifier
+   * @param digestAlgoOid hash algorithm object identifier
+   * @return URI identifier for the combined signature algorithm
+   * @throws NoSuchAlgorithmException if the OID combinations are not supported
+   */
+  public static String getAlgorithmURI(ASN1ObjectIdentifier sigAlgoOid, ASN1ObjectIdentifier digestAlgoOid)
+    throws NoSuchAlgorithmException {
+    Optional<PDFSignatureAlgorithmProperties> algoOptional = supportedAlgoMap.keySet().stream()
+      .map(s -> supportedAlgoMap.get(s))
+      .filter(algoProp ->
+        algoProp.getSigAlgoOID().equals(sigAlgoOid) &&
+          algoProp.getDigestAlgoOID().equals(digestAlgoOid))
+      .findFirst();
+
+    if (algoOptional.isPresent()){
+      return algoOptional.get().sigAlgoId;
+    }
+    throw new NoSuchAlgorithmException("Non supported combination of signature algorithm and hash algorithm");
+  }
+
+  /**
    * Returns the algorithm parameters for a supported algorithm
    *
    * @param algorithm algorithm
