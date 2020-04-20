@@ -157,7 +157,11 @@ public class PdfSignatureVerifier {
     while (it.hasNext()) {
       SignerInformation signer = (SignerInformation) it.next();
       Date claimedSigningTime = getClaimedSigningTime(signer);
-      sigResult.setClaimedSigningTime(claimedSigningTime);
+      Calendar dictionarySignDate = sigResult.getSignature().getSignDate();
+      sigResult.setClaimedSigningTime(claimedSigningTime != null
+        ? claimedSigningTime
+        : dictionarySignDate.getTime()
+      );
       Collection certCollection = certStore.getMatches(signer.getSID());
       X509CertificateHolder certHolder = (X509CertificateHolder) certCollection.iterator().next();
       sigResult.setCert(getCert(certHolder));
@@ -234,6 +238,7 @@ public class PdfSignatureVerifier {
     if (signedCertRef == null) {
       // No Pades signature
       sigResult.setPades(false);
+      return;
     }
     sigResult.setPades(true);
 
@@ -274,12 +279,8 @@ public class PdfSignatureVerifier {
         throw new SignatureException("Unsupported public key type");
       }
 
-      AlgorithmIdentifier algoId = AlgorithmIdentifier.getInstance(pkSeq.getObjectAt(0));
       sigResult.setPkType(pkType);
       if (pkType.equals(JCAConstants.KEY_ALGO_EC)) {
-        ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(algoId.getParameters());
-        EcCurve curve = EcCurve.getEcCurveFromOid(curveOid.getId());
-        sigResult.setEcCurve(curve);
         int totalKeyBits = getEcKeyLength(keyBits);
         sigResult.setKeyLength(totalKeyBits);
         return;

@@ -38,7 +38,6 @@ public class CMSSigVerifyResult {
     private boolean padesVerified;
     private Date claimedSigningTime;
     private String pkType;
-    private EcCurve ecCurve;
     private String sigAlgo;
     private int keyLength;
     private boolean cmsAlgoProtection;

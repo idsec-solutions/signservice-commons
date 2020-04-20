@@ -61,12 +61,24 @@ public class PDFAlgoRegistry {
   public static final String ALGO_ID_DIGEST_SHA3_384 = "http://www.w3.org/2007/05/xmldsig-more#sha3-384";
   public static final String ALGO_ID_DIGEST_SHA3_512 = "http://www.w3.org/2007/05/xmldsig-more#sha3-512";
 
+  //RSA-PSS algonames;
+  public static final String RSAPSS_SHA1_NAME = "SHA1WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA224_NAME = "SHA224WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA256_NAME = "SHA256WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA384_NAME = "SHA384WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA512_NAME = "SHA512WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA3_224_NAME = "SHA3-224WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA3_256_NAME = "SHA3-256WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA3_384_NAME = "SHA3-384WITHRSAANDMGF1";
+  public static final String RSAPSS_SHA3_512_NAME = "SHA3-512WITHRSAANDMGF1";
+
   static {
     supportedAlgoMap = new HashMap<>();
     // Standard RSA
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA256)
       .sigAlgoOID(PKCSObjectIdentifiers.sha256WithRSAEncryption)
+      .sigAlgoName(algorithmNameFinder.getAlgorithmName(PKCSObjectIdentifiers.sha256WithRSAEncryption))
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha256)
@@ -74,6 +86,7 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA384)
       .sigAlgoOID(PKCSObjectIdentifiers.sha384WithRSAEncryption)
+      .sigAlgoName(algorithmNameFinder.getAlgorithmName(PKCSObjectIdentifiers.sha384WithRSAEncryption))
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
@@ -81,6 +94,7 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA512)
       .sigAlgoOID(PKCSObjectIdentifiers.sha512WithRSAEncryption)
+      .sigAlgoName(algorithmNameFinder.getAlgorithmName(PKCSObjectIdentifiers.sha512WithRSAEncryption))
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA512)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha512)
@@ -89,6 +103,7 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA256_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
+      .sigAlgoName(RSAPSS_SHA256_NAME)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha256)
@@ -96,6 +111,7 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA384_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
+      .sigAlgoName(RSAPSS_SHA384_NAME)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
@@ -103,14 +119,16 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA512)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
+      .sigAlgoName(RSAPSS_SHA512_NAME)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA512)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha512)
       .build());
-    // SHA 3 with RSA
+    // SHA 3 with RSA-PSS
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA3_256_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
+      .sigAlgoName(RSAPSS_SHA3_256_NAME)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA3_256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_256)
@@ -118,6 +136,7 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA3_384_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
+      .sigAlgoName(RSAPSS_SHA3_384_NAME)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA3_384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_384)
@@ -125,6 +144,7 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA3_512_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
+      .sigAlgoName(RSAPSS_SHA3_512_NAME)
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA3_512)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha3_512)
@@ -133,6 +153,7 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA256)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA256)
+      .sigAlgoName(algorithmNameFinder.getAlgorithmName(X9ObjectIdentifiers.ecdsa_with_SHA256))
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha256)
@@ -140,13 +161,15 @@ public class PDFAlgoRegistry {
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA384)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA384)
+      .sigAlgoName(algorithmNameFinder.getAlgorithmName(X9ObjectIdentifiers.ecdsa_with_SHA384))
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
       .build());
     putDefaultAlgo(PDFSignatureAlgorithmProperties.builder()
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA512)
-      .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA384)
+      .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA512)
+      .sigAlgoName(algorithmNameFinder.getAlgorithmName(X9ObjectIdentifiers.ecdsa_with_SHA512))
       .algoType(JCAConstants.KEY_ALGO_RSA)
       .digestAlgoId(ALGO_ID_DIGEST_SHA512)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha512)
@@ -268,7 +291,7 @@ public class PDFAlgoRegistry {
    */
   public static String getSigAlgoName(String algorithm) throws NoSuchAlgorithmException {
     if (supportedAlgoMap.containsKey(algorithm)){
-      return algorithmNameFinder.getAlgorithmName(supportedAlgoMap.get(algorithm).getSigAlgoOID());
+      return supportedAlgoMap.get(algorithm).getSigAlgoName();
     }
     throw new NoSuchAlgorithmException("No supported algorithm: " + algorithm);
   }
@@ -321,6 +344,8 @@ public class PDFAlgoRegistry {
     String sigAlgoId;
     /** Algorithm Object Identifier */
     ASN1ObjectIdentifier sigAlgoOID;
+    /** Name for creating an instance of the algorithm in JcaContentSignerBuilder */
+    String sigAlgoName;
     /** The family type of this algorithm */
     String algoType;
     /** The XML URI identifier for this algorithm */

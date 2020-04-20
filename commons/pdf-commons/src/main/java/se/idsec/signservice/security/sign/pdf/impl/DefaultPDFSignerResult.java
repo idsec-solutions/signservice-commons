@@ -47,12 +47,12 @@ public class DefaultPDFSignerResult implements PDFSignerResult {
 
   /** {@inheritDoc} */
   @Override public boolean isSuccess() {
-    return false;
+    return success;
   }
 
   /** {@inheritDoc} */
   @Override public Exception getException() {
-    return null;
+    return exception;
   }
 
   /** {@inheritDoc} */
