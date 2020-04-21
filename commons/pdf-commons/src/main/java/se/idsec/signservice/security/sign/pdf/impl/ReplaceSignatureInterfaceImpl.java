@@ -26,7 +26,11 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
- * Implementation of the SignatureInterface where the
+ * Implementation of the SignatureInterface where the signature is constructed by replacing signature data in an existing signature
+ * with data obtains from a remote signing service.
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public class ReplaceSignatureInterfaceImpl implements SignserviceSignatureInterface {
 
@@ -80,21 +84,19 @@ public class ReplaceSignatureInterfaceImpl implements SignserviceSignatureInterf
     }
 
     /**
-     * Does nothing. Override this if needed.
-     *
-     * @param signedData Generated CMS signed data
-     * @return CMSSignedData Extended CMS signed data
-     */
-    protected CMSSignedData signTimeStamps(CMSSignedData signedData) throws IOException, TSPException {
-        return signedData;
-    }
-
-    /**
      * SignatureInterface implementation.
-     *
+     * <p>
      * This method will be called from inside of the pdfbox and create the PKCS
-     * #7 signature. The given InputStream contains the bytes that are given by
+     * #7 signature (CMS ContentInfo). The given InputStream contains the bytes that are given by
      * the byte range.
+     * </p>
+     * <p>
+     * In this implementation of the signature interface no new signature is created. Instead a previous pre-sign signature is updated
+     * with signature value, signed attributes and certificates from a remote signature process
+     * </p>
+     * @param content the message bytes being signed (specified by ByteRange in the signature dictionary)
+     * @return CMS ContentInfo bytes holding the complete PKCS#7 signature structure
+     * @throws IOException error during signature creation
      */
     @Override
     public byte[] sign(InputStream content) throws IOException {

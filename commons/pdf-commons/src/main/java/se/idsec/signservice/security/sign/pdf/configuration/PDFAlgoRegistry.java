@@ -37,6 +37,9 @@ import java.util.Optional;
 /**
  * Registry for SVT supported algorithms. This class adds support for the minimum supported set of algorithms and allows new algorithms
  * to be added. By default only RSA and ECDSA with SHA 245, 384 and 512 are supported.
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public class PDFAlgoRegistry {
   private static Map<String, PDFSignatureAlgorithmProperties> supportedAlgoMap;
@@ -245,9 +248,9 @@ public class PDFAlgoRegistry {
   }
 
   /**
-   * Returns the algorithm parameters for a supported algorithm
+   * Returns the algorithm parameters for a supported signature algorithm
    *
-   * @param algorithm algorithm
+   * @param algorithm signature algorithm
    * @return algorithm properties
    * @throws IllegalArgumentException if the algorithm is not supported
    */
@@ -259,11 +262,11 @@ public class PDFAlgoRegistry {
   }
 
   /**
-   * Get an instance of the message digest algorithm associated with the specified JWS algorithm
+   * Get an instance of the message digest associated with the specified signature algorithm
    *
-   * @param algorithm algorithm
+   * @param algorithm algorithm URI identifier for signature algorithm
    * @return {@link MessageDigest} instance
-   * @throws NoSuchAlgorithmException if specified JWS algorithm is not supported
+   * @throws NoSuchAlgorithmException if specified signature algorithm is not supported
    */
   public static MessageDigest getMessageDigestInstance(String algorithm)
     throws NoSuchAlgorithmException {
@@ -275,7 +278,8 @@ public class PDFAlgoRegistry {
 
   /**
    * Get the algorithm name for the digest algorithm of the signature algorithm
-   * @param algorithm
+   * @param algorithm algorithm URI identifier
+   * @return the name of the digest algorithm used to create instances of the digest algorithm
    * @throws NoSuchAlgorithmException if the algorithm is not supported
    */
   public static String getDigestName(String algorithm) throws NoSuchAlgorithmException {
@@ -285,8 +289,9 @@ public class PDFAlgoRegistry {
     throw new NoSuchAlgorithmException("No supported digest algorithm for " + algorithm);
   }
   /**
-   * Get the algorithm name for the digest algorithm of the signature algorithm
-   * @param algorithm
+   * Get the algorithm name for the signature algorithm
+   * @param algorithm algorithm URI identifier
+   * @return the name of the signature algorithm used to initiate the use of this algorithm in CMS signing
    * @throws NoSuchAlgorithmException if the algorithm is not supported
    */
   public static String getSigAlgoName(String algorithm) throws NoSuchAlgorithmException {
@@ -297,14 +302,12 @@ public class PDFAlgoRegistry {
   }
 
   /**
-   * Register a new supported JWS algorithm for signing the SVT
+   * Register a new supported signature algorithm
    *
-   * @param pdfSignatureAlgorithmProperties  The The algorithm name used to identify the algorithm in CMS
-   * @return true if the algorithm registration was successful
+   * @param pdfSignatureAlgorithmProperties  the properties of the registered signature algorithm
    */
-  public static boolean registerSupportedAlgorithm(PDFSignatureAlgorithmProperties pdfSignatureAlgorithmProperties) {
+  public static void registerSupportedAlgorithm(PDFSignatureAlgorithmProperties pdfSignatureAlgorithmProperties) {
     supportedAlgoMap.put(pdfSignatureAlgorithmProperties.getDigestAlgoId(), pdfSignatureAlgorithmProperties);
-    return true;
   }
 
   /**
@@ -324,7 +327,9 @@ public class PDFAlgoRegistry {
     throw new IllegalArgumentException("Unsupported JWS Algorithm family");
   }
 
-
+  /**
+   * Private constructor preventing this class from being instantiated
+   */
   private PDFAlgoRegistry() {
   }
 
@@ -341,17 +346,16 @@ public class PDFAlgoRegistry {
   @AllArgsConstructor
   public static class PDFSignatureAlgorithmProperties {
     /** XML UIR identifier for the signature algorithm */
-    String sigAlgoId;
+    private String sigAlgoId;
     /** Algorithm Object Identifier */
-    ASN1ObjectIdentifier sigAlgoOID;
+    private ASN1ObjectIdentifier sigAlgoOID;
     /** Name for creating an instance of the algorithm in JcaContentSignerBuilder */
-    String sigAlgoName;
+    private String sigAlgoName;
     /** The family type of this algorithm */
-    String algoType;
+    private String algoType;
     /** The XML URI identifier for this algorithm */
-    String digestAlgoId;
+    private String digestAlgoId;
     /** The digest algorithm ObjectIdentifier */
-    ASN1ObjectIdentifier digestAlgoOID;
+    private ASN1ObjectIdentifier digestAlgoOID;
   }
-
 }

@@ -34,6 +34,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+/**
+ * Data object holding the parameters necessary to provide a sign image to the PDF document
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -60,6 +66,7 @@ public class VisibleSigImage {
   /**
    * Generates signature options that includes the visible signature
    * @param doc PDF document where the visible signature will be added.
+   * @param signTime the time when this signature is claimed to be created
    * @param signatureSize The preferred size of the signature data content (0 will use default size)
    * @return Signature options with visible signature.
    */

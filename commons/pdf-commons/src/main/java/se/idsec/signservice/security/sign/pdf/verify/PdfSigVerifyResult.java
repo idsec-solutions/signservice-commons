@@ -24,15 +24,26 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Holding Signature verification result for a PDF document
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PdfSigVerifyResult {
 
+    /**  */
     private boolean lastSigValid;
+    /**  */
     private boolean allSigsValid;
+    /**  */
     private List<CMSSigVerifyResult> resultList = new ArrayList<>();
+    /**  */
     private int sigCnt;
+    /**  */
     private int validSignatures;
 }

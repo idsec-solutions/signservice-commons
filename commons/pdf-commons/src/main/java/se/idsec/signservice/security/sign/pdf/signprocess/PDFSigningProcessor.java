@@ -36,6 +36,9 @@ import java.util.List;
  * This class provides a PDF signing processor that provides the basic functionality to use a
  * {@link org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface} implementation to
  * generate PDF signature data
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 @Setter
 @AllArgsConstructor

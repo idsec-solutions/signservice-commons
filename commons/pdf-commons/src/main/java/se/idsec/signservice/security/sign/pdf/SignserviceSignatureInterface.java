@@ -20,6 +20,9 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface
 /**
  * The interface for the signature generation interface. This interface extends the PDFBox SignatureInterface.
  * The purpose of this interface is to provide the functions to provide the CMS signature data for a PDF signature.
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public interface SignserviceSignatureInterface extends SignatureInterface {
 
@@ -37,7 +40,7 @@ public interface SignserviceSignatureInterface extends SignatureInterface {
 
   /**
    * Sets wether the signature should be generated according to the PAdES requirement profile
-   * @param pades
+   * @param pades true if the signature is created as a PAdES compliant signature
    */
   void setPades(boolean pades);
 

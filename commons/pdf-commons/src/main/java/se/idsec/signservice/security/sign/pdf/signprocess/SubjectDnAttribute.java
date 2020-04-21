@@ -16,8 +16,10 @@
 package se.idsec.signservice.security.sign.pdf.signprocess;
 
 /**
+ * Enumeration of common certificate subject attributes
  *
- * @author stefan
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public enum SubjectDnAttribute {
     cn("2.5.4.3"),

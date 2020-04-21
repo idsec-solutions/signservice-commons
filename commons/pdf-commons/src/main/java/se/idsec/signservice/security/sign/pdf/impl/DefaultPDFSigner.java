@@ -32,7 +32,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Default PDF Signer
+ * Default PDF Signer for signing PDF documents
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public class DefaultPDFSigner implements PDFSigner {
 

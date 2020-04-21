@@ -24,7 +24,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.CollectionStore;
 import org.opensaml.security.crypto.JCAConstants;
@@ -40,8 +39,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -53,18 +50,30 @@ import java.util.logging.Logger;
 /**
  * Verifies signatures on PDF documents
  *
- * @author stefan
+ * <p>
+ *   This is a basic implementation that just verifies that the actual signatures validates correctly and reports what certificates
+ *   that was supplied to provide the matching public key. No attempts are made to validate the certificates or any timestamps associated
+ *   with the signature.
+ * </p>
+ * <p>
+ *   This verifier is only intended to be used with the signature integration process as means to validate that the signature assembled
+ *   by the integration service is valid.
+ * </p>
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
-public class PdfSignatureVerifier {
+public class BasicPdfSignatureVerifier {
 
-  private static final Logger LOG = Logger.getLogger(PdfSignatureVerifier.class.getName());
+  private static final Logger LOG = Logger.getLogger(BasicPdfSignatureVerifier.class.getName());
 
   /**
    * Verifies the signature on a PDF document
    *
    * @param pdfDoc      The bytes of a PDF document
    * @return Signature verification result data.
-   * @throws IOException
+   * @throws IOException processing errors associated with malformed input
+   * @throws SignatureException on critical errors that makes this signature invalid
    */
   public static PdfSigVerifyResult verifyPdfSignatures(byte[] pdfDoc) throws IOException, SignatureException {
     PDDocument doc = PDDocument.load(new ByteArrayInputStream(pdfDoc));
@@ -93,8 +102,11 @@ public class PdfSignatureVerifier {
     return result;
   }
 
+  /**
+   * Consolidates the result of the signature validation process
+   * @param result the result object holding the result of individual signature validations
+   */
   private static void consolidateResults(PdfSigVerifyResult result) {
-
     AtomicBoolean allValid = new AtomicBoolean(true);
     AtomicInteger validSignatures = new AtomicInteger();
 
@@ -125,9 +137,8 @@ public class PdfSignatureVerifier {
    *
    * @param signedData         The SignedData of this signature
    * @param signedContentBytes The data being signed by this signature
-   * @param sigResult          The signature verification result object used to express
-   *                           signature result data.
-   * @throws Exception on error
+   * @param sigResult          The signature verification result object used to store signature result data.
+   * @throws Exception on critical errors
    */
   public static void verifySign(byte[] signedData, byte[] signedContentBytes, CMSSigVerifyResult sigResult)
     throws Exception {
@@ -136,18 +147,12 @@ public class PdfSignatureVerifier {
     CMSTypedStream signedContent = sp.getSignedContent();
     signedContent.drain();
 
-    verifyCMSSignature(sp, sigResult);
-  }
-
-  private static void verifyCMSSignature(CMSSignedDataParser sp, CMSSigVerifyResult sigResult)
-    throws CMSException, IOException, CertificateException,
-    OperatorCreationException, NoSuchAlgorithmException, SignatureException {
     CollectionStore certStore = (CollectionStore) sp.getCertificates();
     Iterator ci = certStore.iterator();
     List<X509Certificate> certList = new ArrayList<>();
     while (ci.hasNext()) {
       X509CertificateHolder ch = (X509CertificateHolder) ci.next();
-      certList.add(getCert(ch));
+      certList.add(PdfBoxSigUtil.getCert(ch.getEncoded()));
     }
     sigResult.setCertList(certList);
 
@@ -164,7 +169,7 @@ public class PdfSignatureVerifier {
       );
       Collection certCollection = certStore.getMatches(signer.getSID());
       X509CertificateHolder certHolder = (X509CertificateHolder) certCollection.iterator().next();
-      sigResult.setCert(getCert(certHolder));
+      sigResult.setCert(PdfBoxSigUtil.getCert(certHolder.getEncoded()));
 
       //Check signature
       SignerInformationVerifier signerInformationVerifier = new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certHolder);
@@ -194,29 +199,12 @@ public class PdfSignatureVerifier {
     }
   }
 
+
   /**
-   * converts an X509CertificateHolder object to an X509Certificate object.
-   *
-   * @param certHolder the cert holder object
-   * @return X509Certificate object
-   * @throws IOException
-   * @throws CertificateException
+   * Obtains the claimed signing time from signed attributes
+   * @param signer signer information
+   * @return claimed signing time if present or null if absent
    */
-  public static X509Certificate getCert(X509CertificateHolder certHolder) throws IOException, CertificateException {
-    X509Certificate cert = null;
-    ByteArrayInputStream certIs = new ByteArrayInputStream(certHolder.getEncoded());
-
-    try {
-      CertificateFactory cf = CertificateFactory.getInstance("X.509");
-      cert = (X509Certificate) cf.generateCertificate(certIs);
-
-    }
-    finally {
-      certIs.close();
-    }
-    return cert;
-  }
-
   private static Date getClaimedSigningTime(SignerInformation signer) {
     try {
       AttributeTable signedAttributes = signer.getSignedAttributes();
@@ -230,17 +218,33 @@ public class PdfSignatureVerifier {
     }
   }
 
+  /**
+   * Checks the PAdES properties of a signature
+   * @param signer signer information
+   * @param sigResult the signature validation result data object
+   * @throws IOException on error in input
+   * @throws NoSuchAlgorithmException no such algorithm
+   * @throws CertificateEncodingException certificate errors
+   * @throws SignatureException validation errors
+   */
   private static void verifyPadesProperties(SignerInformation signer, CMSSigVerifyResult sigResult)
     throws IOException, NoSuchAlgorithmException, CertificateEncodingException, SignatureException {
+
+    String subFilter = sigResult.getSignature().getSubFilter();
+    sigResult.setPades(PDSignature.SUBFILTER_ETSI_CADES_DETACHED.getName().equals(subFilter));
+
     PdfBoxSigUtil.SignedCertRef signedCertRef = PdfBoxSigUtil.getSignedCertRefAttribute(
       signer.getSignedAttributes().toASN1Structure().getEncoded("DER"));
 
     if (signedCertRef == null) {
-      // No Pades signature
-      sigResult.setPades(false);
-      return;
+      if (sigResult.isPades()) {
+        // This signature is declared as PAdES but holds no signing certificate reference
+        throw new SignatureException("Signature subfilter indicates that the signature is a PAdES signature but no signed certificate reference is present");
+      } else {
+        // No PAdES signature and no signed certificate reference is provided. Abort
+        return;
+      }
     }
-    sigResult.setPades(true);
 
     MessageDigest md = MessageDigest.getInstance(signedCertRef.getHashAlgorithm().getId());
     byte[] sigCertHash = md.digest(sigResult.getCert().getEncoded());
@@ -256,10 +260,9 @@ public class PdfSignatureVerifier {
    *
    * @param pubKey    The public key
    * @param sigResult The data object where result data are stored
-   * @throws IOException
+   * @throws SignatureException error to obtain public key data
    */
-  public static void getPkParams(PublicKey pubKey, CMSSigVerifyResult sigResult) throws SignatureException {
-
+  private static void getPkParams(PublicKey pubKey, CMSSigVerifyResult sigResult) throws SignatureException {
     try {
 
       ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(pubKey.getEncoded()));

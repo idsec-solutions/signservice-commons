@@ -21,6 +21,12 @@ import se.idsec.signservice.security.sign.pdf.PDFSignerResult;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+/**
+ * Default implementation of the signature result interface
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
 public class DefaultPDFSignerResult implements PDFSignerResult {
 
   private byte[] signedAttributes;
@@ -76,7 +82,7 @@ public class DefaultPDFSignerResult implements PDFSignerResult {
 
   /**
    * Assigned signer certificate chain
-   * @param signerCertificateChain
+   * @param signerCertificateChain signer certificate chain
    */
   public void setSignerCertificateChain(List<X509Certificate> signerCertificateChain) {
     this.signerCertificateChain = signerCertificateChain;
@@ -108,7 +114,7 @@ public class DefaultPDFSignerResult implements PDFSignerResult {
 
   /**
    * Assigns the signed attributes bytes.
-   * @param signedAttributes
+   * @param signedAttributes CMS signed attributes
    */
   public void setSignedAttributes(byte[] signedAttributes) {
     this.signedAttributes = signedAttributes;

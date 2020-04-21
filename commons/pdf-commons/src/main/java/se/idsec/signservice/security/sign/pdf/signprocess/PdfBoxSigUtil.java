@@ -34,10 +34,11 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.IssuerSerial;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSAlgorithm;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
-import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
 import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
 
 import java.io.ByteArrayInputStream;
@@ -51,14 +52,17 @@ import java.security.cert.*;
 import java.util.*;
 
 /**
- * @author stefan
+ * Static utilities for signed PDF documents
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public class PdfBoxSigUtil {
 
   /**
    * This method extracts signed attribute data from a CMS signature
    *
-   * @param signedData
+   * @param signedData CMSSignedData object holding signature data
    * @return The signed attributes of a PDF signature
    * @throws IOException If the provided input has no signed attribute data
    */
@@ -73,9 +77,9 @@ public class PdfBoxSigUtil {
   /**
    * This method extracts signed attribute data from a CMS signature
    *
-   * @param contentInfoBytes the CMS Content info bytes holding CMSSignedData content
+   * @param contentInfoBytes the CMS Content info bytes holding CMS SignedData content
    * @return The signed attributes of a PDF signature
-   * @throws IllegalArgumentException If the provided input has no signed attribute data
+   * @throws IOException If the provided input has no signed attribute data
    */
   public static byte[] getCmsSignedAttributes(byte[] contentInfoBytes) throws IOException {
     try {
@@ -92,9 +96,6 @@ public class PdfBoxSigUtil {
     }
   }
 
-
-
-
   /**
    * A method that updates the PDF SignedData object (Actually a CMS ContentInfo) with a new
    * signature, certificates and SignedAttributes obtained from an external
@@ -105,15 +106,6 @@ public class PdfBoxSigUtil {
    * @param newSigValue The new signature value
    * @param chain The new certificate chain
    * @return The bytes of an updated PDF signature (Encoded Content info).
-   */
-
-  /**
-   *
-   * @param cmsSignedData
-   * @param newTbsBytes
-   * @param newSigValue
-   * @param chain
-   * @return
    */
   public static byte[] updatePdfPKCS7(byte[] cmsSignedData,byte[] newTbsBytes, byte[] newSigValue, List<X509Certificate> chain) {
 
@@ -295,8 +287,8 @@ public class PdfBoxSigUtil {
    *
    * @param signature The signature object to be updated
    * @param sigCert   The certificate being source of data
-   * @throws CertificateEncodingException
-   * @throws IOException
+   * @throws CertificateEncodingException certificate errors
+   * @throws IOException errors in provided input
    */
   public static void setSubjectNameAndLocality(PDSignature signature, Certificate sigCert)
     throws CertificateEncodingException, IOException {
@@ -310,8 +302,8 @@ public class PdfBoxSigUtil {
    *
    * @param cert X.509 certificate
    * @return Subject DN attribute map
-   * @throws CertificateEncodingException
-   * @throws IOException
+   * @throws CertificateEncodingException certificate errors
+   * @throws IOException errors in provided input
    */
   public static Map<SubjectDnAttribute, String> getSubjectAttributes(Certificate cert) throws CertificateEncodingException, IOException {
     ASN1InputStream ain = new ASN1InputStream(cert.getEncoded());
@@ -444,7 +436,7 @@ public class PdfBoxSigUtil {
     throws IOException, CertificateEncodingException, OperatorCreationException, NoSuchAlgorithmException, CertificateException,
     NoSuchProviderException {
 
-    ASN1EncodableVector signedCertAttr = PdfBoxSigUtil.getSignedCertAttr(digestAlgo, getCert(signerCert), includeIssuerSerial);
+    ASN1EncodableVector signedCertAttr = PdfBoxSigUtil.getSignedCertAttr(digestAlgo, getCert(signerCert.getEncoded()), includeIssuerSerial);
     ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(new DERSequence(signedCertAttr));
 
@@ -453,9 +445,9 @@ public class PdfBoxSigUtil {
 
   }
 
-  public static X509Certificate getCert(Certificate inCert) throws IOException, CertificateException {
-    X509Certificate cert = null;
-    ByteArrayInputStream certIs = new ByteArrayInputStream(inCert.getEncoded());
+  public static X509Certificate getCert(byte[] certBytes) throws IOException, CertificateException {
+    X509Certificate cert;
+    ByteArrayInputStream certIs = new ByteArrayInputStream(certBytes);
 
     try {
       CertificateFactory cf = CertificateFactory.getInstance("X.509");

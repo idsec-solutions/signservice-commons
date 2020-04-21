@@ -27,7 +27,9 @@ import java.io.OutputStream;
 /**
  * Wraps a InputStream into a CMSProcessable object for bouncy castle.
  * It's an alternative to the CMSProcessableByteArray.
- * @author Thomas Chojecki
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public class CMSProcessableInputStream implements CMSTypedData
 {

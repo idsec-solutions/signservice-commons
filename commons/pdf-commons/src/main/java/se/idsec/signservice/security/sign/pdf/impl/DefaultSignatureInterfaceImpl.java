@@ -29,13 +29,12 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.util.Store;
-import se.idsec.signservice.security.sign.pdf.signprocess.CMSProcessableInputStream;
+import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
 import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
 import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
+import se.idsec.signservice.security.sign.pdf.signprocess.CMSProcessableInputStream;
 import se.idsec.signservice.security.sign.pdf.signprocess.PdfBoxSigUtil;
-import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +43,12 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+/**
+ * Implementation of the PDF box signing interface. This is used during the pre-sign process
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
 public class DefaultSignatureInterfaceImpl implements SignserviceSignatureInterface {
 
   /** Private key used to perform the signature */
@@ -98,27 +103,15 @@ public class DefaultSignatureInterfaceImpl implements SignserviceSignatureInterf
   }
 
   /**
-   * Does nothing. Override this if needed.
-   *
-   * @param signedData Generated CMS signed data
-   * @return CMSSignedData Extended CMS signed data
-   */
-  protected CMSSignedData signTimeStamps(CMSSignedData signedData) throws IOException, TSPException {
-    return signedData;
-  }
-
-  /**
    * SignatureInterface implementation.
    * <p>
    * This method will be called from inside of the pdfbox and create the PKCS
-   * #7 signature. The given InputStream contains the bytes that are given by
+   * #7 signature (CMS ContentInfo). The given InputStream contains the bytes that are given by
    * the byte range.
-   * <p>
-   * This method is for internal use only. <-- TODO this method should be
-   * private
-   * <p>
-   * Use your favorite cryptographic library to implement PKCS #7 signature
-   * creation.
+   * </p>
+   * @param content the message bytes being signed (specified by ByteRange in the signature dictionary)
+   * @return CMS ContentInfo bytes holding the complete PKCS#7 signature structure
+   * @throws IOException error during signature creation
    */
   @Override
   public byte[] sign(InputStream content) throws IOException {

@@ -16,8 +16,10 @@
 package se.idsec.signservice.security.sign.pdf.configuration;
 
 /**
+ * Object Identifiers useful for PDF signature handling
  *
- * @author stefan
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 public class PdfObjectIds {
 

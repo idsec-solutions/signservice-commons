@@ -26,6 +26,13 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+/**
+ * Signer used to complete the signing process using an external sign service. Certificates and signature values provided by the external
+ * service are injected into a standard signing process.
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
 public class PDFCompleteSigner {
 
   /**

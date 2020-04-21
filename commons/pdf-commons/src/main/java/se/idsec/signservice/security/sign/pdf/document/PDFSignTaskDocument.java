@@ -22,6 +22,9 @@ import lombok.NoArgsConstructor;
 
 /**
  * Dataclass holding a PDF document that is to be signed or has been signed
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 @Data
 @NoArgsConstructor
