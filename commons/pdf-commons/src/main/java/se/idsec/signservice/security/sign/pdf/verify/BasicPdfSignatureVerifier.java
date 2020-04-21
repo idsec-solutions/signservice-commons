@@ -99,6 +99,7 @@ public class BasicPdfSignatureVerifier {
     result.setResultList(individualSigResultList);
     result.setSigCnt(signatureDicts.size());
     consolidateResults(result);
+    doc.close();
     return result;
   }
 
