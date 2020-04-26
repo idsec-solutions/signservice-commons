@@ -13,37 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.security.sign.pdf.verify;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
+package se.idsec.signservice.security.sign;
 
 /**
- * Holding Signature verification result for a PDF document
- *
+ * Marker interface for signer parameters for the {@link Signer} interface.
+ * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class PdfSigVerifyResult {
-
-    /**  */
-    private boolean lastSigValid;
-    /**  */
-    private boolean allSigsValid;
-    /**  */
-    private List<CMSSigVerifyResult> resultList = new ArrayList<>();
-    /**  */
-    private int sigCnt;
-    /**  */
-    private int validSignatures;
+public interface SignerParameters {
 }

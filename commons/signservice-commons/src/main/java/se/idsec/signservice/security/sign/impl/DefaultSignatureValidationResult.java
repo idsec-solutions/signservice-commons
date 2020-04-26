@@ -83,6 +83,16 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
     this.setException(exception);
   }
 
+  /**
+   * Sets the error status based on the supplied {@link InternalSignatureValidationException} exception object.
+   * 
+   * @param validationException
+   *          the exception
+   */
+  public void setError(final InternalSignatureValidationException validationException) {
+    this.setError(validationException.getStatus(), validationException.getMessage(), validationException);
+  }
+
   /** {@inheritDoc} */
   @Override
   public Status getStatus() {
@@ -191,7 +201,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(super.toString());
     sb.append("status='").append(this.status).append("',");
     if (this.statusMessage != null) {
       sb.append("statusMessage='").append(this.statusMessage).append("',");

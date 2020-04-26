@@ -52,7 +52,6 @@
   </developers>
 
   <properties>
-    <signservice-integration-api.version>1.0.1</signservice-integration-api.version>
   </properties>
 
   <dependencies>
@@ -88,12 +87,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-codec</artifactId>
       <version>1.12</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -119,15 +118,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <!-- Temporory here. Just so that Stefan writes correct Javadoc, and Martin doesn't have to fix it afterwards ;-) -->
-        <executions>
-          <execution>
-            <id>attach-javadoc</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <doctitle>SignService PDF Commons - ${project.version}</doctitle>
           <windowtitle>SignService PDF Commons - ${project.version}</windowtitle>

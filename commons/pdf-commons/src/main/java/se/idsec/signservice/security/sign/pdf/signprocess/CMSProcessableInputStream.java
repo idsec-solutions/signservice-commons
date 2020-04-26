@@ -15,60 +15,71 @@
  */
 package se.idsec.signservice.security.sign.pdf.signprocess;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSTypedData;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 /**
- * Wraps a InputStream into a CMSProcessable object for bouncy castle.
- * It's an alternative to the CMSProcessableByteArray.
+ * Wraps a InputStream into a CMSProcessable object for Bouncy Castle. It's an alternative to the
+ * CMSProcessableByteArray.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class CMSProcessableInputStream implements CMSTypedData
-{
-    private InputStream in;
-    private final ASN1ObjectIdentifier contentType;
+public class CMSProcessableInputStream implements CMSTypedData {
 
-    public CMSProcessableInputStream(InputStream is)
-    {
-        this(new ASN1ObjectIdentifier(CMSObjectIdentifiers.data.getId()), is);
-    }
+  private final InputStream in;
+  private final ASN1ObjectIdentifier contentType;
 
-    public CMSProcessableInputStream(ASN1ObjectIdentifier type, InputStream is)
-    {
-        contentType = type;
-        in = is;
-    }
+  /**
+   * Constructor that defaults to use the 1.2.840.113549.1.7.1 OID (PKCS#7 data).
+   * 
+   * @param is
+   *          the input stream
+   */
+  public CMSProcessableInputStream(final InputStream is) {
+    this(new ASN1ObjectIdentifier(CMSObjectIdentifiers.data.getId()), is);
+  }
 
-    @Override
-    public Object getContent()
-    {
-        return in;
-    }
+  /**
+   * Constructor.
+   * 
+   * @param type
+   *          the OID of the object
+   * @param is
+   *          the input stream
+   */
+  public CMSProcessableInputStream(final ASN1ObjectIdentifier type, final InputStream is) {
+    this.contentType = type;
+    this.in = is;
+  }
 
-    @Override
-    public void write(OutputStream out) throws IOException, CMSException
-    {
-        // read the content only one time
-        byte[] buffer = new byte[8 * 1024];
-        int read;
-        while ((read = in.read(buffer)) != -1)
-        {
-            out.write(buffer, 0, read);
-        }
-        in.close();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Object getContent() {
+    return this.in;
+  }
 
-    @Override
-    public ASN1ObjectIdentifier getContentType()
-    {
-        return contentType;
+  /** {@inheritDoc} */
+  @Override
+  public void write(final OutputStream out) throws IOException, CMSException {
+    // read the content only one time
+    final byte[] buffer = new byte[8 * 1024];
+    int read;
+    while ((read = this.in.read(buffer)) != -1) {
+      out.write(buffer, 0, read);
     }
+    this.in.close();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ASN1ObjectIdentifier getContentType() {
+    return this.contentType;
+  }
 }

@@ -16,7 +16,7 @@
 package se.idsec.signservice.security.sign.pdf.configuration;
 
 /**
- * Object Identifiers useful for PDF signature handling
+ * Object Identifiers useful for PDF signature handling.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -39,6 +39,5 @@ public class PdfObjectIds {
     public static final String ID_AA_SIGNING_CERTIFICATE_V2 = "1.2.840.113549.1.9.16.2.47";
     public static final String ID_AA_CMS_ALGORITHM_PROTECTION = "1.2.840.113549.1.9.52";
     
-    //Eliptic curves
     public static final String ID_EC_P256 = "1.2.840.10045.3.1.7";
 }

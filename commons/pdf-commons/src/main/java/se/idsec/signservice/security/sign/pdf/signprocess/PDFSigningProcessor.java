@@ -15,27 +15,28 @@
  */
 package se.idsec.signservice.security.sign.pdf.signprocess;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Setter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
-import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
-import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
-import se.idsec.signservice.security.sign.pdf.impl.DefaultPDFSignerResult;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.cert.X509Certificate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
+import se.idsec.signservice.security.sign.pdf.SignServiceSignatureInterface;
+import se.idsec.signservice.security.sign.pdf.document.VisibleSigImage;
 
 /**
  * This class provides a PDF signing processor that provides the basic functionality to use a
- * {@link org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface} implementation to
- * generate PDF signature data
+ * {@link org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface} implementation to generate PDF
+ * signature data
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -43,77 +44,98 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Builder
+@Slf4j
 public class PDFSigningProcessor {
 
-  private final SignserviceSignatureInterface signatureInterface;
-  private final PDFSignTaskDocument document;
-  private final PDDocument pdfDocument;
-  private final List<X509Certificate> chain;
-  private final long signTimeAndID;
+  /**
+   * Result object for
+   * {@link PDFSigningProcessor#signPdfDocument(PDDocument, SignServiceSignatureInterface, long, VisibleSigImage)}.
+   */
+  @Getter
+  @Builder
+  public static class Result {
+    private byte[] document;
+    private byte[] cmsSignedData;
+    private byte[] cmsSignedAttributes;
+  }
 
-  public DefaultPDFSignerResult signPdf() throws IOException {
+  /**
+   * Signs the supplied PDF document. The document is closed by this method (in all cases).
+   * 
+   * @param pdfDocument
+   *          the document to sign
+   * @param pdfSignatureProvider
+   *          the PDFBox signature provider
+   * @param signTimeAndID
+   *          the signing time (and ID)
+   * @param visibleSignatureImage
+   *          optional signature image
+   * @return a result
+   * @throws PDFSignatureException
+   *           for signature errors
+   */
+  public static Result signPdfDocument(
+      final PDDocument pdfDocument,
+      final SignServiceSignatureInterface pdfSignatureProvider,
+      final long signTimeAndID,
+      final VisibleSigImage visibleSignatureImage) throws PDFSignatureException {
+
     try {
-      boolean pades = false;
-      String adesRequirement = document.getAdesType();
-      if (adesRequirement != null) {
-        pades =
-          adesRequirement.equals(PDFSignTaskDocument.ADES_PROFILE_BES) || adesRequirement.equals(PDFSignTaskDocument.ADES_PROFILE_EPES);
-      }
-      signatureInterface.setPades(pades);
-
-      // create signature dictionary
+      // Create signature dictionary
+      //
       PDSignature signature = new PDSignature();
       signature.setFilter(PDSignature.FILTER_ADOBE_PPKLITE);
-      if (pades) {
+
+      if (pdfSignatureProvider.isPades()) {
         signature.setSubFilter(PDSignature.SUBFILTER_ETSI_CADES_DETACHED);
       }
       else {
         signature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_DETACHED);
       }
 
-      // Sets signing time and document ID to the signing time value set during pr-signing
-      // These values must match for the signature to match the signed document
-      Calendar signingTime = Calendar.getInstance();
+      // Sets signing time and document ID to the signing time value set during pre-signing.
+      //
+      final Calendar signingTime = Calendar.getInstance();
       signingTime.setTime(new Date(signTimeAndID));
       signature.setSignDate(signingTime);
       pdfDocument.setDocumentId(signTimeAndID);
 
-      // register signature dictionary and sign interface
-      if (document.getVisibleSigImage() != null) {
-        SignatureOptions visibleSignatureOptions = document.getVisibleSigImage()
-          .getVisibleSignatureOptions(pdfDocument, signingTime.getTime());
-        pdfDocument.addSignature(signature, signatureInterface, visibleSignatureOptions);
+      // Register signature dictionary and sign interface
+      //
+      if (visibleSignatureImage != null) {
+        final SignatureOptions visibleSignatureOptions = visibleSignatureImage.getVisibleSignatureOptions(pdfDocument, signingTime
+          .getTime());
+        pdfDocument.addSignature(signature, pdfSignatureProvider, visibleSignatureOptions);
       }
       else {
-        pdfDocument.addSignature(signature, signatureInterface);
+        pdfDocument.addSignature(signature, pdfSignatureProvider);
       }
 
-      // Execute signing operation and get resulting PDF document
-      ByteArrayOutputStream output = new ByteArrayOutputStream();
+      // Execute signing operation and get resulting PDF document.
+      //
+      final ByteArrayOutputStream output = new ByteArrayOutputStream();
       // This is where the signing process is invoked
       pdfDocument.saveIncremental(output);
-      output.close();
       pdfDocument.close();
 
-      byte[] pdfDocumentBytes = output.toByteArray();
-
-      //Set results
-      DefaultPDFSignerResult result = new DefaultPDFSignerResult();
-      result.setSuccess(true);
-      result.setPdfSignTaskDocument(PDFSignTaskDocument.builder()
-        .pdfDocument(pdfDocumentBytes)
-        .adesType(document.getAdesType())
-        .signTimeAndId(signTimeAndID)
-        .cmsSignedData(signatureInterface.getCmsSignedData())
-        .build());
-      result.setSignerCertificate(chain.get(0));
-      result.setSignerCertificateChain(chain);
-      result.setSignedAttributes(signatureInterface.getCmsSignedAttributes());
-      return result;
+      return Result.builder()
+        .document(output.toByteArray())
+        .cmsSignedData(pdfSignatureProvider.getCmsSignedData())
+        .cmsSignedAttributes(pdfSignatureProvider.getCmsSignedAttributes())
+        .build();
     }
-    catch (Exception ex) {
-
-      throw new IOException(ex);
+    catch (IOException e) {
+      final String msg = String.format("Failed to sign PDF document - %s", e.getMessage());
+      log.error("{}", msg);
+      throw new PDFSignatureException(msg, e);
+    }
+    finally {
+      try {
+        // If the document already has been closed this is a no-op.
+        pdfDocument.close();
+      }
+      catch (IOException e) {
+      }
     }
   }
 

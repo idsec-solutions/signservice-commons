@@ -46,6 +46,17 @@ public interface SignatureValidator<T> {
   List<SignatureValidationResult> validate(final T document) throws SignatureException;
 
   /**
+   * Predicate that tells if all the supplied result objects indicate a successful validation.
+   * 
+   * @param results
+   *          a (non-empty) list of result objects
+   * @return true if all result objects indicate success and false otherwise
+   */
+  static boolean isCompleteSuccess(final List<SignatureValidationResult> results) {
+    return !results.stream().filter(r -> !r.isSuccess()).findAny().isPresent();
+  }
+
+  /**
    * Predicate that tells if the supplied document is signed.
    * 
    * @param document

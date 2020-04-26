@@ -20,6 +20,7 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import se.idsec.signservice.security.sign.impl.AbstractSignerResult;
 import se.idsec.signservice.security.sign.xml.XMLSignerResult;
 import se.idsec.signservice.xml.InternalXMLException;
 
@@ -29,13 +30,10 @@ import se.idsec.signservice.xml.InternalXMLException;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class DefaultXMLSignerResult implements XMLSignerResult {
+public class DefaultXMLSignerResult extends AbstractSignerResult<Document> implements XMLSignerResult {
 
   /** The signature object. */
   private XMLSignature signature;
-
-  /** The time of signing. */
-  private long signingTime;
 
   /**
    * Constructor.
@@ -45,19 +43,8 @@ public class DefaultXMLSignerResult implements XMLSignerResult {
    */
   public DefaultXMLSignerResult(final XMLSignature signature) {
     this.signature = signature;
-    this.signingTime = System.currentTimeMillis();
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Document getSignedDocument() {
-    return this.signature.getDocument();
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public long getSigningTime() {
-    return this.signingTime;
+    this.setSignedDocument(this.signature.getDocument());
+    this.setSigningTime(System.currentTimeMillis());
   }
 
   /** {@inheritDoc} */

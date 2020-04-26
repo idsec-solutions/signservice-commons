@@ -15,9 +15,19 @@
  */
 package se.idsec.signservice.security.sign.pdf.document;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -27,30 +37,60 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.visible.PDVisibleSigProperties;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.visible.PDVisibleSignDesigner;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
 
 /**
- * Data object holding the parameters necessary to provide a sign image to the PDF document
+ * Data object holding the parameters necessary to provide a sign image to a PDF document.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class VisibleSigImage {
-  public static final Logger LOG = Logger.getLogger(VisibleSigImage.class.getName());
+
+  /** Basic date format used. */
   public static final SimpleDateFormat BASIC_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+  /** Constant representing "first page" (1). */
   public static final int FIRST_PAGE = 1;
+
+  /** Contants representing "last page" (0). */
   public static final int LAST_PAGE = 0;
 
+  /**
+   * The page number where the image should be inserted. 0 means last page.
+   *
+   * @param page
+   *          the page number where the image should be inserted
+   * @return the page number where the image should be inserted
+   */
   private int page;
+
+  /**
+   * The x-axis offset in pixels where the image should be inserted.
+   *
+   * @param xOffset
+   *          the x-axis offset in pixels where the image should be inserted
+   * @return the x-axis offset in pixels where the image should be inserted
+   */
   private int xOffset;
+
+  /**
+   * The y-axis offset in pixels where the image should be inserted.
+   *
+   * @param yOffset
+   *          the y-axis offset in pixels where the image should be inserted
+   * @return the y-axis offset in pixels where the image should be inserted
+   */
   private int yOffset;
   private int zoomPercent;
   private Map<String, String> personalizationParams;
@@ -59,75 +99,103 @@ public class VisibleSigImage {
   private boolean includeDate;
   private String svgImage;
 
-  public SignatureOptions getVisibleSignatureOptions(PDDocument doc, Date signTime){
-    return getVisibleSignatureOptions(doc, signTime, 0);
+  /**
+   * Generates PDFBox signature options that includes the the visible signature.
+   * <p>
+   * Invokes {@link #getVisibleSignatureOptions(PDDocument, Date, int)} with {@code signatureSize} set to 0.
+   * </p>
+   *
+   * @param doc
+   *          the PDF document where the visible signature will be added
+   * @param signTime
+   *          the time when this signature is claimed to be created
+   * @return a signature options object with visible signature
+   * @throws PDFSignatureException
+   *           for errors creating the signature options
+   */
+  public SignatureOptions getVisibleSignatureOptions(final PDDocument doc, final Date signTime) throws PDFSignatureException {
+    return this.getVisibleSignatureOptions(doc, signTime, 0);
   }
 
   /**
-   * Generates signature options that includes the visible signature
-   * @param doc PDF document where the visible signature will be added.
-   * @param signTime the time when this signature is claimed to be created
-   * @param signatureSize The preferred size of the signature data content (0 will use default size)
-   * @return Signature options with visible signature.
+   * Generates PDFBox signature options that includes the the visible signature.
+   *
+   * @param doc
+   *          the PDF document where the visible signature will be added
+   * @param signTime
+   *          the time when this signature is claimed to be created
+   * @param signatureSize
+   *          the preferred size of the signature data content (0 will use default size)
+   * @return a signature options object with visible signature
+   * @throws PDFSignatureException
+   *           for errors creating the signature options
    */
-  public SignatureOptions getVisibleSignatureOptions(PDDocument doc, Date signTime, int signatureSize){
+  public SignatureOptions getVisibleSignatureOptions(final PDDocument doc, final Date signTime, final int signatureSize)
+      throws PDFSignatureException {
 
-    SignatureOptions sigOptons = new SignatureOptions();
+    final SignatureOptions sigOptons = new SignatureOptions();
     sigOptons.setPreferredSignatureSize(signatureSize);
 
     // If page is less than 1, set to last page.
-    page = page < 1 ? doc.getNumberOfPages() : page;
+    this.page = this.page < 1 ? doc.getNumberOfPages() : this.page;
 
+    InputStream imageStream = null;
     try {
-      InputStream imageStream = createImageFromSVG(getPersonalizedSvgImage(svgImage, signTime));
-      PDVisibleSignDesigner visibleSignDesigner = new PDVisibleSignDesigner(doc, imageStream, page);
-      visibleSignDesigner.xAxis(xOffset).yAxis(yOffset).zoom(zoomPercent).adjustForRotation();
-      imageStream.close();
+      imageStream = this.createImageFromSVG(this.getPersonalizedSvgImage(this.svgImage, signTime));
+      final PDVisibleSignDesigner visibleSignDesigner = new PDVisibleSignDesigner(doc, imageStream, this.page);
+      visibleSignDesigner.xAxis(this.xOffset).yAxis(this.yOffset).zoom(this.zoomPercent).adjustForRotation();
 
-      PDVisibleSigProperties visibleSignatureProperties = new PDVisibleSigProperties();
-      //visibleSignatureProperties.signerName(name).signerLocation(location).signatureReason(reason).
-      visibleSignatureProperties.page(page).visualSignEnabled(true).setPdVisibleSignature(visibleSignDesigner).buildSignature();
+      final PDVisibleSigProperties visibleSignatureProperties = new PDVisibleSigProperties();
+      // visibleSignatureProperties.signerName(name).signerLocation(location).signatureReason(reason).
+      visibleSignatureProperties.page(this.page).visualSignEnabled(true).setPdVisibleSignature(visibleSignDesigner).buildSignature();
 
       // Set signature in signature options
       sigOptons.setVisualSignature(visibleSignatureProperties.getVisibleSignature());
-      sigOptons.setPage(page - 1);
+      sigOptons.setPage(this.page - 1);
+      return sigOptons;
     }
-    catch (Exception e) {
-      LOG.warning("Failed to generate requested visible signature image");
-      e.printStackTrace();
+    catch (IOException | TranscoderException e) {
+      final String msg = String.format("Failed to create visible signature options - %s", e.getMessage());
+      log.error("{}", msg, e);
+      throw new PDFSignatureException(msg, e);
     }
-
-    return sigOptons;
+    finally {
+      try {
+        if (imageStream != null) {
+          imageStream.close();
+        }
+      }
+      catch (IOException e) {
+      }
+    }
   }
 
+  private InputStream createImageFromSVG(final String svg) throws TranscoderException {
+    final Reader reader = new BufferedReader(new StringReader(svg));
+    final TranscoderInput svgImage = new TranscoderInput(reader);
 
-  private InputStream createImageFromSVG(String svg) throws TranscoderException {
-    Reader reader = new BufferedReader(new StringReader(svg));
-    TranscoderInput svgImage = new TranscoderInput(reader);
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    final TranscoderOutput tcOut = new TranscoderOutput(bos);
 
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    TranscoderOutput tcOut = new TranscoderOutput(bos);
-
-    PNGTranscoder pngTranscoder = new PNGTranscoder();
-    pngTranscoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, Float.valueOf(String.valueOf(pixelImageWidth)));
-    pngTranscoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, Float.valueOf(String.valueOf(pixelImageHeight)));
+    final PNGTranscoder pngTranscoder = new PNGTranscoder();
+    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, Float.valueOf(String.valueOf(this.pixelImageWidth)));
+    pngTranscoder.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, Float.valueOf(String.valueOf(this.pixelImageHeight)));
     pngTranscoder.transcode(svgImage, tcOut);
     return new ByteArrayInputStream(bos.toByteArray());
   }
 
-  private String getPersonalizedSvgImage(String svg, Date signingTime) {
+  private String getPersonalizedSvgImage(final String svg, final Date signingTime) {
 
     String personalizedJson = svg;
-    Set<String> keySet = personalizationParams.keySet();
-    for (String parameterId: keySet){
-      personalizedJson = personalizedJson.replaceAll("##" + parameterId.toUpperCase() + "##" , personalizationParams.get(parameterId));
+    final Set<String> keySet = this.personalizationParams.keySet();
+    for (final String parameterId : keySet) {
+      personalizedJson = personalizedJson.replaceAll("##" + parameterId.toUpperCase() + "##", this.personalizationParams.get(parameterId));
     }
 
-    if (includeDate){
-      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", BASIC_DATE_FORMAT.format(signingTime));
+    if (this.includeDate) {
+      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", VisibleSigImage.BASIC_DATE_FORMAT.format(signingTime));
     }
     return personalizedJson;
   }
-
 
 }

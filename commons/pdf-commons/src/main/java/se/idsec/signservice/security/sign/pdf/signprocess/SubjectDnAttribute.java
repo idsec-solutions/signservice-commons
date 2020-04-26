@@ -22,38 +22,38 @@ package se.idsec.signservice.security.sign.pdf.signprocess;
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public enum SubjectDnAttribute {
-    cn("2.5.4.3"),
-    givenName("2.5.4.42"),
-    surname("2.5.4.4"),
-    personnummer("1.2.752.29.4.13"),
-    country("2.5.4.6"),
-    locality("2.5.4.7"),
-    serialNumber("2.5.4.5"),
-    orgnaizationName("2.5.4.10"),
-    orgnaizationalUnitName("2.5.4.11"),
-    organizationIdentifier("2.5.4.97"),
-    pseudonym("2.5.4.65"),
-    dnQualifier("2.5.4.46"),
-    title("2.5.4.12"),
-    unknown("");
-    
-    private final String oid;
+  cn("2.5.4.3"), 
+  givenName("2.5.4.42"), 
+  surname("2.5.4.4"), 
+  personalIdentityNumber("1.2.752.29.4.13"), 
+  country("2.5.4.6"), 
+  locality("2.5.4.7"), 
+  serialNumber("2.5.4.5"), 
+  organizationName("2.5.4.10"), 
+  organizationalUnitName("2.5.4.11"), 
+  organizationIdentifier("2.5.4.97"), 
+  pseudonym("2.5.4.65"), 
+  dnQualifier("2.5.4.46"), 
+  title("2.5.4.12"), 
+  unknown("");
 
-    private SubjectDnAttribute(String oid) {
-        this.oid = oid;
-    }
+  private final String oid;
 
-    public String getOid() {
-        return oid;
+  private SubjectDnAttribute(final String oid) {
+    this.oid = oid;
+  }
+
+  public String getOid() {
+    return this.oid;
+  }
+
+  public static SubjectDnAttribute getSubjectDnFromOid(final String oid) {
+    for (SubjectDnAttribute subjDn : values()) {
+      if (oid.equalsIgnoreCase(subjDn.getOid())) {
+        return subjDn;
+      }
     }
-    
-    public static SubjectDnAttribute getSubjectDnFromOid (String oid){
-        for (SubjectDnAttribute subjDn:values()){
-            if (oid.equalsIgnoreCase(subjDn.getOid())){
-                return subjDn;
-            }
-        }
-        return unknown;
-    }
-    
+    return unknown;
+  }
+
 }

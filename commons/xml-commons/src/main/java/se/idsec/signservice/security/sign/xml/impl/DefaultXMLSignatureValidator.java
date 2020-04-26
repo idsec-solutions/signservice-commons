@@ -160,7 +160,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
    * @throws SignatureException
    *           for validation processing errors
    */
-  protected List<SignatureValidationResult> validate(final Document document, final List<Element> signatures) throws SignatureException {
+  protected List<SignatureValidationResult> validate(final Document document, final List<Element> signatures) {
 
     // Get the document ID attribute (and register the ID attributes).
     //

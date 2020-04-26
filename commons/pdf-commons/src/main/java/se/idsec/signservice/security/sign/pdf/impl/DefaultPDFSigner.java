@@ -15,15 +15,6 @@
  */
 package se.idsec.signservice.security.sign.pdf.impl;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
-import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
-import se.idsec.signservice.security.sign.pdf.signprocess.PDFSigningProcessor;
-import se.idsec.signservice.security.sign.SigningCredential;
-import se.idsec.signservice.security.sign.pdf.PDFSigner;
-import se.idsec.signservice.security.sign.pdf.PDFSignerResult;
-
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -31,12 +22,25 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+
+import lombok.extern.slf4j.Slf4j;
+import se.idsec.signservice.security.sign.SigningCredential;
+import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
+import se.idsec.signservice.security.sign.pdf.PDFSigner;
+import se.idsec.signservice.security.sign.pdf.PDFSignerParameters;
+import se.idsec.signservice.security.sign.pdf.PDFSignerResult;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
+import se.idsec.signservice.security.sign.pdf.signprocess.PDFSigningProcessor;
+
 /**
  * Default PDF Signer for signing PDF documents
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
+@Slf4j
 public class DefaultPDFSigner implements PDFSigner {
 
   /** The signing credential. */
@@ -55,11 +59,14 @@ public class DefaultPDFSigner implements PDFSigner {
   /**
    * Constructor.
    *
-   * @param signingCredential  the signing credential to use
-   * @param signatureAlgorithm the URI identifier for the requested signature algorithm
-   * @throws NoSuchAlgorithmException on error
+   * @param signingCredential
+   *          the signing credential to use
+   * @param signatureAlgorithm
+   *          the URI identifier for the requested signature algorithm
+   * @throws NoSuchAlgorithmException
+   *           if the supplied signature algorithm is not supported
    */
-  public DefaultPDFSigner(final SigningCredential signingCredential, String signatureAlgorithm) throws NoSuchAlgorithmException {
+  public DefaultPDFSigner(final SigningCredential signingCredential, final String signatureAlgorithm) throws NoSuchAlgorithmException {
     this.signingCredential = signingCredential;
     if (PDFAlgoRegistry.isAlgoSupported(signatureAlgorithm)) {
       this.signatureAlgorithm = signatureAlgorithm;
@@ -72,12 +79,15 @@ public class DefaultPDFSigner implements PDFSigner {
   /**
    * Constructor.
    *
-   * @param signingCredential  the signing credential to use
-   * @param signatureAlgorithm the object identifier for the requested signature algorithm
-   * @throws NoSuchAlgorithmException on error
+   * @param signingCredential
+   *          the signing credential to use
+   * @param signatureAlgorithm
+   *          the object identifier for the requested signature algorithm
+   * @throws NoSuchAlgorithmException
+   *           if the supplied signature algorithm is not supported
    */
-  public DefaultPDFSigner(final SigningCredential signingCredential, AlgorithmIdentifier signatureAlgorithm)
-    throws NoSuchAlgorithmException {
+  public DefaultPDFSigner(final SigningCredential signingCredential, final AlgorithmIdentifier signatureAlgorithm)
+      throws NoSuchAlgorithmException {
     this.signingCredential = signingCredential;
     this.signatureAlgorithm = PDFAlgoRegistry.getAlgorithmURI(signatureAlgorithm);
   }
@@ -87,48 +97,78 @@ public class DefaultPDFSigner implements PDFSigner {
    * {@link SigningCredential#getCertificateChain()}). The default is {@code false} (only the entity certificate is
    * included).
    *
-   * @param includeCertificateChain whether the certificate chain should be included
+   * @param includeCertificateChain
+   *          whether the certificate chain should be included
    */
-  public void setIncludeCertificateChain(boolean includeCertificateChain) {
+  public void setIncludeCertificateChain(final boolean includeCertificateChain) {
     this.includeCertificateChain = includeCertificateChain;
   }
 
   /** {@inheritDoc} */
-  @Override public SigningCredential getSigningCredential() {
-    return signingCredential;
+  @Override
+  public SigningCredential getSigningCredential() {
+    return this.signingCredential;
   }
 
   /** {@inheritDoc} */
-  @Override public PDFSignerResult sign(PDFSignTaskDocument document) throws SignatureException {
+  @Override
+  public PDFSignerResult sign(final byte[] document) throws SignatureException {
+    return this.sign(document, new PDFSignerParameters());
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public PDFSignerResult sign(final byte[] document, final PDFSignerParameters parameters) throws SignatureException {
+
+    if (parameters == null) {
+      return this.sign(document);
+    }
+
+    PDDocument pdfDocument = null;
     try {
-      PDDocument pdfDocument = PDDocument.load(document.getPdfDocument());
-      List<X509Certificate> signingCertChain = includeCertificateChain
-        ? signingCredential.getCertificateChain()
-        : Arrays.asList(signingCredential.getSigningCertificate());
+      pdfDocument = PDDocument.load(document);
 
-      DefaultSignatureInterfaceImpl defaultSigner = new DefaultSignatureInterfaceImpl(
-        signingCredential.getPrivateKey(),
+      final List<X509Certificate> signingCertChain = this.includeCertificateChain
+          ? this.signingCredential.getCertificateChain()
+          : Arrays.asList(this.signingCredential.getSigningCertificate());
+
+      final DefaultSignatureInterfaceImpl signatureProvider = new DefaultSignatureInterfaceImpl(
+        this.signingCredential.getPrivateKey(),
         signingCertChain,
-        signatureAlgorithm
-      );
+        this.signatureAlgorithm,
+        parameters.getPadesType());
 
-      PDFSigningProcessor pdfSigningProcessor = PDFSigningProcessor.builder()
-        .chain(signingCertChain)
-        .document(document)
-        .pdfDocument(pdfDocument)
-        .signTimeAndID(System.currentTimeMillis())
-        .signatureInterface(defaultSigner)
-        .build();
+      final long signingTime = System.currentTimeMillis();
 
-      DefaultPDFSignerResult result = pdfSigningProcessor.signPdf();
+      final PDFSigningProcessor.Result signatureResult = PDFSigningProcessor.signPdfDocument(pdfDocument, signatureProvider, signingTime,
+        parameters.getVisibleSignatureImage());
 
+      final DefaultPDFSignerResult result = new DefaultPDFSignerResult();
+      result.setSignedDocument(signatureResult.getDocument());
+      result.setSignerCertificate(this.signingCredential.getSigningCertificate());
+      if (this.includeCertificateChain) {
+        result.setSignerCertificateChain(signingCertChain);
+      }
+      result.setSigningTime(signingTime);
+      result.setSignedAttributes(signatureResult.getCmsSignedAttributes());
+      result.setSignedData(signatureResult.getCmsSignedData());
       return result;
     }
     catch (IOException e) {
-      DefaultPDFSignerResult result = new DefaultPDFSignerResult();
-      result.setSuccess(false);
-      result.setException(e);
-      return result;
+      final String msg = String.format("Failed to load PDF document to sign - %s", e.getMessage());
+      log.error("{}", msg, e);
+      throw new PDFSignatureException(msg, e);
+    }
+    finally {
+      if (pdfDocument != null) {
+        try {
+          // Closing an already closed document is a no-op
+          pdfDocument.close();
+        }
+        catch (IOException e) {
+        }
+      }
     }
   }
+
 }

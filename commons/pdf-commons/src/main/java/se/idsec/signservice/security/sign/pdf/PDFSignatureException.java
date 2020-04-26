@@ -13,28 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.security.sign.xml;
+package se.idsec.signservice.security.sign.pdf;
 
 import java.security.SignatureException;
 
-import org.w3c.dom.Document;
-
-import se.idsec.signservice.security.sign.Signer;
-import se.idsec.signservice.security.sign.VoidSignerParameters;
-
 /**
- * Interface for XML signatures.
+ * Exception class for PDF signature errors.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface XMLSigner extends Signer<Document, XMLSignerResult, VoidSignerParameters> {
-  
+public class PDFSignatureException extends SignatureException {
+
+  /** For serializing. */
+  private static final long serialVersionUID = -2912000835132489128L;
+
   /**
-   * This implementation does not support any type of parameters. Will invoke {@link #sign(Document)}.
+   * Constructor.
+   * 
+   * @param msg the error message
    */
-  default XMLSignerResult sign(final Document document, final VoidSignerParameters parameters) throws SignatureException {
-    return this.sign(document);
+  public PDFSignatureException(final String msg) {
+    super(msg);
   }
-  
+
+  /**
+   * Constructor.
+   * 
+   * @param message the error message
+   * @param cause the cause of the error
+   */
+  public PDFSignatureException(final String message, Throwable cause) {
+    super(message, cause);
+  }
+
 }

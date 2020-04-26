@@ -15,7 +15,6 @@
  */
 package se.idsec.signservice.security.sign.pdf;
 
-import se.idsec.signservice.security.sign.pdf.document.PDFSignTaskDocument;
 import se.idsec.signservice.security.sign.Signer;
 
 /**
@@ -24,6 +23,5 @@ import se.idsec.signservice.security.sign.Signer;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface PDFSigner extends Signer<PDFSignTaskDocument, PDFSignerResult> {
-
+public interface PDFSigner extends Signer<byte[], PDFSignerResult, PDFSignerParameters> {  
 }

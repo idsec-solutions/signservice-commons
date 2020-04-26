@@ -15,7 +15,13 @@
  */
 package se.idsec.signservice.security.sign.pdf.impl;
 
-import lombok.Setter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
@@ -30,123 +36,139 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.Store;
-import se.idsec.signservice.security.sign.pdf.SignserviceSignatureInterface;
+
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import se.idsec.signservice.security.sign.AdesProfileType;
+import se.idsec.signservice.security.sign.pdf.SignServiceSignatureInterface;
 import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
 import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
 import se.idsec.signservice.security.sign.pdf.signprocess.CMSProcessableInputStream;
 import se.idsec.signservice.security.sign.pdf.signprocess.PdfBoxSigUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.List;
-
 /**
- * Implementation of the PDF box signing interface. This is used during the pre-sign process
+ * Implementation of the PDF box signing interface. This is used during the pre-sign process.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class DefaultSignatureInterfaceImpl implements SignserviceSignatureInterface {
+@Slf4j
+public class DefaultSignatureInterfaceImpl implements SignServiceSignatureInterface {
 
-  /** Private key used to perform the signature */
+  /** Private key used to perform the signature. */
   private final PrivateKey privateKey;
 
-  /** The certificates of the signer */
+  /** The certificates of the signer. */
   private final List<X509Certificate> certificates;
 
-  /** The signature algorithm to used, specified as a URI identifier */
+  /** The signature algorithm to used, specified as a URI identifier. */
   private final String algorithm;
 
-  /** Set to true if processing is done according to the PAdES profile */
-  private boolean pades = false;
-
-  @Setter
-  /** Set to true if PAdES issuer serial information should be included in the PAdES data */
-  private boolean padesIssuerSerial = false;
-
-  /** CMS Signed data result */
-  private byte[] cmsSignedData;
-
-  /** The CMS Signed attributes result */
-  byte[] cmsSignedAttributes;
+  /** Set to true if processing is done according to the PAdES profile. */
+  private boolean pades;
 
   /**
-   * Constructor
-   * @param privateKey private signing key
-   * @param certificates signing certificate chain
-   * @param algorithm signing algorithm
+   * Set to true if PAdES issuer serial information should be included in the PAdES data.
+   *
+   * @param includePadesIssuerSerial
+   *          whether to include the PAdES issuer and serial number information in PAdES data
    */
-  public DefaultSignatureInterfaceImpl(PrivateKey privateKey, List<X509Certificate> certificates, String algorithm) {
+  @Setter
+  private boolean includePadesIssuerSerial = false;
+
+  /** CMS Signed data result. */
+  private byte[] cmsSignedData;
+
+  /** The CMS Signed attributes result. */
+  private byte[] cmsSignedAttributes;
+
+  /**
+   * Constructor.
+   *
+   * @param privateKey
+   *          private signing key
+   * @param certificates
+   *          signing certificate chain
+   * @param algorithm
+   *          signing algorithm
+   * @param pades
+   *          PAdES type (may be null)
+   */
+  public DefaultSignatureInterfaceImpl(final PrivateKey privateKey, final List<X509Certificate> certificates, final String algorithm,
+      final AdesProfileType pades) {
     this.privateKey = privateKey;
     this.certificates = certificates;
     this.algorithm = algorithm;
+    this.pades = pades != null && !AdesProfileType.None.equals(pades);
   }
 
   /** {@inheritDoc} */
   @Override
   public byte[] getCmsSignedData() {
-    return cmsSignedData;
-  }
-
-  /** {@inheritDoc} */
-  @Override public byte[] getCmsSignedAttributes() {
-    return cmsSignedAttributes;
+    return this.cmsSignedData;
   }
 
   /** {@inheritDoc} */
   @Override
-  public void setPades(boolean pades) {
-    this.pades = pades;
+  public byte[] getCmsSignedAttributes() {
+    return this.cmsSignedAttributes;
   }
 
   /**
    * SignatureInterface implementation.
    * <p>
-   * This method will be called from inside of the pdfbox and create the PKCS
-   * #7 signature (CMS ContentInfo). The given InputStream contains the bytes that are given by
-   * the byte range.
+   * This method will be called from inside of the pdfbox and creates the PKCS #7 signature (CMS ContentInfo). The given
+   * InputStream contains the bytes that are given by the byte range.
    * </p>
-   * @param content the message bytes being signed (specified by ByteRange in the signature dictionary)
+   *
+   * @param content
+   *          the message bytes being signed (specified by ByteRange in the signature dictionary)
    * @return CMS ContentInfo bytes holding the complete PKCS#7 signature structure
-   * @throws IOException error during signature creation
+   * @throws IOException
+   *           error during signature creation
    */
   @Override
-  public byte[] sign(InputStream content) throws IOException {
+  public byte[] sign(final InputStream content) throws IOException {
     try {
-      Store certs = new JcaCertStore(certificates);
-      CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
-      org.bouncycastle.asn1.x509.Certificate cert = org.bouncycastle.asn1.x509.Certificate.getInstance(
-        ASN1Primitive.fromByteArray(certificates.get(0).getEncoded()));
-      ContentSigner signer = new JcaContentSignerBuilder(PDFAlgoRegistry.getSigAlgoName(algorithm)).build(privateKey);
-      JcaSignerInfoGeneratorBuilder builder = new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().build());
-      if (pades) {
+      final Store<?> certs = new JcaCertStore(this.certificates);
+      final CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
+      final org.bouncycastle.asn1.x509.Certificate cert = org.bouncycastle.asn1.x509.Certificate.getInstance(
+        ASN1Primitive.fromByteArray(this.certificates.get(0).getEncoded()));
+      final ContentSigner signer = new JcaContentSignerBuilder(PDFAlgoRegistry.getSigAlgoName(this.algorithm)).build(this.privateKey);
+      final JcaSignerInfoGeneratorBuilder builder = new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().build());
+      if (this.pades) {
         // Add signed signer certificate signed attribute
-        builder.setSignedAttributeGenerator(
-          PdfBoxSigUtil.getPadesSignerInfoGenerator(certificates.get(0),
-            PDFAlgoRegistry.getAlgorithmProperties(algorithm).getDigestAlgoOID(), padesIssuerSerial));
+        builder.setSignedAttributeGenerator(PdfBoxSigUtil.getPadesSignerInfoGenerator(
+          this.certificates.get(0),
+          PDFAlgoRegistry.getAlgorithmProperties(this.algorithm).getDigestAlgoOID(),
+          this.includePadesIssuerSerial));
       }
       gen.addSignerInfoGenerator(builder.build(signer, new X509CertificateHolder(cert)));
       gen.addCertificates(certs);
-      CMSProcessableInputStream msg = new CMSProcessableInputStream(content);
-      CMSSignedData resultSignedData = gen.generate(msg, false);
+      final CMSProcessableInputStream msg = new CMSProcessableInputStream(content);
+      final CMSSignedData resultSignedData = gen.generate(msg, false);
 
       // Get signed attributes according to PAdES profile requirements
-      cmsSignedAttributes = PdfBoxSigUtil.getCmsSignedAttributes(resultSignedData);
-      if (pades){
+      this.cmsSignedAttributes = PdfBoxSigUtil.getCmsSignedAttributes(resultSignedData);
+      if (this.pades) {
         // Signing time is not allowed in PAdES signatures. Remove it
-        cmsSignedAttributes = PdfBoxSigUtil.removeSignedAttr(cmsSignedAttributes, new ASN1ObjectIdentifier[]{new ASN1ObjectIdentifier(
-          PdfObjectIds.ID_SIGNING_TIME)});
+        this.cmsSignedAttributes = PdfBoxSigUtil.removeSignedAttr(this.cmsSignedAttributes,
+          new ASN1ObjectIdentifier[] { new ASN1ObjectIdentifier(PdfObjectIds.ID_SIGNING_TIME) });
       }
-
-      cmsSignedData = resultSignedData.toASN1Structure().getEncoded(ASN1Encoding.DL);
-      return cmsSignedData;
+      this.cmsSignedData = resultSignedData.toASN1Structure().getEncoded(ASN1Encoding.DL);
+      return this.cmsSignedData;
     }
     catch (GeneralSecurityException | CMSException | OperatorCreationException e) {
-      throw new IOException(e);
+      final String msg = String.format("Failed to sign PDF content - %s", e.getMessage());
+      log.error("{}", msg, e);
+      throw new IOException(msg, e);
     }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isPades() {
+    return this.pades;
   }
 
 }
