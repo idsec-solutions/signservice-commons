@@ -235,7 +235,7 @@ public class PDFAlgorithmRegistry {
   }
 
   /**
-   * Test if a particular JWSAlgorithm is supported.
+   * Test if a particular algorithm is supported.
    *
    * @param algorithm
    *          algorithm to test
@@ -387,7 +387,7 @@ public class PDFAlgorithmRegistry {
   }
 
   /**
-   * Retrieve the algorithm family for a specific JWS algorithm.
+   * Retrieve the algorithm family for a specific algorithm.
    *
    * @param algorithm
    *          the algorithm
@@ -399,7 +399,7 @@ public class PDFAlgorithmRegistry {
     if (supportedAlgoMap.containsKey(algorithm)) {
       return supportedAlgoMap.get(algorithm).getAlgoType();
     }
-    throw new IllegalArgumentException("Unsupported JWS Algorithm family");
+    throw new IllegalArgumentException("Unsupported algorithm family");
   }
 
   /**
