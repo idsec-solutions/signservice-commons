@@ -157,8 +157,6 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
    * @param signatures
    *          the signatures
    * @return a list of result objects
-   * @throws SignatureException
-   *           for validation processing errors
    */
   protected List<SignatureValidationResult> validate(final Document document, final List<Element> signatures) {
 

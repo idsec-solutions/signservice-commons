@@ -2,7 +2,7 @@
 
 # signservice-commons
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
 
 Core components for the IDsec Signature Service.
 
@@ -12,22 +12,37 @@ The [Swedish eID Framework](https://docs.swedenconnect.se/technical-framework/) 
 
 The **signservice-commons** repository comprises of:
 
-* A Maven BOM to be used by those including the signservice-commons artifacts.
+#### Maven BOM
 
-* signservice-commons - A library containing utilities for JAXB and XML processing, certificate utilities and interfaces for signing and signature validation.
+A Maven BOM to be used by those including the signservice-commons artifacts.
 
-* signservice-xml-commons - Classes for XML signing and validation of XML signatures.
+##### Maven
 
-* signservice-pdf-commons - Classes for PDF signing and validation of PDF signatures. *Work is ongoing*
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons)
 
-### API documentation
+```
+<dependencyManagement>
+  <dependencies>
+    ...
+    <dependency>
+      <groupId>se.idsec.signservice.commons</groupId>
+      <artifactId>signservice-bom</artifactId>
+      <version>${signservice-bom.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+    ...
+  </dependencies>
+</dependencyManagement>
+```
 
-* Java API documentation for [signservice-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/signservice-commons).
-* Java API documentation for [signservice-xml-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/xml-commons).
+#### signservice-commons
 
-### Maven
+A library containing utilities for JAXB and XML processing, certificate utilities and interfaces for signing and signature validation. 
 
-All artifacts from the **signservice-commons** repository are published to Maven central.
+##### Maven
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom)
 
 ```
 <dependency>
@@ -35,12 +50,50 @@ All artifacts from the **signservice-commons** repository are published to Maven
   <artifactId>signservice-commons</artifactId>
   <version>${signservice-commons.version}</version>
 </dependency>
+```
 
+##### API documentation
+
+Java API documentation for [signservice-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/signservice-commons).
+
+#### signservice-xml-commons
+
+Classes for XML signing and validation of XML signatures.
+
+##### Maven
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons)
+
+```
 <dependency>
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-xml-commons</artifactId>
   <version>${signservice-xml-commons.version}</version>
 </dependency>
 ```
+
+##### API documentation
+
+Java API documentation for [signservice-xml-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/xml-commons).
+
+#### signservice-pdf-commons
+
+Classes for PDF signing and validation of PDF signatures.
+
+##### Maven
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-pdf-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-pdf-commons)
+
+```
+<dependency>
+  <groupId>se.idsec.signservice.commons</groupId>
+  <artifactId>signservice-pdf-commons</artifactId>
+  <version>${signservice-pdf-commons.version}</version>
+</dependency>
+```
+
+##### API documentation
+
+Java API documentation for [signservice-pdf-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/pdf-commons).
 
 ---Copyright &copy; 2019-2020, [IDsec Solutions AB](http://www.idsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
