@@ -31,7 +31,7 @@ import se.idsec.signservice.security.sign.VoidSignerParameters;
 public interface XMLSigner extends Signer<Document, XMLSignerResult, VoidSignerParameters> {
   
   /**
-   * This implementation does not support any type of parameters. Will invoke {@link #sign(Document)}.
+   * This implementation does not support any type of parameters. Will invoke {@code sign(Document)}.
    */
   default XMLSignerResult sign(final Document document, final VoidSignerParameters parameters) throws SignatureException {
     return this.sign(document);
