@@ -13,28 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.security.sign.xml;
-
-import java.security.SignatureException;
-
-import org.w3c.dom.Document;
-
-import se.idsec.signservice.security.sign.Signer;
-import se.idsec.signservice.security.sign.VoidSignerParameters;
+package se.idsec.signservice.security.sign;
 
 /**
- * Interface for XML signatures.
+ * Marker interface for signer parameters for the {@link Signer} interface.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface XMLSigner extends Signer<Document, XMLSignerResult, VoidSignerParameters> {
-  
-  /**
-   * This implementation does not support any type of parameters. Will invoke {@link #sign(Document)}.
-   */
-  default XMLSignerResult sign(final Document document, final VoidSignerParameters parameters) throws SignatureException {
-    return this.sign(document);
-  }
-  
+public interface SignerParameters {
 }

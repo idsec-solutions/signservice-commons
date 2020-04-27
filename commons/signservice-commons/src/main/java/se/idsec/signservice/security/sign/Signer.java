@@ -24,22 +24,43 @@ import java.security.SignatureException;
  *          the type for the document that is signed
  * @param <R>
  *          the type of signing result
+ * @param <P>
+ *          the type of signer parameters
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface Signer<T, R extends SignerResult<T>> {
+public interface Signer<T, R extends SignerResult<T>, P extends SignerParameters> {
 
   /**
    * Signs the document using the installed signing credential ({@link #getSigningCredential()}).
+   * <p>
+   * Corresponds to invoking {@link #sign(Object, SignerParameters)} with the parameters set to {@code null}.
+   * </p>
    * 
    * @param document
    *          the document to sign
    * @return a signature result (including the signed document)
    * @throws SignatureException
    *           for signature errors
+   * @see #sign(Object, SignerParameters)
    */
   R sign(final T document) throws SignatureException;
+
+  /**
+   * Signs the document using the installed signing credential ({@link #getSigningCredential()}) and the supplied signer
+   * parameters.
+   * 
+   * @param document
+   *          the document to sign
+   * @param parameters
+   *          optional signer parameters
+   * @return a signature result (including the signed document)
+   * @throws SignatureException
+   *           for signature errors
+   * @see #sign(Object)
+   */
+  R sign(final T document, final P parameters) throws SignatureException;
 
   /**
    * Gets the signing credential that is used for the signing operation.

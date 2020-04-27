@@ -189,7 +189,12 @@ public class DefaultXMLSigner implements XMLSigner {
       //
       signature.sign(this.signingCredential.getPrivateKey());
 
-      return new DefaultXMLSignerResult(signature);
+      final DefaultXMLSignerResult result = new DefaultXMLSignerResult(signature);
+      result.setSignerCertificate(this.signingCredential.getSigningCertificate());
+      if (this.includeCertificateChain) {
+        result.setSignerCertificateChain(this.signingCredential.getCertificateChain());
+      }
+      return result;
     }
     catch (XMLSecurityException e) {
       final String msg = String.format("Error while creating Signature - %s", e.getMessage());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Litsec AB
+ * Copyright 2019-2020 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,33 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
+import java.util.Date;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509v1CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509v1CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.opensaml.security.crypto.JCAConstants;
 import org.opensaml.xmlsec.algorithm.AlgorithmDescriptor;
 import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 
 import lombok.extern.slf4j.Slf4j;
+import se.idsec.signservice.security.certificate.CertificateUtils;
 import se.idsec.signservice.security.sign.SigningCredential;
 
 /**
@@ -37,8 +49,9 @@ import se.idsec.signservice.security.sign.SigningCredential;
  * <p>
  * Mainly useful for testing, but also when to-be-signed bytes are calculated.
  * </p>
- * 
- * @author Martin Lindström (martin@litsec.se)
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
  */
 @Slf4j
 public class StaticCredentials {
@@ -61,6 +74,12 @@ public class StaticCredentials {
   /** The curve to use for EC keys - default is {@value #DEFAULT_EC_CURVE}. */
   private String ecCurve = DEFAULT_EC_CURVE;
 
+  /** Certificate for RSA private key. */
+  private X509Certificate rsaCertificate;
+
+  /** Certificate for EC private key. */
+  private X509Certificate ecCertificate;
+
   /**
    * Constructor.
    */
@@ -69,7 +88,7 @@ public class StaticCredentials {
 
   /**
    * Constructor setting the key size for RSA and curve for EC to use.
-   * 
+   *
    * @param rsaKeySize
    *          RSA key size in bits (default is {@value #DEFAULT_RSA_KEY_SIZE})
    * @param ecCurve
@@ -84,7 +103,7 @@ public class StaticCredentials {
 
   /**
    * Returns a {@link SigningCredential} that can be used to sign using the supplied algorithm.
-   * 
+   *
    * @param algorithmUri
    *          the signature algorithm URI
    * @return a SigningCredential instance
@@ -107,12 +126,14 @@ public class StaticCredentials {
       final String algoKey = ((SignatureAlgorithm) descriptor).getKey();
       if (JCAConstants.KEY_ALGO_RSA.equals(algoKey)) {
         synchronized (this) {
-          return new DefaultSigningCredential("RSA", this.getRsaKeyPair());
+          KeyPair rsaKeyPair = this.getRsaKeyPair();
+          return new DefaultSigningCredential("RSA", rsaKeyPair.getPrivate(), this.getRsaCertificate());
         }
       }
       else if (JCAConstants.KEY_ALGO_EC.equals(algoKey)) {
         synchronized (this) {
-          return new DefaultSigningCredential("EC", this.getEcKeyPair());
+          KeyPair ecKeyPair = this.getEcKeyPair();
+          return new DefaultSigningCredential("EC", ecKeyPair.getPrivate(), this.getEcCertificate());
         }
       }
       else {
@@ -128,7 +149,7 @@ public class StaticCredentials {
 
   /**
    * Gets the generated RSA key pair.
-   * 
+   *
    * @return the RSA key pair.
    * @throws InvalidParameterException
    *           if the keysize is incorrect
@@ -142,7 +163,7 @@ public class StaticCredentials {
 
   /**
    * Gets the generated EC key pair.
-   * 
+   *
    * @return the EC key pair
    * @throws InvalidAlgorithmParameterException
    *           for unsupported curve
@@ -156,7 +177,7 @@ public class StaticCredentials {
 
   /**
    * Generates a RSA key pair.
-   * 
+   *
    * @param keysize
    *          the keysize in bits
    * @return RSA key pair
@@ -168,17 +189,18 @@ public class StaticCredentials {
     try {
       KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
       generator.initialize(keysize);
-      return generator.generateKeyPair();
+      KeyPair kp = generator.generateKeyPair();
+      this.rsaCertificate = generateV1Certificate(kp, JCAConstants.KEY_ALGO_RSA);
+      return kp;
     }
-    catch (NoSuchAlgorithmException e) {
-      // RSA not supported? That's not happening.
+    catch (NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
       throw new SecurityException(e);
     }
   }
 
   /**
    * Generates an EC keypair.
-   * 
+   *
    * @param ecCurve
    *          the curve
    * @return EC keypair
@@ -190,11 +212,64 @@ public class StaticCredentials {
     try {
       KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
       generator.initialize(new ECGenParameterSpec(ecCurve), new SecureRandom());
-      return generator.generateKeyPair();
+      KeyPair kp = generator.generateKeyPair();
+      this.ecCertificate = this.generateV1Certificate(kp, JCAConstants.KEY_ALGO_EC);
+      return kp;
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
       throw new SecurityException(e);
     }
+  }
+
+  /**
+   * Gets the RSA certificate.
+   *
+   * @return the RSA certificate
+   */
+  private X509Certificate getRsaCertificate() {
+    return this.rsaCertificate;
+  }
+
+  /**
+   * Gets the EC certificate.
+   *
+   * @return the EC certificate
+   */
+  private X509Certificate getEcCertificate() {
+    return this.ecCertificate;
+  }
+
+  /**
+   * Generates self signed certificate.
+   *
+   * @param pair
+   *          key pair
+   * @param algoKey
+   *          algorithm type
+   * @return certificate for the key pair
+   * @throws OperatorCreationException
+   *           on error
+   * @throws IOException
+   *           on error
+   * @throws CertificateException
+   *           on error
+   */
+  private X509Certificate generateV1Certificate(final KeyPair pair, final String algoKey)
+      throws OperatorCreationException, IOException, CertificateException {
+
+    final X509v1CertificateBuilder certGenerator = new JcaX509v1CertificateBuilder(
+      new X500Name("CN=Test Signer"), /* issuer */
+      BigInteger.valueOf(System.currentTimeMillis()), /* serial */
+      new Date(System.currentTimeMillis() - 7200000L), /* notBefore */
+      new Date(System.currentTimeMillis() + (5 * 365 * 24 * 3600000L)), /* notAfter */
+      new X500Name("CN=Test Signer"), /* subject */
+      pair.getPublic());
+
+    final ContentSigner signer = JCAConstants.KEY_ALGO_RSA.equals(algoKey)
+        ? new JcaContentSignerBuilder("SHA256WITHRSA").build(pair.getPrivate())
+        : new JcaContentSignerBuilder("SHA256WITHECDSA").build(pair.getPrivate());
+
+    return CertificateUtils.decodeCertificate(certGenerator.build(signer).getEncoded());
   }
 
 }

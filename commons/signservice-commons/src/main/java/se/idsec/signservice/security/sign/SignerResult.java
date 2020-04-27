@@ -15,6 +15,9 @@
  */
 package se.idsec.signservice.security.sign;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 /**
  * Representation of the result to an {@link Signer#sign(Object)} invocation. 
  * 
@@ -36,5 +39,19 @@ public interface SignerResult<T> {
    * @return the time of signing (milliseconds since 1970-01-01)
    */
   long getSigningTime();
+  
+  /**
+   * Gets the signer certificate.
+   * 
+   * @return the signer certificate
+   */
+  X509Certificate getSignerCertificate();
+
+  /**
+   * Gets the signer certificate chain. The chain starts with the signer certificate. 
+   * 
+   * @return signer certificate chain (holding at least one certificate)
+   */
+  List<X509Certificate> getSignerCertificateChain();  
 
 }

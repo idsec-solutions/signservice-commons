@@ -15,8 +15,6 @@
  */
 package se.idsec.signservice.security.sign.pdf;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-
 import se.idsec.signservice.security.sign.Signer;
 
 /**
@@ -25,8 +23,5 @@ import se.idsec.signservice.security.sign.Signer;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface PDFSigner extends Signer<PDDocument, PDFSignerResult> {
-
-  // TODO
-  
+public interface PDFSigner extends Signer<byte[], PDFSignerResult, PDFSignerParameters> {  
 }
