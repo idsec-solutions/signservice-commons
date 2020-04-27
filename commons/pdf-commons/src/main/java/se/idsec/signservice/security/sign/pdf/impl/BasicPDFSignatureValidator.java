@@ -63,12 +63,11 @@ import se.idsec.signservice.security.certificate.CertificateValidator;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult.Status;
 import se.idsec.signservice.security.sign.impl.InternalSignatureValidationException;
-import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
 import se.idsec.signservice.security.sign.pdf.PDFSignatureValidationResult;
 import se.idsec.signservice.security.sign.pdf.PDFSignatureValidator;
-import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
-import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
-import se.idsec.signservice.security.sign.pdf.signprocess.PdfBoxSigUtil;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgorithmRegistry;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFObjectIdentifiers;
+import se.idsec.signservice.security.sign.pdf.utils.PDFBoxSignatureUtils;
 import se.idsec.signservice.utils.Pair;
 
 /**
@@ -86,36 +85,10 @@ import se.idsec.signservice.utils.Pair;
 @Slf4j
 public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
-  /** A (possibly empty) list of required signer certificates. */
-  private final List<X509Certificate> requiredSignerCertificates;
-
   /**
-   * Constructor setting up the validator so that no required certificates are configured. This means that no control of
-   * the signer certificate will be performed.
+   * Constructor.
    */
   public BasicPDFSignatureValidator() {
-    this.requiredSignerCertificates = Collections.emptyList();
-  }
-
-  /**
-   * Constructor setting up the validator to require that the signature is signed using the supplied certificate.
-   * 
-   * @param acceptedSignerCertificate
-   *          required signer certificate
-   */
-  public BasicPDFSignatureValidator(final X509Certificate acceptedSignerCertificate) {
-    this(Collections.singletonList(acceptedSignerCertificate));
-  }
-
-  /**
-   * Constructor setting up the validator to require that the signature is signed using any of the supplied
-   * certificates.
-   * 
-   * @param acceptedSignerCertificates
-   *          required signer certificates
-   */
-  public BasicPDFSignatureValidator(final List<X509Certificate> acceptedSignerCertificates) {
-    this.requiredSignerCertificates = acceptedSignerCertificates;
   }
 
   /** {@inheritDoc} */
@@ -141,7 +114,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
     catch (IOException e) {
       final String msg = String.format("Internal error while verifying PDF signature - %s", e.getMessage());
       log.error("{}", msg, e);
-      throw new PDFSignatureException(msg, e);
+      throw new SignatureException(msg, e);
     }
     finally {
       try {
@@ -154,6 +127,15 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
     }
   }
 
+  /**
+   * Validates the supplied signature.
+   * 
+   * @param document
+   *          the PDF document holding the signature
+   * @param signature
+   *          the signature
+   * @return a validation result
+   */
   protected PDFSignatureValidationResult validatePdfSignature(final byte[] document, final PDSignature signature) {
     DefaultPDFSignatureValidationResult result = new DefaultPDFSignatureValidationResult();
     result.setPdfSignature(signature);
@@ -161,8 +143,8 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final byte[] signedContentBytes = signature.getSignedContent(new ByteArrayInputStream(document));
       final byte[] signedDataBytes = signature.getContents(new ByteArrayInputStream(document));
 
-      final CMSSignedDataParser signedDataParser = new CMSSignedDataParser(new BcDigestCalculatorProvider(), new CMSTypedStream(
-        new ByteArrayInputStream(signedContentBytes)), signedDataBytes);
+      final CMSSignedDataParser signedDataParser = new CMSSignedDataParser(new BcDigestCalculatorProvider(),
+        new CMSTypedStream(new ByteArrayInputStream(signedContentBytes)), signedDataBytes);
       final CMSTypedStream signedContent = signedDataParser.getSignedContent();
       signedContent.drain();
 
@@ -237,14 +219,14 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       //
       final String digestAlgoOid = signerInformation.getDigestAlgOID();
       final String encryptionAlgorithmOid = signerInformation.getEncryptionAlgOID();
-      final String signatureAlgorithm = PDFAlgoRegistry.getAlgorithmURI(
+      final String signatureAlgorithm = PDFAlgorithmRegistry.getAlgorithmURI(
         new ASN1ObjectIdentifier(encryptionAlgorithmOid), new ASN1ObjectIdentifier(digestAlgoOid));
       result.setSignatureAlgorithm(signatureAlgorithm);
 
       // Check if the CMS algorithm protection attribute has been set, and if so, assert algorithm consistency.
       //
       final Attribute cmsAlgorithmProtection = signerInformation.getSignedAttributes()
-        .get(new ASN1ObjectIdentifier(PdfObjectIds.ID_AA_CMS_ALGORITHM_PROTECTION));
+        .get(new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_CMS_ALGORITHM_PROTECTION));
 
       if (cmsAlgorithmProtection != null) {
         Pair<AlgorithmIdentifier, AlgorithmIdentifier> cmsAlgorithmProtectionAlgs = getCmsAlgoritmProtectionData(cmsAlgorithmProtection);
@@ -255,7 +237,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
         // Make sure the algorithms are consistent with our signature algorithm.
         //
-        final PDFAlgoRegistry.PDFSignatureAlgorithmProperties algorithmProperties = PDFAlgoRegistry.getAlgorithmProperties(
+        final PDFAlgorithmRegistry.PDFSignatureAlgorithmProperties algorithmProperties = PDFAlgorithmRegistry.getAlgorithmProperties(
           signatureAlgorithm);
 
         if (!algorithmProperties.getSigAlgoOID().equals(protSignAlgo.getAlgorithm())) {
@@ -316,7 +298,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final String subFilter = signature.getSubFilter();
 
       if (PDSignature.SUBFILTER_ETSI_CADES_DETACHED.getName().equals(subFilter)) {
-        PdfBoxSigUtil.SignedCertRef signedCertificateRef = PdfBoxSigUtil.getSignedCertRefAttribute(
+        PDFBoxSignatureUtils.SignedCertRef signedCertificateRef = PDFBoxSignatureUtils.getSignedCertRefAttribute(
           signerInformation.getSignedAttributes().toASN1Structure().getEncoded(ASN1Encoding.DER));
 
         if (signedCertificateRef == null) {
@@ -437,10 +419,12 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
     }
   }
 
-  /** {@inheritDoc} */
+  /**
+   * The basic implementation will always return an empty list.
+   */
   @Override
   public List<X509Certificate> getRequiredSignerCertificates() {
-    return this.requiredSignerCertificates;
+    return Collections.emptyList();
   }
 
   /**

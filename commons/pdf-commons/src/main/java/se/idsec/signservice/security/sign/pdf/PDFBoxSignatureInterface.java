@@ -24,7 +24,7 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface SignServiceSignatureInterface extends SignatureInterface {
+public interface PDFBoxSignatureInterface extends SignatureInterface {
 
   /**
    * Gets the result of the signing process in the form of ContentInfo holding SignedData.

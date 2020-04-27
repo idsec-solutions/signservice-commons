@@ -42,10 +42,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
 
 /**
- * Data object holding the parameters necessary to provide a sign image to a PDF document.
+ * Data object holding the parameters necessary to provide a signature image to a PDF document.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -55,7 +54,7 @@ import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
-public class VisibleSigImage {
+public class VisibleSignatureImage {
 
   /** Basic date format used. */
   public static final SimpleDateFormat BASIC_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -92,11 +91,59 @@ public class VisibleSigImage {
    * @return the y-axis offset in pixels where the image should be inserted
    */
   private int yOffset;
+
+  /**
+   * The zoom percentagy of the image, where 0 means original size.
+   * 
+   * @param zoomPercent
+   *          the zoom percentagy of the image
+   * @return the zoom percentagy of the image
+   */
   private int zoomPercent;
+
+  /**
+   * A map of name value pairs that will be included in the image (if it supports it).
+   * 
+   * @param personalizationParams
+   *          name-value pairs
+   * @return name-value pairs
+   */
   private Map<String, String> personalizationParams;
+
+  /**
+   * The width of the image in pixels.
+   * 
+   * @param pixelImageWidth
+   *          the width of the image in pixels
+   * @return the width of the image in pixels
+   */
   private int pixelImageWidth;
+
+  /**
+   * The height of the image in pixels.
+   * 
+   * @param pixelImageHeight
+   *          the height of the image in pixels
+   * @return the height of the image in pixels
+   */
   private int pixelImageHeight;
+
+  /**
+   * Tells whether the sign date should be included in the image.
+   * 
+   * @param includeDate
+   *          tells whether the sign date should be included in the image
+   * @return tells whether the sign date should be included in the image
+   */
   private boolean includeDate;
+
+  /**
+   * The contents of the SVG image.
+   * 
+   * @param svgImage
+   *          the contents of the SVG image
+   * @return the contents of the SVG image
+   */
   private String svgImage;
 
   /**
@@ -110,10 +157,10 @@ public class VisibleSigImage {
    * @param signTime
    *          the time when this signature is claimed to be created
    * @return a signature options object with visible signature
-   * @throws PDFSignatureException
+   * @throws IOException
    *           for errors creating the signature options
    */
-  public SignatureOptions getVisibleSignatureOptions(final PDDocument doc, final Date signTime) throws PDFSignatureException {
+  public SignatureOptions getVisibleSignatureOptions(final PDDocument doc, final Date signTime) throws IOException {
     return this.getVisibleSignatureOptions(doc, signTime, 0);
   }
 
@@ -127,11 +174,11 @@ public class VisibleSigImage {
    * @param signatureSize
    *          the preferred size of the signature data content (0 will use default size)
    * @return a signature options object with visible signature
-   * @throws PDFSignatureException
+   * @throws IOException
    *           for errors creating the signature options
    */
   public SignatureOptions getVisibleSignatureOptions(final PDDocument doc, final Date signTime, final int signatureSize)
-      throws PDFSignatureException {
+      throws IOException {
 
     final SignatureOptions sigOptons = new SignatureOptions();
     sigOptons.setPreferredSignatureSize(signatureSize);
@@ -154,10 +201,10 @@ public class VisibleSigImage {
       sigOptons.setPage(this.page - 1);
       return sigOptons;
     }
-    catch (IOException | TranscoderException e) {
+    catch (TranscoderException e) {
       final String msg = String.format("Failed to create visible signature options - %s", e.getMessage());
       log.error("{}", msg, e);
-      throw new PDFSignatureException(msg, e);
+      throw new IOException(msg, e);
     }
     finally {
       try {
@@ -193,7 +240,7 @@ public class VisibleSigImage {
     }
 
     if (this.includeDate) {
-      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", VisibleSigImage.BASIC_DATE_FORMAT.format(signingTime));
+      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", VisibleSignatureImage.BASIC_DATE_FORMAT.format(signingTime));
     }
     return personalizedJson;
   }

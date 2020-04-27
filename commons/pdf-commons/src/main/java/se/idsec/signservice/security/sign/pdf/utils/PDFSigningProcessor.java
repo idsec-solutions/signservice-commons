@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.security.sign.pdf.signprocess;
+package se.idsec.signservice.security.sign.pdf.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -29,14 +30,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
-import se.idsec.signservice.security.sign.pdf.SignServiceSignatureInterface;
-import se.idsec.signservice.security.sign.pdf.document.VisibleSigImage;
+import se.idsec.signservice.security.sign.pdf.PDFBoxSignatureInterface;
+import se.idsec.signservice.security.sign.pdf.document.VisibleSignatureImage;
 
 /**
  * This class provides a PDF signing processor that provides the basic functionality to use a
  * {@link org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface} implementation to generate PDF
- * signature data
+ * signature data.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -46,18 +46,6 @@ import se.idsec.signservice.security.sign.pdf.document.VisibleSigImage;
 @Builder
 @Slf4j
 public class PDFSigningProcessor {
-
-  /**
-   * Result object for
-   * {@link PDFSigningProcessor#signPdfDocument(PDDocument, SignServiceSignatureInterface, long, VisibleSigImage)}.
-   */
-  @Getter
-  @Builder
-  public static class Result {
-    private byte[] document;
-    private byte[] cmsSignedData;
-    private byte[] cmsSignedAttributes;
-  }
 
   /**
    * Signs the supplied PDF document. The document is closed by this method (in all cases).
@@ -71,14 +59,14 @@ public class PDFSigningProcessor {
    * @param visibleSignatureImage
    *          optional signature image
    * @return a result
-   * @throws PDFSignatureException
+   * @throws SignatureException
    *           for signature errors
    */
   public static Result signPdfDocument(
       final PDDocument pdfDocument,
-      final SignServiceSignatureInterface pdfSignatureProvider,
+      final PDFBoxSignatureInterface pdfSignatureProvider,
       final long signTimeAndID,
-      final VisibleSigImage visibleSignatureImage) throws PDFSignatureException {
+      final VisibleSignatureImage visibleSignatureImage) throws SignatureException {
 
     try {
       // Create signature dictionary
@@ -103,8 +91,8 @@ public class PDFSigningProcessor {
       // Register signature dictionary and sign interface
       //
       if (visibleSignatureImage != null) {
-        final SignatureOptions visibleSignatureOptions = visibleSignatureImage.getVisibleSignatureOptions(pdfDocument, signingTime
-          .getTime());
+        final SignatureOptions visibleSignatureOptions =             
+            visibleSignatureImage.getVisibleSignatureOptions(pdfDocument, signingTime.getTime());
         pdfDocument.addSignature(signature, pdfSignatureProvider, visibleSignatureOptions);
       }
       else {
@@ -127,7 +115,7 @@ public class PDFSigningProcessor {
     catch (IOException e) {
       final String msg = String.format("Failed to sign PDF document - %s", e.getMessage());
       log.error("{}", msg);
-      throw new PDFSignatureException(msg, e);
+      throw new SignatureException(msg, e);
     }
     finally {
       try {
@@ -137,6 +125,36 @@ public class PDFSigningProcessor {
       catch (IOException e) {
       }
     }
+  }
+  
+  /**
+   * Result object for
+   * {@link PDFSigningProcessor#signPdfDocument(PDDocument, PDFBoxSignatureInterface, long, VisibleSignatureImage)}.
+   */
+  @Getter
+  @Builder
+  public static class Result {
+    
+    /**
+     * The signed document.
+     * 
+     * @return the signed document
+     */
+    private byte[] document;
+    
+    /**
+     * The CMS SignedData.
+     * 
+     * @return the CMS SignedData
+     */
+    private byte[] cmsSignedData;
+    
+    /**
+     * The signed attributes.
+     * 
+     * @return the signed attributes
+     */
+    private byte[] cmsSignedAttributes;
   }
 
 }

@@ -40,20 +40,20 @@ import org.bouncycastle.util.Store;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.sign.AdesProfileType;
-import se.idsec.signservice.security.sign.pdf.SignServiceSignatureInterface;
-import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
-import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
-import se.idsec.signservice.security.sign.pdf.signprocess.CMSProcessableInputStream;
-import se.idsec.signservice.security.sign.pdf.signprocess.PdfBoxSigUtil;
+import se.idsec.signservice.security.sign.pdf.PDFBoxSignatureInterface;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgorithmRegistry;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFObjectIdentifiers;
+import se.idsec.signservice.security.sign.pdf.utils.CMSProcessableInputStream;
+import se.idsec.signservice.security.sign.pdf.utils.PDFBoxSignatureUtils;
 
 /**
- * Implementation of the PDF box signing interface. This is used during the pre-sign process.
+ * Implementation of the PDF box signing interface.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 @Slf4j
-public class DefaultSignatureInterfaceImpl implements SignServiceSignatureInterface {
+public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface {
 
   /** Private key used to perform the signature. */
   private final PrivateKey privateKey;
@@ -94,8 +94,8 @@ public class DefaultSignatureInterfaceImpl implements SignServiceSignatureInterf
    * @param pades
    *          PAdES type (may be null)
    */
-  public DefaultSignatureInterfaceImpl(final PrivateKey privateKey, final List<X509Certificate> certificates, final String algorithm,
-      final AdesProfileType pades) {
+  public DefaultPDFBoxSignatureInterface(final PrivateKey privateKey, final List<X509Certificate> certificates, 
+      final String algorithm, final AdesProfileType pades) {
     this.privateKey = privateKey;
     this.certificates = certificates;
     this.algorithm = algorithm;
@@ -134,13 +134,13 @@ public class DefaultSignatureInterfaceImpl implements SignServiceSignatureInterf
       final CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
       final org.bouncycastle.asn1.x509.Certificate cert = org.bouncycastle.asn1.x509.Certificate.getInstance(
         ASN1Primitive.fromByteArray(this.certificates.get(0).getEncoded()));
-      final ContentSigner signer = new JcaContentSignerBuilder(PDFAlgoRegistry.getSigAlgoName(this.algorithm)).build(this.privateKey);
+      final ContentSigner signer = new JcaContentSignerBuilder(PDFAlgorithmRegistry.getSigAlgoName(this.algorithm)).build(this.privateKey);
       final JcaSignerInfoGeneratorBuilder builder = new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().build());
       if (this.pades) {
         // Add signed signer certificate signed attribute
-        builder.setSignedAttributeGenerator(PdfBoxSigUtil.getPadesSignerInfoGenerator(
+        builder.setSignedAttributeGenerator(PDFBoxSignatureUtils.getPadesSignerInfoGenerator(
           this.certificates.get(0),
-          PDFAlgoRegistry.getAlgorithmProperties(this.algorithm).getDigestAlgoOID(),
+          PDFAlgorithmRegistry.getAlgorithmProperties(this.algorithm).getDigestAlgoOID(),
           this.includePadesIssuerSerial));
       }
       gen.addSignerInfoGenerator(builder.build(signer, new X509CertificateHolder(cert)));
@@ -149,11 +149,11 @@ public class DefaultSignatureInterfaceImpl implements SignServiceSignatureInterf
       final CMSSignedData resultSignedData = gen.generate(msg, false);
 
       // Get signed attributes according to PAdES profile requirements
-      this.cmsSignedAttributes = PdfBoxSigUtil.getCmsSignedAttributes(resultSignedData);
+      this.cmsSignedAttributes = PDFBoxSignatureUtils.getCmsSignedAttributes(resultSignedData);
       if (this.pades) {
         // Signing time is not allowed in PAdES signatures. Remove it
-        this.cmsSignedAttributes = PdfBoxSigUtil.removeSignedAttr(this.cmsSignedAttributes,
-          new ASN1ObjectIdentifier[] { new ASN1ObjectIdentifier(PdfObjectIds.ID_SIGNING_TIME) });
+        this.cmsSignedAttributes = PDFBoxSignatureUtils.removeSignedAttr(this.cmsSignedAttributes,
+          new ASN1ObjectIdentifier[] { new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_SIGNING_TIME) });
       }
       this.cmsSignedData = resultSignedData.toASN1Structure().getEncoded(ASN1Encoding.DL);
       return this.cmsSignedData;

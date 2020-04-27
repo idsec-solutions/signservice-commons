@@ -27,12 +27,11 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.sign.SigningCredential;
-import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
 import se.idsec.signservice.security.sign.pdf.PDFSigner;
 import se.idsec.signservice.security.sign.pdf.PDFSignerParameters;
 import se.idsec.signservice.security.sign.pdf.PDFSignerResult;
-import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgoRegistry;
-import se.idsec.signservice.security.sign.pdf.signprocess.PDFSigningProcessor;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgorithmRegistry;
+import se.idsec.signservice.security.sign.pdf.utils.PDFSigningProcessor;
 
 /**
  * Default PDF Signer for signing PDF documents
@@ -68,7 +67,7 @@ public class DefaultPDFSigner implements PDFSigner {
    */
   public DefaultPDFSigner(final SigningCredential signingCredential, final String signatureAlgorithm) throws NoSuchAlgorithmException {
     this.signingCredential = signingCredential;
-    if (PDFAlgoRegistry.isAlgoSupported(signatureAlgorithm)) {
+    if (PDFAlgorithmRegistry.isAlgoSupported(signatureAlgorithm)) {
       this.signatureAlgorithm = signatureAlgorithm;
     }
     else {
@@ -89,7 +88,7 @@ public class DefaultPDFSigner implements PDFSigner {
   public DefaultPDFSigner(final SigningCredential signingCredential, final AlgorithmIdentifier signatureAlgorithm)
       throws NoSuchAlgorithmException {
     this.signingCredential = signingCredential;
-    this.signatureAlgorithm = PDFAlgoRegistry.getAlgorithmURI(signatureAlgorithm);
+    this.signatureAlgorithm = PDFAlgorithmRegistry.getAlgorithmURI(signatureAlgorithm);
   }
 
   /**
@@ -132,7 +131,7 @@ public class DefaultPDFSigner implements PDFSigner {
           ? this.signingCredential.getCertificateChain()
           : Arrays.asList(this.signingCredential.getSigningCertificate());
 
-      final DefaultSignatureInterfaceImpl signatureProvider = new DefaultSignatureInterfaceImpl(
+      final DefaultPDFBoxSignatureInterface signatureProvider = new DefaultPDFBoxSignatureInterface(
         this.signingCredential.getPrivateKey(),
         signingCertChain,
         this.signatureAlgorithm,
@@ -157,7 +156,7 @@ public class DefaultPDFSigner implements PDFSigner {
     catch (IOException e) {
       final String msg = String.format("Failed to load PDF document to sign - %s", e.getMessage());
       log.error("{}", msg, e);
-      throw new PDFSignatureException(msg, e);
+      throw new SignatureException(msg, e);
     }
     finally {
       if (pdfDocument != null) {

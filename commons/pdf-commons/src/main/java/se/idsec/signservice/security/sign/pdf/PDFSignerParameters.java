@@ -21,7 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.idsec.signservice.security.sign.AdesProfileType;
 import se.idsec.signservice.security.sign.SignerParameters;
-import se.idsec.signservice.security.sign.pdf.document.VisibleSigImage;
+import se.idsec.signservice.security.sign.pdf.document.VisibleSignatureImage;
 
 @Data
 @NoArgsConstructor
@@ -45,6 +45,6 @@ public class PDFSignerParameters implements SignerParameters {
    *          the visible image to include
    * @return the visible image to include or null
    */
-  private VisibleSigImage visibleSignatureImage;
+  private VisibleSignatureImage visibleSignatureImage;
 
 }

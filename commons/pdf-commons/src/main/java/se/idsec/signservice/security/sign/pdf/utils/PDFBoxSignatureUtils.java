@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.security.sign.pdf.signprocess;
+package se.idsec.signservice.security.sign.pdf.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,6 +68,7 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.IssuerSerial;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSAlgorithm;
+import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -77,8 +78,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.idsec.signservice.security.certificate.CertificateUtils;
-import se.idsec.signservice.security.sign.pdf.PDFSignatureException;
-import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
+import se.idsec.signservice.security.sign.pdf.configuration.PDFObjectIdentifiers;
 
 /**
  * Static utilities for signed PDF documents.
@@ -86,7 +86,7 @@ import se.idsec.signservice.security.sign.pdf.configuration.PdfObjectIds;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class PdfBoxSigUtil {
+public class PDFBoxSignatureUtils {
 
   /**
    * This method extracts signed attribute data from a CMS signature
@@ -94,10 +94,10 @@ public class PdfBoxSigUtil {
    * @param signedData
    *          CMSSignedData object holding signature data
    * @return The signed attributes of a PDF signature
-   * @throws PDFSignatureException
+   * @throws CMSException
    *           If the provided input has no signed attribute data
    */
-  public static byte[] getCmsSignedAttributes(final CMSSignedData signedData) throws PDFSignatureException {
+  public static byte[] getCmsSignedAttributes(final CMSSignedData signedData) throws CMSException {
     byte[] cmsSignedAttributes = null;
     try {
       if (signedData.getSignerInfos() != null || signedData.getSignerInfos().size() > 0) {
@@ -105,13 +105,13 @@ public class PdfBoxSigUtil {
       }
     }
     catch (IOException e) {
-      throw new PDFSignatureException("No CMS signed attributes are available", e);
+      throw new CMSException("No CMS signed attributes are available", e);
     }
     if (cmsSignedAttributes != null) {
       return cmsSignedAttributes;
     }
     else {
-      throw new PDFSignatureException("No CMS signed attributes are available");
+      throw new CMSException("No CMS signed attributes are available");
     }
   }
 
@@ -121,14 +121,14 @@ public class PdfBoxSigUtil {
    * @param contentInfoBytes
    *          the CMS Content info bytes holding CMS SignedData content
    * @return The signed attributes of a PDF signature
-   * @throws PDFSignatureException
+   * @throws CMSException
    *           If the provided input has no signed attribute data
    */
-  public static byte[] getCmsSignedAttributes(final byte[] contentInfoBytes) throws PDFSignatureException {
+  public static byte[] getCmsSignedAttributes(final byte[] contentInfoBytes) throws CMSException {
     try {
       final ContentInfo contentInfo = ContentInfo.getInstance(contentInfoBytes);
       final ASN1ObjectIdentifier contentType = contentInfo.getContentType();
-      if (!contentType.getId().equals(PdfObjectIds.ID_PKCS7_SIGNED_DATA)) {
+      if (!contentType.getId().equals(PDFObjectIdentifiers.ID_PKCS7_SIGNED_DATA)) {
         throw new IOException("No SignedData present in input");
       }
       final SignedData signedData = SignedData.getInstance(contentInfo.getContent());
@@ -136,7 +136,7 @@ public class PdfBoxSigUtil {
       return signerInfo.getAuthenticatedAttributes().getEncoded("DER");
     }
     catch (IllegalArgumentException | NullPointerException | IOException e) {
-      throw new PDFSignatureException("No CMS signed attributes are available", e);
+      throw new CMSException("No CMS signed attributes are available", e);
     }
   }
 
@@ -153,12 +153,11 @@ public class PdfBoxSigUtil {
    * @param chain
    *          The new certificate chain
    * @return The bytes of an updated PDF signature (Encoded Content info)
-   * @throws PDFSignatureException
+   * @throws CMSException
    *           for errors
-   * @throws CertificateEncodingException
    */
   public static byte[] updatePdfPKCS7(final byte[] cmsSignedData, final byte[] newTbsBytes,
-      final byte[] newSigValue, final List<X509Certificate> chain) throws PDFSignatureException {
+      final byte[] newSigValue, final List<X509Certificate> chain) throws CMSException {
 
     try {
       //
@@ -170,18 +169,18 @@ public class PdfBoxSigUtil {
         pkcs7 = din.readObject();
       }
       catch (IOException e) {
-        throw new PDFSignatureException("Illegal PKCS7");
+        throw new CMSException("Illegal PKCS7");
       }
       finally {
         din.close();
       }
       if (!ASN1Sequence.class.isInstance(pkcs7)) {
-        throw new PDFSignatureException("Illegal PKCS7");
+        throw new CMSException("Illegal PKCS7");
       }
       final ASN1Sequence signedData = (ASN1Sequence) pkcs7;
       final ASN1ObjectIdentifier objId = (ASN1ObjectIdentifier) signedData.getObjectAt(0);
-      if (!PdfObjectIds.ID_PKCS7_SIGNED_DATA.equals(objId.getId())) {
-        throw new PDFSignatureException("No SignedData available");
+      if (!PDFObjectIdentifiers.ID_PKCS7_SIGNED_DATA.equals(objId.getId())) {
+        throw new CMSException("No SignedData available");
       }
 
       // Add Signed data content type to new PKCS7
@@ -189,14 +188,9 @@ public class PdfBoxSigUtil {
       npkcs7.add(objId);
 
       /*
-       * SignedData ::= SEQUENCE { 
-       *    version CMSVersion, 
-       *    digestAlgorithms DigestAlgorithmIdentifiers, 
-       *    encapContentInfo EncapsulatedContentInfo, 
-       *    certificates [0] IMPLICIT CertificateSet OPTIONAL, 
-       *    crls [1] IMPLICIT RevocationInfoChoices OPTIONAL, 
-       *    signerInfos SignerInfos 
-       *  }
+       * SignedData ::= SEQUENCE { version CMSVersion, digestAlgorithms DigestAlgorithmIdentifiers, encapContentInfo
+       * EncapsulatedContentInfo, certificates [0] IMPLICIT CertificateSet OPTIONAL, crls [1] IMPLICIT
+       * RevocationInfoChoices OPTIONAL, signerInfos SignerInfos }
        */
 
       // Get the SignedData sequence
@@ -235,7 +229,7 @@ public class PdfBoxSigUtil {
       // SignerInfos is the next object in the sequence of Signed Data (first untagged after certs)
       final ASN1Set signerInfos = (ASN1Set) signedDataSeq.getObjectAt(sdObjCount);
       if (signerInfos.size() != 1) {
-        throw new PDFSignatureException("Unsupported multiple signer infos");
+        throw new CMSException("Unsupported multiple signer infos");
       }
       final ASN1Sequence signerInfo = (ASN1Sequence) signerInfos.getObjectAt(0);
       int siCounter = 0;
@@ -258,7 +252,7 @@ public class PdfBoxSigUtil {
 
       // signing certificate issuer and serial number
       final Certificate sigCert = chain.get(0);
-      final ASN1EncodableVector issuerAndSerial = PdfBoxSigUtil.getIssuerAndSerial(sigCert);
+      final ASN1EncodableVector issuerAndSerial = PDFBoxSignatureUtils.getIssuerAndSerial(sigCert);
       nsi.add(new DERSequence(issuerAndSerial));
       siCounter++;
 
@@ -315,7 +309,7 @@ public class PdfBoxSigUtil {
       return pkcs7Bytes;
     }
     catch (IOException | CertificateEncodingException | NullPointerException | IllegalArgumentException e) {
-      throw new PDFSignatureException("Failed to update PKCS7 - " + e.getMessage(), e);
+      throw new CMSException("Failed to update PKCS7 - " + e.getMessage(), e);
     }
   }
 
@@ -367,15 +361,15 @@ public class PdfBoxSigUtil {
    *          the signature object to be updated
    * @param sigCert
    *          the certificate being source of data
-   * @throws PDFSignatureException
+   * @throws IOException
    *           for errors getting the subject attributes from the certificate
    */
   public static void setSubjectNameAndLocality(final PDSignature signature, final Certificate sigCert)
-      throws PDFSignatureException {
+      throws IOException {
 
-    final Map<SubjectDnAttribute, String> subjectDnAttributeMap = PdfBoxSigUtil.getSubjectAttributes(sigCert);
-    signature.setName(PdfBoxSigUtil.getName(subjectDnAttributeMap));
-    signature.setLocation(PdfBoxSigUtil.getLocation(subjectDnAttributeMap));
+    final Map<SubjectDnAttribute, String> subjectDnAttributeMap = PDFBoxSignatureUtils.getSubjectAttributes(sigCert);
+    signature.setName(PDFBoxSignatureUtils.getName(subjectDnAttributeMap));
+    signature.setLocation(PDFBoxSignatureUtils.getLocation(subjectDnAttributeMap));
   }
 
   /**
@@ -384,10 +378,10 @@ public class PdfBoxSigUtil {
    * @param cert
    *          X.509 certificate
    * @return subject DN attribute map
-   * @throws PDFSignatureException
+   * @throws IOException
    *           for errors getting the subject attributes from the certificate
    */
-  public static Map<SubjectDnAttribute, String> getSubjectAttributes(final Certificate cert) throws PDFSignatureException {
+  public static Map<SubjectDnAttribute, String> getSubjectAttributes(final Certificate cert) throws IOException {
 
     try {
       final ASN1InputStream ain = new ASN1InputStream(cert.getEncoded());
@@ -406,12 +400,12 @@ public class PdfBoxSigUtil {
       }
       // Get subject
       final ASN1Sequence subjectDn = (ASN1Sequence) tbsSeq.getObjectAt(counter + 4);
-      final Map<SubjectDnAttribute, String> subjectDnAttributeMap = PdfBoxSigUtil.getSubjectAttributes(subjectDn);
+      final Map<SubjectDnAttribute, String> subjectDnAttributeMap = PDFBoxSignatureUtils.getSubjectAttributes(subjectDn);
 
       return subjectDnAttributeMap;
     }
-    catch (IOException | CertificateEncodingException e) {
-      throw new PDFSignatureException("Failed to get subject attributes from certificate - " + e.getMessage(), e);
+    catch (CertificateEncodingException e) {
+      throw new IOException("Failed to get subject attributes from certificate - " + e.getMessage(), e);
     }
   }
 
@@ -434,7 +428,7 @@ public class PdfBoxSigUtil {
         final ASN1ObjectIdentifier rdnOid = (ASN1ObjectIdentifier) rdnSeq.getObjectAt(0);
         final String oidStr = rdnOid.getId();
         final ASN1Encodable rdnVal = rdnSeq.getObjectAt(1);
-        final String rdnValStr = PdfBoxSigUtil.getStringValue(rdnVal);
+        final String rdnValStr = PDFBoxSignatureUtils.getStringValue(rdnVal);
         final SubjectDnAttribute subjectDnAttr = SubjectDnAttribute.getSubjectDnFromOid(oidStr);
         if (!subjectDnAttr.equals(SubjectDnAttribute.unknown)) {
           subjectDnAttributeMap.put(subjectDnAttr, rdnValStr);
@@ -445,6 +439,17 @@ public class PdfBoxSigUtil {
     return subjectDnAttributeMap;
   }
 
+  /**
+   * Gets the RSA PKCS#10 digest info.
+   * 
+   * @param digestAlgo
+   *          digest algorithm
+   * @param hashValue
+   *          the hash value
+   * @return the digest info
+   * @throws IOException
+   *           for errors
+   */
   public static byte[] getRSAPkcs1DigestInfo(final AlgorithmIdentifier digestAlgo, final byte[] hashValue) throws IOException {
     final ASN1EncodableVector digestInfoSeq = new ASN1EncodableVector();
     digestInfoSeq.add(digestAlgo);
@@ -529,12 +534,12 @@ public class PdfBoxSigUtil {
 
     return "unknown";
   }
-
+  
   public static DefaultSignedAttributeTableGenerator getPadesSignerInfoGenerator(
       final Certificate signerCert, final ASN1ObjectIdentifier digestAlgo, final boolean includeIssuerSerial)
       throws CertificateException, NoSuchAlgorithmException {
 
-    final ASN1EncodableVector signedCertAttr = PdfBoxSigUtil.getSignedCertAttr(
+    final ASN1EncodableVector signedCertAttr = PDFBoxSignatureUtils.getSignedCertAttr(
       digestAlgo, CertificateUtils.decodeCertificate(signerCert.getEncoded()), includeIssuerSerial);
     final ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(new DERSequence(signedCertAttr));
@@ -558,11 +563,11 @@ public class PdfBoxSigUtil {
       ASN1ObjectIdentifier signedCertOid;
 
       if (digestAlgo.equals(CMSAlgorithm.SHA1)) {
-        signedCertOid = new ASN1ObjectIdentifier(PdfObjectIds.ID_AA_SIGNING_CERTIFICATE_V1);
+        signedCertOid = new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_SIGNING_CERTIFICATE_V1);
         essSigCertV2 = false;
       }
       else {
-        signedCertOid = new ASN1ObjectIdentifier(PdfObjectIds.ID_AA_SIGNING_CERTIFICATE_V2);
+        signedCertOid = new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_SIGNING_CERTIFICATE_V2);
         essSigCertV2 = true;
       }
 
@@ -639,7 +644,7 @@ public class PdfBoxSigUtil {
   }
 
   public static SignedCertRef getSignedCertRefAttribute(final byte[] signedAttrBytes) throws IOException {
-    
+
     final ASN1InputStream ais = new ASN1InputStream(signedAttrBytes);
     ASN1Set inAttrSet = null;
     try {
@@ -651,7 +656,7 @@ public class PdfBoxSigUtil {
     for (int i = 0; i < inAttrSet.size(); i++) {
       final Attribute attr = Attribute.getInstance(inAttrSet.getObjectAt(i));
 
-      if (attr.getAttrType().equals(new ASN1ObjectIdentifier(PdfObjectIds.ID_AA_SIGNING_CERTIFICATE_V2))) {
+      if (attr.getAttrType().equals(new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_SIGNING_CERTIFICATE_V2))) {
         final ASN1Encodable[] attributeValues = attr.getAttributeValues();
         final SigningCertificateV2 signingCertificateV2 = SigningCertificateV2.getInstance(attributeValues[0]);
         final ESSCertIDv2[] certsRefs = signingCertificateV2.getCerts();
@@ -665,7 +670,7 @@ public class PdfBoxSigUtil {
           .signedCertHash(certsRef.getCertHash())
           .build();
       }
-      if (attr.getAttrType().equals(new ASN1ObjectIdentifier(PdfObjectIds.ID_AA_SIGNING_CERTIFICATE_V1))) {
+      if (attr.getAttrType().equals(new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_SIGNING_CERTIFICATE_V1))) {
         final ASN1Encodable[] attributeValues = attr.getAttributeValues();
         final SigningCertificate signingCertificate = SigningCertificate.getInstance(attributeValues[0]);
         final ESSCertID[] certsRefs = signingCertificate.getCerts();
@@ -676,7 +681,7 @@ public class PdfBoxSigUtil {
           .build();
       }
     }
-    return null;    
+    return null;
   }
 
   @Data

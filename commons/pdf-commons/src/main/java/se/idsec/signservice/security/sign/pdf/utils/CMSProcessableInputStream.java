@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.idsec.signservice.security.sign.pdf.signprocess;
+package se.idsec.signservice.security.sign.pdf.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSTypedData;
 
 /**
- * Wraps a InputStream into a CMSProcessable object for Bouncy Castle. It's an alternative to the
+ * Wraps an {@link InputStream} into a CMSProcessable object for Bouncy Castle. It's an alternative to the
  * CMSProcessableByteArray.
  *
  * @author Martin Lindström (martin@idsec.se)

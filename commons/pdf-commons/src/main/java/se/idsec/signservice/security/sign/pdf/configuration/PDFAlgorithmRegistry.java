@@ -41,7 +41,7 @@ import lombok.Getter;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class PDFAlgoRegistry {
+public class PDFAlgorithmRegistry {
 
   /** Mapping of algorithm IDs and signature properties. */
   private static Map<String, PDFSignatureAlgorithmProperties> supportedAlgoMap;
@@ -405,7 +405,7 @@ public class PDFAlgoRegistry {
   /**
    * Private constructor preventing this class from being instantiated
    */
-  private PDFAlgoRegistry() {
+  private PDFAlgorithmRegistry() {
   }
 
   private static void putAlgo(final PDFSignatureAlgorithmProperties pdfSignatureAlgorithmProperties) {
