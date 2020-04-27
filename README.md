@@ -12,7 +12,7 @@ The [Swedish eID Framework](https://docs.swedenconnect.se/technical-framework/) 
 
 The **signservice-commons** repository comprises of:
 
-#### Maven BOM
+### Maven BOM
 
 A Maven BOM to be used by those including the signservice-commons artifacts.
 
@@ -36,7 +36,7 @@ A Maven BOM to be used by those including the signservice-commons artifacts.
 </dependencyManagement>
 ```
 
-#### signservice-commons
+### signservice-commons
 
 A library containing utilities for JAXB and XML processing, certificate utilities and interfaces for signing and signature validation. 
 
@@ -56,7 +56,7 @@ A library containing utilities for JAXB and XML processing, certificate utilitie
 
 Java API documentation for [signservice-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/signservice-commons).
 
-#### signservice-xml-commons
+### signservice-xml-commons
 
 Classes for XML signing and validation of XML signatures.
 
@@ -76,7 +76,7 @@ Classes for XML signing and validation of XML signatures.
 
 Java API documentation for [signservice-xml-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/xml-commons).
 
-#### signservice-pdf-commons
+### signservice-pdf-commons
 
 Classes for PDF signing and validation of PDF signatures.
 
@@ -96,4 +96,6 @@ Classes for PDF signing and validation of PDF signatures.
 
 Java API documentation for [signservice-pdf-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/pdf-commons).
 
----Copyright &copy; 2019-2020, [IDsec Solutions AB](http://www.idsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+---
+
+Copyright &copy; 2019-2020, [IDsec Solutions AB](http://www.idsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
