@@ -175,7 +175,7 @@ public class PDFAlgorithmRegistry {
       .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
       .build());
     putAlgo(PDFSignatureAlgorithmProperties.builder()
-      .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA512)
+      .sigAlgoId(ALGO_ID_SIGNATURE_RSA_SHA512_MGF1)
       .sigAlgoOID(PKCSObjectIdentifiers.id_RSASSA_PSS)
       .sigAlgoName(RSAPSS_SHA512_NAME)
       .algoType(JCAConstants.KEY_ALGO_RSA)
@@ -212,7 +212,7 @@ public class PDFAlgorithmRegistry {
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA256)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA256)
       .sigAlgoName(algorithmNameFinder.getAlgorithmName(X9ObjectIdentifiers.ecdsa_with_SHA256))
-      .algoType(JCAConstants.KEY_ALGO_RSA)
+      .algoType(JCAConstants.KEY_ALGO_EC)
       .digestAlgoId(ALGO_ID_DIGEST_SHA256)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha256)
       .build());
@@ -220,7 +220,7 @@ public class PDFAlgorithmRegistry {
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA384)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA384)
       .sigAlgoName(algorithmNameFinder.getAlgorithmName(X9ObjectIdentifiers.ecdsa_with_SHA384))
-      .algoType(JCAConstants.KEY_ALGO_RSA)
+      .algoType(JCAConstants.KEY_ALGO_EC)
       .digestAlgoId(ALGO_ID_DIGEST_SHA384)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha384)
       .build());
@@ -228,7 +228,7 @@ public class PDFAlgorithmRegistry {
       .sigAlgoId(ALGO_ID_SIGNATURE_ECDSA_SHA512)
       .sigAlgoOID(X9ObjectIdentifiers.ecdsa_with_SHA512)
       .sigAlgoName(algorithmNameFinder.getAlgorithmName(X9ObjectIdentifiers.ecdsa_with_SHA512))
-      .algoType(JCAConstants.KEY_ALGO_RSA)
+      .algoType(JCAConstants.KEY_ALGO_EC)
       .digestAlgoId(ALGO_ID_DIGEST_SHA512)
       .digestAlgoOID(NISTObjectIdentifiers.id_sha512)
       .build());

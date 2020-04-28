@@ -12,6 +12,8 @@
     <version>1.0.2</version>
   </parent>
 
+  <version>1.0.3-SNAPSHOT</version>
+
   <name>IDsec Solutions :: SignService :: Commons :: PDF Commons</name>
   <description>SignService PDF Commons</description>
   <url>https://github.com/idsec-solutions/signservice-commons</url>
@@ -59,7 +61,7 @@
     <dependency>
       <groupId>se.idsec.signservice.commons</groupId>
       <artifactId>signservice-commons</artifactId>
-      <version>${project.version}</version>
+      <version>1.0.2</version>
     </dependency>
 
     <dependency>
