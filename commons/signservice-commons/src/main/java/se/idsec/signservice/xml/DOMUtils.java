@@ -20,7 +20,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Queue;
+import java.util.WeakHashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -53,6 +60,14 @@ public class DOMUtils {
 
   /** DOM transformer. */
   private static Transformer transformer;
+
+  /** We lovingly borrow from Apache's xmlsec ... States the parser pool size. */
+  private static int parserPoolSize = AccessController.doPrivileged(
+    (PrivilegedAction<Integer>) () -> Integer.getInteger("org.apache.xml.security.parser.pool-size", 20));
+
+  /** Map of classloaders and queues of document builders. */
+  private static final Map<ClassLoader, Queue<DocumentBuilder>> documentBuilders = Collections.synchronizedMap(
+    new WeakHashMap<ClassLoader, Queue<DocumentBuilder>>());
 
   static {
     try {
@@ -164,11 +179,29 @@ public class DOMUtils {
    * @return a DOM document
    */
   public static Document inputStreamToDocument(final InputStream stream) {
+
+    ClassLoader loader = getContextClassLoader();
+    if (loader == null) {
+      loader = getClassLoader(DOMUtils.class);
+    }
+    if (loader == null) {
+      try {
+        return createDocumentBuilder().parse(stream);
+      }
+      catch (SAXException | IOException e) {
+        throw new InternalXMLException("Failed to decode bytes into DOM document", e);
+      }
+    }
+    final Queue<DocumentBuilder> queue = getDocumentBuilderPool(loader);
+    final DocumentBuilder documentBuilder = getDocumentBuilder(queue);
     try {
-      return createDocumentBuilder().parse(stream);
+      return documentBuilder.parse(stream);
     }
     catch (SAXException | IOException e) {
       throw new InternalXMLException("Failed to decode bytes into DOM document", e);
+    }
+    finally {
+      returnToPool(documentBuilder, queue);
     }
   }
 
@@ -198,7 +231,89 @@ public class DOMUtils {
       throw new InternalXMLException("Invalid Base64");
     }
   }
-  
+
+  /**
+   * Gets a document builder pool (queue) for the given class loader.
+   * 
+   * @param loader
+   *          the class loader
+   * @return a queue of document builders
+   */
+  private static Queue<DocumentBuilder> getDocumentBuilderPool(final ClassLoader loader) {
+    Queue<DocumentBuilder> queue = documentBuilders.get(loader);
+    if (queue == null) {
+      queue = new ArrayBlockingQueue<>(parserPoolSize);
+      documentBuilders.put(loader, queue);
+    }
+    return queue;
+  }
+
+  /**
+   * Gets a document builder from the given queue. If no document builder is available a new one is created.
+   * 
+   * @param queue
+   *          the queue
+   * @return a document builder
+   */
+  private static DocumentBuilder getDocumentBuilder(final Queue<DocumentBuilder> queue) {
+    DocumentBuilder documentBuilder = queue.poll();
+    if (documentBuilder == null) {
+      documentBuilder = createDocumentBuilder();
+    }
+    return documentBuilder;
+  }
+
+  /**
+   * Returns the given document builder to the pool (queue).
+   * 
+   * @param documentBuilder
+   *          the document builder
+   * @param queue
+   *          the pool
+   */
+  private static void returnToPool(final DocumentBuilder documentBuilder, final Queue<DocumentBuilder> queue) {
+    if (queue != null) {
+      documentBuilder.reset();
+      queue.offer(documentBuilder);
+    }
+  }
+
+  /**
+   * Gets the context class loader.
+   * 
+   * @return the context class loader
+   */
+  private static ClassLoader getContextClassLoader() {
+    final SecurityManager sm = System.getSecurityManager();
+    if (sm != null) {
+      return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        public ClassLoader run() {
+          return Thread.currentThread().getContextClassLoader();
+        }
+      });
+    }
+    return Thread.currentThread().getContextClassLoader();
+  }
+
+  /**
+   * Gets the class loader for the given class.
+   * 
+   * @param clazz
+   *          the class
+   * @return the class loader
+   */
+  private static ClassLoader getClassLoader(final Class<?> clazz) {
+    final SecurityManager sm = System.getSecurityManager();
+    if (sm != null) {
+      return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        public ClassLoader run() {
+          return clazz.getClassLoader();
+        }
+      });
+    }
+    return clazz.getClassLoader();
+  }
+
   // Hidden constructor
   private DOMUtils() {
   }
