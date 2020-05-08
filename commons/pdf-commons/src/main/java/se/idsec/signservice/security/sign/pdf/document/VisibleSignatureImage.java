@@ -56,8 +56,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class VisibleSignatureImage {
 
-  /** Basic date format used. */
-  public static final SimpleDateFormat BASIC_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+  /** Default date format. */
+  public SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
 
   /** Constant representing "first page" (1). */
   public static final int FIRST_PAGE = 1;
@@ -240,7 +240,7 @@ public class VisibleSignatureImage {
     }
 
     if (this.includeDate) {
-      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", VisibleSignatureImage.BASIC_DATE_FORMAT.format(signingTime));
+      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", dateFormat.format(signingTime));
     }
     return personalizedJson;
   }
