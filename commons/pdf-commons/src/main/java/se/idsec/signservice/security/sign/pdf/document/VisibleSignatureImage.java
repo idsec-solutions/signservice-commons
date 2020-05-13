@@ -56,8 +56,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class VisibleSignatureImage {
 
-  /** Basic date format used. */
-  public static final SimpleDateFormat BASIC_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+  /** Default date format. */
+  public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm z";
+
+  /** Date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}. */
+  private SimpleDateFormat dateFormat;
 
   /** Constant representing "first page" (1). */
   public static final int FIRST_PAGE = 1;
@@ -217,6 +220,38 @@ public class VisibleSignatureImage {
     }
   }
 
+  /**
+   * Assigns the date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}.
+   * 
+   * @param dateFormat
+   *          the date format for signing time
+   */
+  public void setDateFormat(final SimpleDateFormat dateFormat) {
+    this.dateFormat = dateFormat;
+  }
+
+  /**
+   * Assigns the date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}.
+   * 
+   * @param dateFormat
+   *          the date format for signing time
+   */
+  public void setDateFormat(final String dateFormat) {
+    this.dateFormat = new SimpleDateFormat(dateFormat);
+  }
+
+  /**
+   * Gets the date format for signing time.
+   * 
+   * @return the date format for signing time
+   */
+  public SimpleDateFormat getDateFormat() {
+    if (this.dateFormat == null) {
+      this.setDateFormat(DEFAULT_DATE_FORMAT);
+    }
+    return this.dateFormat;
+  }
+
   private InputStream createImageFromSVG(final String svg) throws TranscoderException {
     final Reader reader = new BufferedReader(new StringReader(svg));
     final TranscoderInput svgImage = new TranscoderInput(reader);
@@ -240,7 +275,7 @@ public class VisibleSignatureImage {
     }
 
     if (this.includeDate) {
-      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", VisibleSignatureImage.BASIC_DATE_FORMAT.format(signingTime));
+      personalizedJson = personalizedJson.replaceAll("##SIGNTIME##", this.getDateFormat().format(signingTime));
     }
     return personalizedJson;
   }
