@@ -18,7 +18,7 @@ A Maven BOM to be used by those including the signservice-commons artifacts.
 
 ##### Maven
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom)
 
 ```
 <dependencyManagement>
@@ -42,7 +42,8 @@ A library containing utilities for JAXB and XML processing, certificate utilitie
 
 ##### Maven
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-commons)
+
 
 ```
 <dependency>
