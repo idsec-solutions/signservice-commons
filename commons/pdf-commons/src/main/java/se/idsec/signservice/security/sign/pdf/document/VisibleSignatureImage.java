@@ -57,7 +57,10 @@ import lombok.extern.slf4j.Slf4j;
 public class VisibleSignatureImage {
 
   /** Default date format. */
-  public SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+  public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm z";
+
+  /** Date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}. */
+  private SimpleDateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
 
   /** Constant representing "first page" (1). */
   public static final int FIRST_PAGE = 1;
