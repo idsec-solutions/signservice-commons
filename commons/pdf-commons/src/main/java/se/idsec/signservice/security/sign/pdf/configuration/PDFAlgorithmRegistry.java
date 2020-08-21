@@ -302,11 +302,37 @@ public class PDFAlgorithmRegistry {
     return supportedAlgoMap.keySet()
       .stream()
       .map(s -> supportedAlgoMap.get(s))
-      .filter(algoProp -> algoProp.getSigAlgoOID().equals(sigAlgoOid) &&
+      .filter(algoProp -> isSigAlgoEquivalent(algoProp.getSigAlgoOID(), sigAlgoOid, digestAlgoOid) &&
           algoProp.getDigestAlgoOID().equals(digestAlgoOid))
       .map(PDFSignatureAlgorithmProperties::getSigAlgoId)
       .findFirst()
       .orElseThrow(() -> new NoSuchAlgorithmException("Non supported combination of signature algorithm and hash algorithm"));
+  }
+
+  /**
+   * This function is designed to allow identifiers for RSA encryption to be equivalent to identifiers for various RSA combined with various hash functions
+   * @param sigAlgoPropOID
+   * @param cmsSigAlgoOID
+   * @return
+   */
+  private static boolean isSigAlgoEquivalent(ASN1ObjectIdentifier sigAlgoPropOID, ASN1ObjectIdentifier cmsSigAlgoOID, ASN1ObjectIdentifier cmsDigestAlgoOID) {
+    // Allow RSA encryption identifier in place of explicit identifier for hash and public key algo
+    if (cmsSigAlgoOID.equals(PKCSObjectIdentifiers.rsaEncryption)){
+      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha224) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha224WithRSAEncryption)){
+        return true;
+      }
+      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha256) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha256WithRSAEncryption)){
+        return true;
+      }
+      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha384) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha384WithRSAEncryption)){
+        return true;
+      }
+      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha512) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha512WithRSAEncryption)){
+        return true;
+      }
+    }
+    // If not then just compare OID:s
+    return sigAlgoPropOID.equals(cmsSigAlgoOID);
   }
 
   /**
@@ -383,7 +409,7 @@ public class PDFAlgorithmRegistry {
     if (pdfSignatureAlgorithmProperties == null || pdfSignatureAlgorithmProperties.getSigAlgoId() == null) {
       throw new IllegalArgumentException("pdfSignatureAlgorithmProperties must not be null");
     }
-    supportedAlgoMap.put(pdfSignatureAlgorithmProperties.getDigestAlgoId(), pdfSignatureAlgorithmProperties);
+    putAlgo(pdfSignatureAlgorithmProperties);
   }
 
   /**
