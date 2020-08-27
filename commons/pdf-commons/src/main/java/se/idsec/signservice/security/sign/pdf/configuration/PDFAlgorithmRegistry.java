@@ -310,29 +310,34 @@ public class PDFAlgorithmRegistry {
   }
 
   /**
-   * This function is designed to allow identifiers for RSA encryption to be equivalent to identifiers for various RSA combined with various hash functions
-   * @param sigAlgoPropOID
-   * @param cmsSigAlgoOID
-   * @return
+   * This method is designed to allow identifiers for RSA encryption to be equivalent to identifiers for various RSA combined with various hash functions
+   * @param signatureAlgorithmPropertyOid
+   *           signature algorithm OID registered in the algorithm properties in this registry for the signature algorithm
+   * @param cmsSignatureAlgorithmOid
+   *           CMS signature algorithm OID matched with the registered signature algorithm
+   * @param cmsDigestAlgorithmOid
+   *           CMS digest algorithm used with this signature algorithm
+   * @return true if the CMS algorithms are equivalent with the registered signature algorithm OID
    */
-  private static boolean isSigAlgoEquivalent(ASN1ObjectIdentifier sigAlgoPropOID, ASN1ObjectIdentifier cmsSigAlgoOID, ASN1ObjectIdentifier cmsDigestAlgoOID) {
+  private static boolean isSigAlgoEquivalent(final ASN1ObjectIdentifier signatureAlgorithmPropertyOid,
+    final ASN1ObjectIdentifier cmsSignatureAlgorithmOid, final ASN1ObjectIdentifier cmsDigestAlgorithmOid) {
     // Allow RSA encryption identifier in place of explicit identifier for hash and public key algo
-    if (cmsSigAlgoOID.equals(PKCSObjectIdentifiers.rsaEncryption)){
-      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha224) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha224WithRSAEncryption)){
+    if (cmsSignatureAlgorithmOid.equals(PKCSObjectIdentifiers.rsaEncryption)){
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha224) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha224WithRSAEncryption)){
         return true;
       }
-      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha256) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha256WithRSAEncryption)){
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha256) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha256WithRSAEncryption)){
         return true;
       }
-      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha384) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha384WithRSAEncryption)){
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha384) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha384WithRSAEncryption)){
         return true;
       }
-      if (cmsDigestAlgoOID.equals(NISTObjectIdentifiers.id_sha512) && sigAlgoPropOID.equals(PKCSObjectIdentifiers.sha512WithRSAEncryption)){
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha512) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha512WithRSAEncryption)){
         return true;
       }
     }
     // If not then just compare OID:s
-    return sigAlgoPropOID.equals(cmsSigAlgoOID);
+    return signatureAlgorithmPropertyOid.equals(cmsSignatureAlgorithmOid);
   }
 
   /**
