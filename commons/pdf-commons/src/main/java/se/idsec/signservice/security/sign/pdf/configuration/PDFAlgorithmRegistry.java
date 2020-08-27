@@ -302,11 +302,42 @@ public class PDFAlgorithmRegistry {
     return supportedAlgoMap.keySet()
       .stream()
       .map(s -> supportedAlgoMap.get(s))
-      .filter(algoProp -> algoProp.getSigAlgoOID().equals(sigAlgoOid) &&
+      .filter(algoProp -> isSigAlgoEquivalent(algoProp.getSigAlgoOID(), sigAlgoOid, digestAlgoOid) &&
           algoProp.getDigestAlgoOID().equals(digestAlgoOid))
       .map(PDFSignatureAlgorithmProperties::getSigAlgoId)
       .findFirst()
       .orElseThrow(() -> new NoSuchAlgorithmException("Non supported combination of signature algorithm and hash algorithm"));
+  }
+
+  /**
+   * This method is designed to allow identifiers for RSA encryption to be equivalent to identifiers for various RSA combined with various hash functions
+   * @param signatureAlgorithmPropertyOid
+   *           signature algorithm OID registered in the algorithm properties in this registry for the signature algorithm
+   * @param cmsSignatureAlgorithmOid
+   *           CMS signature algorithm OID matched with the registered signature algorithm
+   * @param cmsDigestAlgorithmOid
+   *           CMS digest algorithm used with this signature algorithm
+   * @return true if the CMS algorithms are equivalent with the registered signature algorithm OID
+   */
+  private static boolean isSigAlgoEquivalent(final ASN1ObjectIdentifier signatureAlgorithmPropertyOid,
+    final ASN1ObjectIdentifier cmsSignatureAlgorithmOid, final ASN1ObjectIdentifier cmsDigestAlgorithmOid) {
+    // Allow RSA encryption identifier in place of explicit identifier for hash and public key algo
+    if (cmsSignatureAlgorithmOid.equals(PKCSObjectIdentifiers.rsaEncryption)){
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha224) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha224WithRSAEncryption)){
+        return true;
+      }
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha256) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha256WithRSAEncryption)){
+        return true;
+      }
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha384) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha384WithRSAEncryption)){
+        return true;
+      }
+      if (cmsDigestAlgorithmOid.equals(NISTObjectIdentifiers.id_sha512) && signatureAlgorithmPropertyOid.equals(PKCSObjectIdentifiers.sha512WithRSAEncryption)){
+        return true;
+      }
+    }
+    // If not then just compare OID:s
+    return signatureAlgorithmPropertyOid.equals(cmsSignatureAlgorithmOid);
   }
 
   /**
@@ -383,7 +414,7 @@ public class PDFAlgorithmRegistry {
     if (pdfSignatureAlgorithmProperties == null || pdfSignatureAlgorithmProperties.getSigAlgoId() == null) {
       throw new IllegalArgumentException("pdfSignatureAlgorithmProperties must not be null");
     }
-    supportedAlgoMap.put(pdfSignatureAlgorithmProperties.getDigestAlgoId(), pdfSignatureAlgorithmProperties);
+    putAlgo(pdfSignatureAlgorithmProperties);
   }
 
   /**
