@@ -35,35 +35,10 @@ public interface PDFSignatureValidationResult extends SignatureValidationResult 
   PDSignature getPdfSignature();
 
   /**
-   * Gets the claimed signing time.
-   * <p>
-   * This is primarily obtained from the signed attributes, and if not present there, read from the PDF signature
-   * dictionary.
-   * </p>
-   * 
-   * @return the signing time (as millis since epoch)
-   */
-  Long getClaimedSigningTime();
-
-  /**
-   * Gets the URI identifier of the signature algorithm.
-   * 
-   * @return signature algorithm URI identifier
-   */
-  String getSignatureAlgorithm();
-
-  /**
    * Predicate that tells if the signature has the CMS algorithm protection signed attribute set.
    * 
    * @return true if the CMS algorithm protection signed attribute is set and false otherwise
    */
   boolean isCmsAlgorithmProtection();
-
-  /**
-   * Predicate that tells if the signature that was validated is a PAdES signature (and this was correctly validated).
-   * 
-   * @return true if PAdES, and false otherwise
-   */
-  boolean isPades();
 
 }

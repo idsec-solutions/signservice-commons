@@ -33,17 +33,8 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
   /** The PDF signature. */
   private PDSignature pdfSignature;
 
-  /** The claimed signing time. */
-  private Long claimedSigningTime;
-
-  /** The URI identifier of the signature algorithm. */
-  private String signatureAlgorithm;
-
   /** Tells if the signature has the CMS algorithm protection signed attribute set. */
   private boolean cmsAlgorithmProtection = false;
-
-  /** Tells if the signature that was validated is a PAdES signature. */
-  private boolean pades = false;
 
   /**
    * Constructor.
@@ -69,48 +60,6 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
 
   /** {@inheritDoc} */
   @Override
-  public Long getClaimedSigningTime() {
-    return this.claimedSigningTime;
-  }
-
-  /**
-   * Assigns the claimed signing time.
-   * 
-   * @param claimedSigningTime
-   *          the claimed signing time (in millis since epoch)
-   */
-  public void setClaimedSigningTime(final Long claimedSigningTime) {
-    this.claimedSigningTime = claimedSigningTime;
-  }
-
-  /**
-   * Assigns the claimed signing time.
-   * 
-   * @param claimedSigningTime
-   *          the claimed signing time
-   */
-  public void setClaimedSigningTime(final Date claimedSigningTime) {
-    this.claimedSigningTime = claimedSigningTime != null ? claimedSigningTime.getTime() : null;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public String getSignatureAlgorithm() {
-    return this.signatureAlgorithm;
-  }
-
-  /**
-   * Assigns the URI identifier of the signature algorithm.
-   * 
-   * @param signatureAlgorithm
-   *          signature algorithm URI identifier
-   */
-  public void setSignatureAlgorithm(final String signatureAlgorithm) {
-    this.signatureAlgorithm = signatureAlgorithm;
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public boolean isCmsAlgorithmProtection() {
     return this.cmsAlgorithmProtection;
   }
@@ -128,29 +77,13 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
 
   /** {@inheritDoc} */
   @Override
-  public boolean isPades() {
-    return this.pades;
-  }
-
-  /**
-   * Assigns the flag that tells if the signature that was validated is a PAdES signature. Default is {@code false}.
-   * 
-   * @param pades
-   *          true if PAdES and false otherwise
-   */
-  public void setPades(final boolean pades) {
-    this.pades = pades;
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(super.toString());
     sb.append(",pdfSignature=<").append(this.pdfSignature != null ? "set" : "not set").append(">");
-    sb.append(",claimedSigningTime='").append(this.claimedSigningTime);
-    sb.append("',signatureAlgorithm='").append(this.signatureAlgorithm);
+    sb.append(",claimedSigningTime='").append(this.getClaimedSigningTime());
+    sb.append("',signatureAlgorithm='").append(this.getSignatureAlgorithm());
     sb.append("',cmsAlgorithmProtection='").append(this.cmsAlgorithmProtection);
-    sb.append("',isPades='").append(this.pades).append("'");
+    sb.append("',isPades='").append(this.isEtsiAdes()).append("'");
     return sb.toString();
   }
 

@@ -17,6 +17,7 @@ package se.idsec.signservice.security.sign.impl;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
@@ -48,6 +49,15 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /** The certificate validation result. */
   private CertificateValidationResult certificateValidationResult;
+
+  /** The URI identifier of the signature algorithm */
+  private String signatureAlgorithm;
+
+  /**  The claimed signing time included in the signature, not claimed by an external time stamp authority */
+  private Date claimedSigningTime;
+
+  /** Predicate that tells if the signature that was validated is a signature according to the corresponding ETSI AdES signature profile */
+  private boolean etsiAdes;
 
   /**
    * Default constructor.
@@ -196,6 +206,48 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
    */
   public void setCertificateValidationResult(final CertificateValidationResult certificateValidationResult) {
     this.certificateValidationResult = certificateValidationResult;
+  }
+
+  /** {@inheritDoc} */
+  @Override public String getSignatureAlgorithm() {
+    return signatureAlgorithm;
+  }
+
+  /**
+   * Assigns the signature algorithm URI of the signature
+   * @param signatureAlgorithm
+   *          signature algorithm URI
+   */
+  public void setSignatureAlgorithm(String signatureAlgorithm) {
+    this.signatureAlgorithm = signatureAlgorithm;
+  }
+
+  /** {@inheritDoc} */
+  @Override public Date getClaimedSigningTime() {
+    return claimedSigningTime;
+  }
+
+  /**
+   * Assigns the claimed signing time for the signature
+   * @param claimedSigningTime
+   *          claimed signing time
+   */
+  public void setClaimedSigningTime(Date claimedSigningTime) {
+    this.claimedSigningTime = claimedSigningTime;
+  }
+
+  /** {@inheritDoc} */
+  @Override public boolean isEtsiAdes() {
+    return etsiAdes;
+  }
+
+  /**
+   * Assigns the ETSI AdES signature profile compliance status
+   * @param etsiAdes
+   *          true if this is an ETSI AdES compliant signature
+   */
+  public void setEtsiAdes(boolean etsiAdes) {
+    this.etsiAdes = etsiAdes;
   }
 
   /** {@inheritDoc} */
