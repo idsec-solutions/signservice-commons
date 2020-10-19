@@ -180,7 +180,8 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
       //
       if (result.isSuccess() && this.certificateValidator != null) {
         try {
-          CertificateValidationResult validatorResult = this.certificateValidator.validate(result.getSignerCertificate(), result.getAdditionalCertificates(), null);
+          CertificateValidationResult validatorResult = this.certificateValidator.validate(
+            result.getSignerCertificate(), result.getAdditionalCertificates(), null);
           result.setCertificateValidationResult(validatorResult);
         }
         catch (CertPathBuilderException e) {

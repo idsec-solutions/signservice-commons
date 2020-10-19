@@ -15,8 +15,6 @@
  */
 package se.idsec.signservice.security.sign.pdf.impl;
 
-import java.util.Date;
-
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 
 import se.idsec.signservice.security.sign.impl.DefaultSignatureValidationResult;

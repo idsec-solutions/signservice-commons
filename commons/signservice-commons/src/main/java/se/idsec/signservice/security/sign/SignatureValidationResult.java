@@ -52,7 +52,7 @@ public interface SignatureValidationResult {
 
     /** The signature was valid, but validation of the signer certificate did not take us to a trusted root. */
     ERROR_NOT_TRUSTED,
-    
+
     /** Bad format on signature. */
     ERROR_BAD_FORMAT
   }
@@ -120,12 +120,13 @@ public interface SignatureValidationResult {
    * This is a signing time asserted within the signature, not asserted by any external time stamp service.
    * </p>
    *
-   * @return the claimed signing time
+   * @return the claimed signing time (if available)
    */
   Date getClaimedSigningTime();
 
   /**
-   * Predicate that tells if the signature that was validated is a signature according to the corresponding ETSI AdES signature profile.
+   * Predicate that tells if the signature that was validated is a signature according to the corresponding ETSI AdES
+   * signature profile.
    *
    * @return true if this signature conforms to the ETSI AdES profile, and false otherwise
    */

@@ -137,7 +137,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
    * @return a validation result
    */
   protected PDFSignatureValidationResult validatePdfSignature(final byte[] document, final PDSignature signature) {
-    DefaultPDFSignatureValidationResult result = new DefaultPDFSignatureValidationResult();
+    final DefaultPDFSignatureValidationResult result = new DefaultPDFSignatureValidationResult();
     result.setPdfSignature(signature);
     try {
       final byte[] signedContentBytes = signature.getSignedContent(new ByteArrayInputStream(document));
@@ -200,8 +200,8 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       // Verify the signature
       //
-      final SignerInformationVerifier signerInformationVerifier = new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC")
-        .build(certHolder);
+      final SignerInformationVerifier signerInformationVerifier = 
+          new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certHolder);
 
       try {
         boolean signatureVerificationResult = signerInformation.verify(signerInformationVerifier);
