@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1</version>
+  <version>1.1.0-SNAPSHOT</version>
 
   <name>IDsec Solutions :: BOM for SignService</name>
   <description>BOM for SignService</description>
@@ -149,6 +149,13 @@
         <artifactId>pdfbox</artifactId>
         <version>${pdfbox.version}</version>
       </dependency>
+      
+      <!-- Commons IO -->
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.7</version>
+      </dependency>
 
       <!-- JAXB -->
       
@@ -250,7 +257,7 @@
       <dependency>
         <groupId>se.swedenconnect.opensaml</groupId>
         <artifactId>opensaml-security-ext</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
       </dependency>
 
       <dependency>
@@ -258,6 +265,10 @@
         <artifactId>opensaml3-ext</artifactId>
         <version>1.4.4</version>
         <exclusions>
+          <exclusion>
+            <groupId>se.swedenconnect.opensaml</groupId>
+            <artifactId>opensaml-security-ext</artifactId>
+          </exclusion>
           <exclusion>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -276,7 +287,22 @@
       <dependency>
         <groupId>se.litsec.opensaml.sweid</groupId>
         <artifactId>swedish-eid-opensaml3</artifactId>
-        <version>1.3.1</version>
+        <version>1.3.2</version>
+        <exclusions>
+          <exclusion>
+            <groupId>se.swedenconnect.opensaml</groupId>
+            <artifactId>opensaml-security-ext</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>se.litsec.opensaml</groupId>
+            <artifactId>opensaml3-ext</artifactId>
+          </exclusion>
+          <!-- We're not using this, and it causes Maven problems right now ... -->
+          <exclusion>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+          </exclusion>          
+        </exclusions>
       </dependency>
 
       <!-- Misc -->
@@ -290,7 +316,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13.1</version>
         <scope>test</scope>
       </dependency>
 
