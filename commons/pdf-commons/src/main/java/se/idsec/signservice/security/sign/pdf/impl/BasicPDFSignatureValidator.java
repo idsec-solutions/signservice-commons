@@ -103,10 +103,10 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final List<PDSignature> signatureDictionaries = pdfDocument.getSignatureDictionaries();
 
       for (PDSignature signature : signatureDictionaries) {
-        log.debug("Validating PDF signature [{}] ...", signature.getName());
+        log.debug("Validating PDF signature [name:{}] ...", signature.getName());
         PDFSignatureValidationResult result = this.validatePdfSignature(document, signature);
         results.add(result);
-        log.debug("PDF signature validation result for [{}]: {}", signature.getName(), result);
+        log.debug("PDF signature validation result for [name:{}]: {}", signature.getName(), result.toString());
       }
 
       return results;
