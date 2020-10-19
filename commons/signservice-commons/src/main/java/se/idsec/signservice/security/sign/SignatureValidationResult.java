@@ -16,6 +16,7 @@
 package se.idsec.signservice.security.sign;
 
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import se.idsec.signservice.security.certificate.CertificateValidationResult;
 
@@ -51,7 +52,7 @@ public interface SignatureValidationResult {
 
     /** The signature was valid, but validation of the signer certificate did not take us to a trusted root. */
     ERROR_NOT_TRUSTED,
-    
+
     /** Bad format on signature. */
     ERROR_BAD_FORMAT
   }
@@ -105,5 +106,30 @@ public interface SignatureValidationResult {
    * @return the certificate validation result
    */
   CertificateValidationResult getCertificateValidationResult();
+
+  /**
+   * Gets the URI identifier of the signature algorithm.
+   *
+   * @return signature algorithm URI identifier
+   */
+  String getSignatureAlgorithm();
+
+  /**
+   * Gets the claimed signing time.
+   * <p>
+   * This is a signing time asserted within the signature, not asserted by any external time stamp service.
+   * </p>
+   *
+   * @return the claimed signing time (if available)
+   */
+  Date getClaimedSigningTime();
+
+  /**
+   * Predicate that tells if the signature that was validated is a signature according to the corresponding ETSI AdES
+   * signature profile.
+   *
+   * @return true if this signature conforms to the ETSI AdES profile, and false otherwise
+   */
+  boolean isEtsiAdes();
 
 }

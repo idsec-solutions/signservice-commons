@@ -17,6 +17,7 @@ package se.idsec.signservice.security.sign.impl;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
@@ -48,6 +49,18 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /** The certificate validation result. */
   private CertificateValidationResult certificateValidationResult;
+
+  /** The URI identifier of the signature algorithm */
+  private String signatureAlgorithm;
+
+  /** The claimed signing time included in the signature, not claimed by an external time stamp authority. */
+  private Date claimedSigningTime;
+
+  /**
+   * Predicate that tells if the signature that was validated is a signature according to the corresponding ETSI AdES
+   * signature profile.
+   */
+  private boolean etsiAdes;
 
   /**
    * Default constructor.
@@ -200,25 +213,81 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /** {@inheritDoc} */
   @Override
+  public String getSignatureAlgorithm() {
+    return signatureAlgorithm;
+  }
+
+  /**
+   * Assigns the signature algorithm URI of the signature.
+   * 
+   * @param signatureAlgorithm
+   *          signature algorithm URI
+   */
+  public void setSignatureAlgorithm(final String signatureAlgorithm) {
+    this.signatureAlgorithm = signatureAlgorithm;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Date getClaimedSigningTime() {
+    return claimedSigningTime;
+  }
+
+  /**
+   * Assigns the claimed signing time for the signature.
+   * 
+   * @param claimedSigningTime
+   *          claimed signing time
+   */
+  public void setClaimedSigningTime(final Date claimedSigningTime) {
+    this.claimedSigningTime = claimedSigningTime;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isEtsiAdes() {
+    return this.etsiAdes;
+  }
+
+  /**
+   * Assigns the ETSI AdES signature profile compliance status.
+   * 
+   * @param etsiAdes
+   *          true if this is an ETSI AdES compliant signature
+   */
+  public void setEtsiAdes(final boolean etsiAdes) {
+    this.etsiAdes = etsiAdes;
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer(super.toString());
-    sb.append("status='").append(this.status).append("',");
+    sb.append("status='").append(this.status);
     if (this.statusMessage != null) {
-      sb.append("statusMessage='").append(this.statusMessage).append("',");
+      sb.append(",statusMessage='").append(this.statusMessage);
     }
     if (this.exception != null) {
-      sb.append("exception=[")
+      sb.append(",exception=[")
         .append(exception.getClass().getSimpleName())
         .append(":")
         .append(exception.getMessage())
-        .append("],");
+        .append("]");
     }
     if (this.signerCertificate != null) {
-      sb.append("signerCertificate=[").append(CertificateUtils.toLogString(this.signerCertificate)).append("],");
+      sb.append(",signerCertificate=[").append(CertificateUtils.toLogString(this.signerCertificate)).append("]");
     }
     if (this.certificateValidationResult != null) {
-      sb.append("certificateValidationResult=[").append(this.certificateValidationResult).append("]");
+      sb.append(",certificateValidationResult=[").append(this.certificateValidationResult).append("]");
     }
+    if (this.signatureAlgorithm != null) {
+      sb.append(",signatureAlgorithm=").append(this.signatureAlgorithm);
+    }
+    if (this.claimedSigningTime != null) {
+      sb.append(",claimedSigningTime=").append(this.claimedSigningTime);
+    }
+    sb.append("isEtsiAdes=").append(this.etsiAdes);
+    
     return sb.toString();
   }
 

@@ -137,7 +137,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
    * @return a validation result
    */
   protected PDFSignatureValidationResult validatePdfSignature(final byte[] document, final PDSignature signature) {
-    DefaultPDFSignatureValidationResult result = new DefaultPDFSignatureValidationResult();
+    final DefaultPDFSignatureValidationResult result = new DefaultPDFSignatureValidationResult();
     result.setPdfSignature(signature);
     try {
       final byte[] signedContentBytes = signature.getSignedContent(new ByteArrayInputStream(document));
@@ -181,7 +181,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
         final Calendar dictionarySignDate = signature.getSignDate();
         if (dictionarySignDate != null) {
           log.debug("Claimed signing time was not present in signer information using time from PDF dictionary");
-          result.setClaimedSigningTime(dictionarySignDate.getTimeInMillis());
+          result.setClaimedSigningTime(dictionarySignDate.getTime());
         }
         else {
           log.warn("Claimed signing time was not present in signer information OR the PDF dictionary");
@@ -200,8 +200,8 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       // Verify the signature
       //
-      final SignerInformationVerifier signerInformationVerifier = new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC")
-        .build(certHolder);
+      final SignerInformationVerifier signerInformationVerifier = 
+          new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certHolder);
 
       try {
         boolean signatureVerificationResult = signerInformation.verify(signerInformationVerifier);
@@ -260,7 +260,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       // Check if this is a PAdES signature, and if so, validate the PAdES properties.
       //
-      result.setPades(this.verifyPadesProperties(signature, signerInformation, result.getSignerCertificate()));
+      result.setEtsiAdes(this.verifyPadesProperties(signature, signerInformation, result.getSignerCertificate()));
 
       result.setStatus(Status.SUCCESS);
     }

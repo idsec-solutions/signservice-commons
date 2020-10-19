@@ -180,7 +180,8 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
       //
       if (result.isSuccess() && this.certificateValidator != null) {
         try {
-          CertificateValidationResult validatorResult = this.certificateValidator.validate(result.getSignerCertificate(), result.getAdditionalCertificates(), null);
+          CertificateValidationResult validatorResult = this.certificateValidator.validate(
+            result.getSignerCertificate(), result.getAdditionalCertificates(), null);
           result.setCertificateValidationResult(validatorResult);
         }
         catch (CertPathBuilderException e) {
@@ -217,6 +218,9 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
     try {
       // Parse the signature element.
       XMLSignature xmlSignature = new XMLSignature(signature, "");
+
+      // Set the signature algorithm
+      result.setSignatureAlgorithm(xmlSignature.getSignedInfo().getSignatureMethodURI());
 
       // Make sure the signature covers the entire document.
       //
