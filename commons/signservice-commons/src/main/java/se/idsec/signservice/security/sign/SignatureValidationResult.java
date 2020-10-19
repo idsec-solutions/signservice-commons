@@ -120,7 +120,7 @@ public interface SignatureValidationResult {
    * This is a signing time asserted within the signature, not asserted by any external time stamp service.
    * </p>
    *
-   * @return the signing time (as millis since epoch)
+   * @return the claimed signing time
    */
   Date getClaimedSigningTime();
 

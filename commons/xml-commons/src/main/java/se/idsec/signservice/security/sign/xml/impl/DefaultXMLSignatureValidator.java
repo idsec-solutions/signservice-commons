@@ -218,6 +218,9 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
       // Parse the signature element.
       XMLSignature xmlSignature = new XMLSignature(signature, "");
 
+      // Set the signature algorithm
+      result.setSignatureAlgorithm(xmlSignature.getSignedInfo().getSignatureMethodURI());
+
       // Make sure the signature covers the entire document.
       //
       final List<String> uris = this.getSignedInfoReferenceURIs(xmlSignature.getSignedInfo().getElement());

@@ -59,7 +59,7 @@
     <dependency>
       <groupId>se.idsec.signservice.commons</groupId>
       <artifactId>signservice-commons</artifactId>
-      <version>${project.version}</version>
+      <version>1.0.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>

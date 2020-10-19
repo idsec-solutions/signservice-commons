@@ -209,7 +209,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
   }
 
   /** {@inheritDoc} */
-  @Override public String getSignatureAlgorithm() {
+  @Override
+  public String getSignatureAlgorithm() {
     return signatureAlgorithm;
   }
 
@@ -218,12 +219,13 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
    * @param signatureAlgorithm
    *          signature algorithm URI
    */
-  public void setSignatureAlgorithm(String signatureAlgorithm) {
+  public void setSignatureAlgorithm(final String signatureAlgorithm) {
     this.signatureAlgorithm = signatureAlgorithm;
   }
 
   /** {@inheritDoc} */
-  @Override public Date getClaimedSigningTime() {
+  @Override
+  public Date getClaimedSigningTime() {
     return claimedSigningTime;
   }
 
@@ -232,12 +234,13 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
    * @param claimedSigningTime
    *          claimed signing time
    */
-  public void setClaimedSigningTime(Date claimedSigningTime) {
+  public void setClaimedSigningTime(final Date claimedSigningTime) {
     this.claimedSigningTime = claimedSigningTime;
   }
 
   /** {@inheritDoc} */
-  @Override public boolean isEtsiAdes() {
+  @Override
+  public boolean isEtsiAdes() {
     return etsiAdes;
   }
 
@@ -246,7 +249,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
    * @param etsiAdes
    *          true if this is an ETSI AdES compliant signature
    */
-  public void setEtsiAdes(boolean etsiAdes) {
+  public void setEtsiAdes(final boolean etsiAdes) {
     this.etsiAdes = etsiAdes;
   }
 
