@@ -205,7 +205,7 @@
       <dependency>
         <groupId>se.swedenconnect.schemas.csig</groupId>
         <artifactId>dss-ext11-jaxb</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.3</version>
       </dependency>
       
       <dependency>
