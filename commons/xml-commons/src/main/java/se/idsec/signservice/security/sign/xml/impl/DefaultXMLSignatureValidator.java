@@ -225,7 +225,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
       // Make sure the signature covers the entire document.
       //
       final List<String> uris = this.getSignedInfoReferenceURIs(xmlSignature.getSignedInfo().getElement());
-      if (!uris.contains(signatureUriReference)) {
+      if (!uris.contains(signatureUriReference) && !uris.contains("") ) {
         final String msg = String.format("The Signature contained the reference(s) %s - none of these covers the entire document", uris);
         log.error(msg);
         result.setError(Status.ERROR_BAD_FORMAT, msg);
