@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2021 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -31,13 +32,13 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.xmlsec.SignatureSigningConfiguration;
 import org.opensaml.xmlsec.algorithm.AlgorithmDescriptor;
 import org.opensaml.xmlsec.algorithm.AlgorithmRegistry;
 import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -388,12 +389,16 @@ public class DefaultXMLSigner implements XMLSigner {
    */
   public static String registerIdAttributes(final Document document) {
     final Element rootElement = document.getDocumentElement();
-    String signatureUriReference = XMLUtils.getAttributeValue(rootElement, "ID");
+    String signatureUriReference = Optional.ofNullable(rootElement.getAttributeNodeNS(null, "ID"))
+        .map(Attr::getValue)
+        .orElse(null);
     if (StringUtils.isNotEmpty(signatureUriReference)) {
       rootElement.setIdAttribute("ID", true);
     }
     else {
-      signatureUriReference = XMLUtils.getAttributeValue(rootElement, "Id");
+      signatureUriReference = Optional.ofNullable(rootElement.getAttributeNodeNS(null, "Id"))
+          .map(Attr::getValue)
+          .orElse(null); 
       if (StringUtils.isNotEmpty(signatureUriReference)) {
         rootElement.setIdAttribute("Id", true);
       }
