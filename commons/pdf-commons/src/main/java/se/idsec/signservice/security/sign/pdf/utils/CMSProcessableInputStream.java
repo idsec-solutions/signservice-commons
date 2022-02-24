@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class CMSProcessableInputStream implements CMSTypedData {
 
   /**
    * Constructor that defaults to use the 1.2.840.113549.1.7.1 OID (PKCS#7 data).
-   * 
+   *
    * @param is
    *          the input stream
    */
@@ -48,7 +48,7 @@ public class CMSProcessableInputStream implements CMSTypedData {
 
   /**
    * Constructor.
-   * 
+   *
    * @param type
    *          the OID of the object
    * @param is

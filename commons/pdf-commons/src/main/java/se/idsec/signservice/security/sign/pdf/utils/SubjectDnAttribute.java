@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ public enum SubjectDnAttribute {
 
   /**
    * Gets the object identifier of the attribute.
-   * 
+   *
    * @return the object identifier of the attribute
    */
   public String getOid() {
@@ -76,7 +76,7 @@ public enum SubjectDnAttribute {
 
   /**
    * Based on the supplied OID the method returns the corresponding enum.
-   * 
+   *
    * @param oid
    *          the object identifier of the attribute
    * @return a SubjectDnAttribute enum
@@ -92,7 +92,7 @@ public enum SubjectDnAttribute {
 
   /**
    * Constructor.
-   * 
+   *
    * @param oid
    *          the object identifier of the attribute
    */

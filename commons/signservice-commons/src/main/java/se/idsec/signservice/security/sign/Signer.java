@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package se.idsec.signservice.security.sign;
 
 import java.security.SignatureException;
+
+import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Interface that represents a signer, i.e. an instance that given a set of signature properties signs documents.
@@ -67,6 +69,6 @@ public interface Signer<T, R extends SignerResult<T>, P extends SignerParameters
    * 
    * @return the signing credential
    */
-  SigningCredential getSigningCredential();
+  PkiCredential getSigningCredential();
 
 }

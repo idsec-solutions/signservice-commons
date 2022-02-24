@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,21 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
-import net.shibboleth.utilities.java.support.logic.Constraint;
 import se.idsec.signservice.security.sign.SigningCredential;
+import se.swedenconnect.security.credential.BasicCredential;
 
 /**
  * Default implementation of the {@link SigningCredential} interface.
  * 
+ * @deprecated Use {@link BasicCredential} instead.
+ * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class DefaultSigningCredential implements SigningCredential {
-
-  /** The name of the credential. */
-  private String name;
-
-  /** The private key. */
-  private PrivateKey privateKey;
-
-  /** The public key. */
-  private PublicKey publicKey;
-
-  /** The signing certificate. */
-  private X509Certificate signingCertificate;
+@Deprecated(since = "1.2.0", forRemoval = true)
+public class DefaultSigningCredential extends BasicCredential implements SigningCredential {
 
   /**
    * Constructor.
@@ -54,10 +44,15 @@ public class DefaultSigningCredential implements SigningCredential {
    *          the key pair (private/public key)
    */
   public DefaultSigningCredential(final String name, final KeyPair keyPair) {
-    this.name = Constraint.isNotEmpty(name, "name must be set");
-    Constraint.isNotNull(keyPair, "keyPair must not be null");
-    this.privateKey = keyPair.getPrivate();
-    this.publicKey = keyPair.getPublic();
+    super(Optional.ofNullable(keyPair).map(KeyPair::getPublic).orElse(null),
+      Optional.ofNullable(keyPair).map(KeyPair::getPrivate).orElse(null));
+    this.setName(name);
+    try {
+      this.init();
+    }
+    catch (final Exception e) {
+      throw new SecurityException("Failed to initialize credential", e);
+    }
   }
 
   /**
@@ -71,9 +66,14 @@ public class DefaultSigningCredential implements SigningCredential {
    *          the public key
    */
   public DefaultSigningCredential(final String name, final PrivateKey privateKey, final PublicKey publicKey) {
-    this.name = Constraint.isNotEmpty(name, "name must be set");
-    this.privateKey = Constraint.isNotNull(privateKey, "privateKey must not be null");
-    this.publicKey = Constraint.isNotNull(publicKey, "publicKey must not be null");
+    super(publicKey, privateKey);
+    this.setName(name);
+    try {
+      this.init();
+    }
+    catch (final Exception e) {
+      throw new SecurityException("Failed to initialize credential", e);
+    }
   }
 
   /**
@@ -88,42 +88,14 @@ public class DefaultSigningCredential implements SigningCredential {
    */
   public DefaultSigningCredential(
       final String name, final PrivateKey privateKey, final X509Certificate signingCertificate) {
-    this.name = Constraint.isNotEmpty(name, "name must be set");
-    this.privateKey = Constraint.isNotNull(privateKey, "privateKey must not be null");
-    this.signingCertificate = Constraint.isNotNull(signingCertificate, "signingCertificate must not be null");
-    this.publicKey = this.signingCertificate.getPublicKey();
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public X509Certificate getSigningCertificate() {
-    return this.signingCertificate;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public PublicKey getPublicKey() {
-    return this.publicKey;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public PrivateKey getPrivateKey() {
-    return this.privateKey;
-  }
-
-  /**
-   * Returns an empty list, or if the signing certificate is set, a list with this object.
-   */
-  @Override
-  public List<X509Certificate> getCertificateChain() {
-    return this.signingCertificate != null ? Collections.singletonList(this.signingCertificate) : Collections.emptyList();
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public String getName() {
-    return this.name;
+    super(signingCertificate, privateKey);
+    this.setName(name);
+    try {
+      this.init();
+    }
+    catch (final Exception e) {
+      throw new SecurityException("Failed to initialize credential", e);
+    }
   }
 
 }

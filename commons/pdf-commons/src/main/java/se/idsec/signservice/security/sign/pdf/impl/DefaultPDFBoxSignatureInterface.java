@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
   private final String algorithm;
 
   /** Set to true if processing is done according to the PAdES profile. */
-  private boolean pades;
+  private final boolean pades;
 
   /**
    * Set to true if PAdES issuer serial information should be included in the PAdES data.
@@ -94,7 +94,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
    * @param pades
    *          PAdES type (may be null)
    */
-  public DefaultPDFBoxSignatureInterface(final PrivateKey privateKey, final List<X509Certificate> certificates, 
+  public DefaultPDFBoxSignatureInterface(final PrivateKey privateKey, final List<X509Certificate> certificates,
       final String algorithm, final AdesProfileType pades) {
     this.privateKey = privateKey;
     this.certificates = certificates;
@@ -140,7 +140,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
         // Add signed signer certificate signed attribute
         builder.setSignedAttributeGenerator(PDFBoxSignatureUtils.getPadesSignerInfoGenerator(
           this.certificates.get(0),
-          PDFAlgorithmRegistry.getAlgorithmProperties(this.algorithm).getDigestAlgoOID(),
+          PDFAlgorithmRegistry.getAlgorithmProperties(this.algorithm).getMessageDigestAlgorithm().getAlgorithmIdentifier().getAlgorithm(),
           this.includePadesIssuerSerial));
       }
       gen.addSignerInfoGenerator(builder.build(signer, new X509CertificateHolder(cert)));

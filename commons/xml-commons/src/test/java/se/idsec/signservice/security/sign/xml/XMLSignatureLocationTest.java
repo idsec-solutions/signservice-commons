@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import se.idsec.signservice.xml.DOMUtils;
 
 /**
  * Tests for {@code XMLSignatureLocation}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -43,7 +43,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     Document empty = getDocument("xml/empty.xml");
     location.insertSignature(createSignatureElement(), empty);
     Assert.assertEquals("Signature", getLastElement(empty));
-    Assert.assertTrue(location.getSignature(empty) != null);    
+    Assert.assertTrue(location.getSignature(empty) != null);
     location.testInsert(empty);
 
     Document simple = getDocument("xml/simple.xml");
@@ -168,7 +168,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
 
     Document doc = getDocument("xml/multipleElements.xml");
     location.insertSignature(createSignatureElement(), doc);
-    
+
     Assert.assertEquals(
       String.format("Document: multipleElements.xml, xPath: %s", xpath),
       "Signature",
@@ -199,28 +199,28 @@ public class XMLSignatureLocationTest extends XMLTestBase {
   @Test
   public void testXPathSignRequest() throws Exception {
     XMLSignatureLocation location = new XMLSignatureLocation("/*/*[local-name()='OptionalInputs']", ChildPosition.LAST);
-        
+
     Document signRequest = getDocument("xml/signRequest.xml");
     location.insertSignature(createSignatureElement(), signRequest);
-    
-    Node node = signRequest.getDocumentElement().getElementsByTagName("dss:OptionalInputs").item(0);    
+
+    Node node = signRequest.getDocumentElement().getElementsByTagName("dss:OptionalInputs").item(0);
     Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName());
     Assert.assertTrue(location.getSignature(signRequest) != null);
   }
-  
+
   @Test
   public void testXPathSignRequestSameOwner() throws Exception {
-    XMLSignatureLocation location = new XMLSignatureLocation("/*/*[local-name()='OptionalInputs']", ChildPosition.LAST); 
-        
+    XMLSignatureLocation location = new XMLSignatureLocation("/*/*[local-name()='OptionalInputs']", ChildPosition.LAST);
+
     Document signRequest = getDocument("xml/signRequest2.xml");
-    Element signatureElement = (Element) signRequest.importNode(createSignatureElement(), true); 
-    
+    Element signatureElement = (Element) signRequest.importNode(createSignatureElement(), true);
+
     location.insertSignature(signatureElement, signRequest);
-    
-    Node node = signRequest.getDocumentElement().getElementsByTagName("OptionalInputs").item(0);    
-    Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName()); 
+
+    Node node = signRequest.getDocumentElement().getElementsByTagName("OptionalInputs").item(0);
+    Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName());
   }
-    
+
   private static String getFirstElement(Document doc) {
     return doc.getDocumentElement().getChildNodes().item(0).getLocalName();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,47 +24,30 @@ import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 
 import se.idsec.signservice.xml.DOMUtils;
-import se.litsec.opensaml.utils.X509CertificateUtils;
-import se.swedenconnect.opensaml.OpenSAMLInitializer;
-import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
-import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
-import se.swedenconnect.opensaml.xmlsec.config.SAML2IntSecurityConfiguration;
+import se.swedenconnect.security.credential.utils.X509Utils;
 
 /**
  * Abstract base class for XML tests.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public abstract class XMLTestBase {
 
   @BeforeClass
-  public static void initializeOpenSAML() throws Exception {
-    OpenSAMLInitializer.getInstance().initialize(
-      new OpenSAMLSecurityDefaultsConfig(new SAML2IntSecurityConfiguration()),
-      new OpenSAMLSecurityExtensionConfig());
+  public static void init() {
+    org.apache.xml.security.Init.init();
   }
 
-  protected static Document getDocument(String path) throws Exception {
-    Resource resource = new ClassPathResource(path);
-    InputStream is = resource.getInputStream();
-    try {
+  protected static Document getDocument(final String path) throws Exception {
+    final Resource resource = new ClassPathResource(path);
+    try (final InputStream is = resource.getInputStream()) {
       return DOMUtils.createDocumentBuilder().parse(is);
     }
-    finally {
-      is.close();
-    }
   }
-  
-  protected X509Certificate getCertificate(String path) throws Exception {
-    Resource resource = new ClassPathResource(path);
-    InputStream is = resource.getInputStream();
-    try {
-      return X509CertificateUtils.decodeCertificate(is);
-    }
-    finally {
-      is.close();
-    }    
+
+  protected X509Certificate getCertificate(final String path) throws Exception {
+    return X509Utils.decodeCertificate(new ClassPathResource(path));
   }
 
 }

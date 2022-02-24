@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class DefaultPDFSignerResult extends AbstractSignerResult<byte[]> impleme
 
   /**
    * Assigns the signed attributes bytes.
-   * 
+   *
    * @param signedAttributes
    *          CMS signed attributes
    */
@@ -56,7 +56,7 @@ public class DefaultPDFSignerResult extends AbstractSignerResult<byte[]> impleme
 
   /**
    * Assigns the CMS signed data.
-   * 
+   *
    * @param signedData
    *          the signed data bytes
    */

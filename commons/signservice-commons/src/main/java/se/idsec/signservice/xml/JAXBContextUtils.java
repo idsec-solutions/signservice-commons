@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,18 @@ public class JAXBContextUtils {
 
   /** Cache of queried package dependencies. */
   private static ConcurrentMap<String, String> packageCache = new ConcurrentHashMap<>();
+  
+  static {
+    // Fill the package cache with Apache xmlsec settings ...
+    packageCache.put("org.apache.xml.security.binding.excc14n", "");
+    packageCache.put("org.apache.xml.security.binding.xmldsig", "");
+    packageCache.put("org.apache.xml.security.binding.xmldsig.pss", "org.apache.xml.security.binding.xmldsig");      
+    packageCache.put("org.apache.xml.security.binding.xmldsig11", "org.apache.xml.security.binding.xmldsig");
+    packageCache.put("org.apache.xml.security.binding.xmlenc", "org.apache.xml.security.binding.xmldsig");
+    packageCache.put("org.apache.xml.security.binding.xmlenc11", 
+      "org.apache.xml.security.binding.xmldsig:org.apache.xml.security.binding.xmlenc");
+    packageCache.put("org.apache.xml.security.binding.xop", "");
+  }
 
   /**
    * Returns a string holding the comma-separated package names that are required to create a {@link JAXBContext} that
@@ -47,6 +59,7 @@ public class JAXBContextUtils {
     // For the Sweden Connect JAXB libraries we always have a JAXBContextFactory class that knows about
     // which packages that implement the classes that corresponds to schema includes for the schema that
     // holds the given class.
+    // For Apache xmlsec classes we handle it by our static configuration. 
     //
     final String packageName = clazz.getPackage().getName();
     String dependentPackages = packageCache.get(packageName);

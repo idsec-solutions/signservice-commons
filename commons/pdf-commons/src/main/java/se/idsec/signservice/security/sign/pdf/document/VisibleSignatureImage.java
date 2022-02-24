@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ public class VisibleSignatureImage {
 
   /**
    * The zoom percentagy of the image, where 0 means original size.
-   * 
+   *
    * @param zoomPercent
    *          the zoom percentagy of the image
    * @return the zoom percentagy of the image
@@ -103,7 +103,7 @@ public class VisibleSignatureImage {
 
   /**
    * A map of name value pairs that will be included in the image (if it supports it).
-   * 
+   *
    * @param personalizationParams
    *          name-value pairs
    * @return name-value pairs
@@ -112,7 +112,7 @@ public class VisibleSignatureImage {
 
   /**
    * The width of the image in pixels.
-   * 
+   *
    * @param pixelImageWidth
    *          the width of the image in pixels
    * @return the width of the image in pixels
@@ -121,7 +121,7 @@ public class VisibleSignatureImage {
 
   /**
    * The height of the image in pixels.
-   * 
+   *
    * @param pixelImageHeight
    *          the height of the image in pixels
    * @return the height of the image in pixels
@@ -130,25 +130,25 @@ public class VisibleSignatureImage {
 
   /**
    * Tells whether the sign date should be included in the image.
-   * 
+   *
    * @param includeDate
    *          tells whether the sign date should be included in the image
    * @return tells whether the sign date should be included in the image
    */
   private boolean includeDate;
-  
-  /** 
+
+  /**
    * Date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}.
-   * 
+   *
    * @param dateFormat the date format for signing time
    * @return date format for signing time
-   * 
+   *
    */
   private String dateFormat;
 
   /**
    * The contents of the SVG image.
-   * 
+   *
    * @param svgImage
    *          the contents of the SVG image
    * @return the contents of the SVG image
@@ -253,7 +253,7 @@ public class VisibleSignatureImage {
     }
     return personalizedJson;
   }
-  
+
   private SimpleDateFormat createDateFormatter() {
     return this.dateFormat != null ? new SimpleDateFormat(this.dateFormat) : new SimpleDateFormat(DEFAULT_DATE_FORMAT);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,12 @@ import se.idsec.signservice.security.sign.AdesProfileType;
 import se.idsec.signservice.security.sign.SignerParameters;
 import se.idsec.signservice.security.sign.pdf.document.VisibleSignatureImage;
 
+/**
+ * PDF signer parameters.
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,7 +37,7 @@ public class PDFSignerParameters implements SignerParameters {
 
   /**
    * The PAdES type of signature. A {@code null} value means no PAdES signature.
-   * 
+   *
    * @param padesType
    *          the type of PAdES signature
    * @return the type of PAdES signature, or null
@@ -40,7 +46,7 @@ public class PDFSignerParameters implements SignerParameters {
 
   /**
    * Set if a visible PDF signature should be included in the signature.
-   * 
+   *
    * @param visibleSignatureImage
    *          the visible image to include
    * @return the visible image to include or null

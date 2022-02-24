@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import se.idsec.signservice.security.sign.pdf.PDFSignatureValidationResult;
 
 /**
  * Implementation of the {@link PDFSignatureValidationResult} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -48,7 +48,7 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
 
   /**
    * Assigns the PDF signature object (that was validated).
-   * 
+   *
    * @param pdfSignature
    *          the PDF signature object
    */
@@ -65,7 +65,7 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
   /**
    * Assigns the flag that tells if the signature has the CMS algorithm protection signed attribute set. The default is
    * {@code false}.
-   * 
+   *
    * @param cmsAlgorithmProtection
    *          flag telling if the signature has the CMS algorithm protection signed attribute set
    */

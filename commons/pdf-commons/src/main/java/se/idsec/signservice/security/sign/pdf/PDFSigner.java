@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 IDsec Solutions AB
+ * Copyright 2020-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import se.idsec.signservice.security.sign.Signer;
 
 /**
  * Interface for PDF signatures.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface PDFSigner extends Signer<byte[], PDFSignerResult, PDFSignerParameters> {  
+public interface PDFSigner extends Signer<byte[], PDFSignerResult, PDFSignerParameters> {
 }

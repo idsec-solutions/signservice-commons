@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,7 @@ import se.idsec.signservice.security.sign.pdf.configuration.PDFAlgorithmRegistry
 import se.idsec.signservice.security.sign.pdf.configuration.PDFObjectIdentifiers;
 import se.idsec.signservice.security.sign.pdf.utils.PDFBoxSignatureUtils;
 import se.idsec.signservice.utils.Pair;
+import se.swedenconnect.security.algorithms.SignatureAlgorithm;
 
 /**
  * Verifies the signature(s) on a PDF document.
@@ -78,7 +79,7 @@ import se.idsec.signservice.utils.Pair;
  * certificates that was supplied to provide the matching public key. No attempts are made to validate the certificates
  * or any timestamps associated with the signature.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -102,16 +103,16 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final List<SignatureValidationResult> results = new ArrayList<>();
       final List<PDSignature> signatureDictionaries = pdfDocument.getSignatureDictionaries();
 
-      for (PDSignature signature : signatureDictionaries) {
+      for (final PDSignature signature : signatureDictionaries) {
         log.debug("Validating PDF signature [name:{}] ...", signature.getName());
-        PDFSignatureValidationResult result = this.validatePdfSignature(document, signature);
+        final PDFSignatureValidationResult result = this.validatePdfSignature(document, signature);
         results.add(result);
         log.debug("PDF signature validation result for [name:{}]: {}", signature.getName(), result.toString());
       }
 
       return results;
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       final String msg = String.format("Internal error while verifying PDF signature - %s", e.getMessage());
       log.error("{}", msg, e);
       throw new SignatureException(msg, e);
@@ -122,14 +123,14 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
           pdfDocument.close();
         }
       }
-      catch (IOException e) {
+      catch (final IOException e) {
       }
     }
   }
 
   /**
    * Validates the supplied signature.
-   * 
+   *
    * @param document
    *          the PDF document holding the signature
    * @param signature
@@ -150,8 +151,8 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       // Get hold of all certificates found in the document.
       //
-      CollectionStore<?> certStore = (CollectionStore<?>) signedDataParser.getCertificates();
-      Iterator<?> ci = certStore.iterator();
+      final CollectionStore<?> certStore = (CollectionStore<?>) signedDataParser.getCertificates();
+      final Iterator<?> ci = certStore.iterator();
       final List<X509Certificate> certList = new ArrayList<>();
       while (ci.hasNext()) {
         final X509CertificateHolder ch = (X509CertificateHolder) ci.next();
@@ -200,17 +201,17 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       // Verify the signature
       //
-      final SignerInformationVerifier signerInformationVerifier = 
+      final SignerInformationVerifier signerInformationVerifier =
           new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certHolder);
 
       try {
-        boolean signatureVerificationResult = signerInformation.verify(signerInformationVerifier);
+        final boolean signatureVerificationResult = signerInformation.verify(signerInformationVerifier);
         if (!signatureVerificationResult) {
           result.setError(Status.ERROR_INVALID_SIGNATURE, "Invalid PDF signature");
           return result;
         }
       }
-      catch (CMSVerifierCertificateNotValidException e) {
+      catch (final CMSVerifierCertificateNotValidException e) {
         result.setError(Status.ERROR_SIGNER_INVALID, "Signing certificate was not valid at time of signing", e);
         return result;
       }
@@ -229,7 +230,8 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
         .get(new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_CMS_ALGORITHM_PROTECTION));
 
       if (cmsAlgorithmProtection != null) {
-        Pair<AlgorithmIdentifier, AlgorithmIdentifier> cmsAlgorithmProtectionAlgs = getCmsAlgoritmProtectionData(cmsAlgorithmProtection);
+        final Pair<AlgorithmIdentifier, AlgorithmIdentifier> cmsAlgorithmProtectionAlgs =
+            getCmsAlgoritmProtectionData(cmsAlgorithmProtection);
         final AlgorithmIdentifier protSignAlgo = cmsAlgorithmProtectionAlgs.getFirst();
         final AlgorithmIdentifier protHashAlgo = cmsAlgorithmProtectionAlgs.getSecond();
 
@@ -237,17 +239,16 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
         // Make sure the algorithms are consistent with our signature algorithm.
         //
-        final PDFAlgorithmRegistry.PDFSignatureAlgorithmProperties algorithmProperties = PDFAlgorithmRegistry.getAlgorithmProperties(
-          signatureAlgorithm);
+        final SignatureAlgorithm algorithmProperties = PDFAlgorithmRegistry.getAlgorithmProperties(signatureAlgorithm);
 
-        if (!algorithmProperties.getSigAlgoOID().equals(protSignAlgo.getAlgorithm())) {
+        if (!algorithmProperties.getAlgorithmIdentifier().getAlgorithm().equals(protSignAlgo.getAlgorithm())) {
           final String msg = String.format(
             "CMS algorithm protection signature algorithm (%s) is not consistent with signature algorithm used to sign data (%s)",
             protSignAlgo.getAlgorithm().getId(), signatureAlgorithm);
           result.setError(Status.ERROR_INVALID_SIGNATURE, msg);
           return result;
         }
-        if (!algorithmProperties.getDigestAlgoOID().equals(protHashAlgo.getAlgorithm())) {
+        if (!algorithmProperties.getMessageDigestAlgorithm().getAlgorithmIdentifier().getAlgorithm().equals(protHashAlgo.getAlgorithm())) {
           final String msg = String.format(
             "CMS algorithm protection hash algorithm (%s) is not consistent with signature algorithm used to sign data (%s)",
             protHashAlgo.getAlgorithm().getId(), signatureAlgorithm);
@@ -264,7 +265,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       result.setStatus(Status.SUCCESS);
     }
-    catch (InternalSignatureValidationException e) {
+    catch (final InternalSignatureValidationException e) {
       log.error("{}", e.getMessage(), e);
       result.setError(e);
     }
@@ -279,7 +280,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
   /**
    * Verifies PAdES properties.
-   * 
+   *
    * @param signature
    *          the PDF signature
    * @param signerInformation
@@ -298,7 +299,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final String subFilter = signature.getSubFilter();
 
       if (PDSignature.SUBFILTER_ETSI_CADES_DETACHED.getName().equals(subFilter)) {
-        PDFBoxSignatureUtils.SignedCertRef signedCertificateRef = PDFBoxSignatureUtils.getSignedCertRefAttribute(
+        final PDFBoxSignatureUtils.SignedCertRef signedCertificateRef = PDFBoxSignatureUtils.getSignedCertRefAttribute(
           signerInformation.getSignedAttributes().toASN1Structure().getEncoded(ASN1Encoding.DER));
 
         if (signedCertificateRef == null) {
@@ -326,7 +327,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
   /**
    * Obtains the claimed signing time from signed attributes.
-   * 
+   *
    * @param signer
    *          signer information
    * @return claimed signing time if present or null if absent
@@ -342,7 +343,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       try {
         return ASN1UTCTime.class.cast(attributeValues[0]).getDate();
       }
-      catch (ParseException e) {
+      catch (final ParseException e) {
         log.error("Imvalid format for claimed signing time - {}", e.getMessage(), e);
         return null;
       }
@@ -354,7 +355,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
   /**
    * Gets the signature and hash algorithms from the CMS algorithm protection attribute.
-   * 
+   *
    * @param cmsAlgorithmProtectionAttribute
    * @return a pair of the signature algorithm ID and the hash algoritm id
    * @throws InternalSignatureValidationException
@@ -364,7 +365,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final Attribute cmsAlgorithmProtectionAttribute) throws InternalSignatureValidationException {
 
     try {
-      ASN1Sequence cmsapSeq = ASN1Sequence.getInstance(cmsAlgorithmProtectionAttribute.getAttrValues().getObjectAt(0));
+      final ASN1Sequence cmsapSeq = ASN1Sequence.getInstance(cmsAlgorithmProtectionAttribute.getAttrValues().getObjectAt(0));
 
       // Get Hash algorithm
       final AlgorithmIdentifier hashAlgorithmId = AlgorithmIdentifier.getInstance(cmsapSeq.getObjectAt(0));
@@ -391,7 +392,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       }
       return new Pair<>(signatureAlgorithmId, hashAlgorithmId);
     }
-    catch (IllegalArgumentException e) {
+    catch (final IllegalArgumentException e) {
       throw new InternalSignatureValidationException(
         Status.ERROR_BAD_FORMAT, "Error processing CMS algorithm protection attribute - " + e.getMessage(), e);
     }
@@ -405,7 +406,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       pdfDocument = PDDocument.load(document);
       return !pdfDocument.getSignatureDictionaries().isEmpty();
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       throw new IllegalArgumentException("Invalid document", e);
     }
     finally {
@@ -414,7 +415,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
           pdfDocument.close();
         }
       }
-      catch (IOException e) {
+      catch (final IOException e) {
       }
     }
   }
