@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,21 +28,21 @@ public interface PDFBoxSignatureInterface extends SignatureInterface {
 
   /**
    * Gets the result of the signing process in the form of ContentInfo holding SignedData.
-   * 
+   *
    * @return the CMS ContentInfo holding SignedData
    */
   byte[] getCmsSignedData();
 
   /**
    * Gets the signed attributes from the result of the signing process.
-   * 
+   *
    * @return the CMS SignedAttributes
    */
   byte[] getCmsSignedAttributes();
 
   /**
    * Tells whether the signature should be generated according to the PAdES requirement profile.
-   * 
+   *
    * @return true if the signature is created as a PAdES compliant signature
    */
   boolean isPades();

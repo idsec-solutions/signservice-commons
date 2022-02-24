@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**
  * Signature validation result for validating PDF signatures.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -29,14 +29,14 @@ public interface PDFSignatureValidationResult extends SignatureValidationResult 
 
   /**
    * Gets the PDF signature object (that was validated).
-   * 
+   *
    * @return the PDF signature object
    */
   PDSignature getPdfSignature();
 
   /**
    * Predicate that tells if the signature has the CMS algorithm protection signed attribute set.
-   * 
+   *
    * @return true if the CMS algorithm protection signed attribute is set and false otherwise
    */
   boolean isCmsAlgorithmProtection();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 IDsec Solutions AB
+ * Copyright 2020-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import se.idsec.signservice.security.sign.SignerResult;
 
 /**
  * Represents the result from an PDF signature operation.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  * @see PDFSigner
@@ -32,14 +32,14 @@ public interface PDFSignerResult extends SignerResult<byte[]> {
    * CMSSignedData after adapting the result to requirements by the signing service. One such example is if the
    * signature is a PAdES signature, where the signing time attribute must be removed before being sent to the signing
    * service.
-   * 
+   *
    * @return signed attributes bytes
    */
   byte[] getSignedAttributes();
-  
+
   /**
    * Gets the bytes of CMS Content Info holding the SignedData.
-   * 
+   *
    * @return the bytes of CMS Content Info holding the SignedData
    */
   byte[] getSignedData();

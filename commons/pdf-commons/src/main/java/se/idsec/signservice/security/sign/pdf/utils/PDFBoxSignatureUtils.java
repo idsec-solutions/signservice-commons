@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -441,7 +441,7 @@ public class PDFBoxSignatureUtils {
 
   /**
    * Gets the RSA PKCS#10 digest info.
-   * 
+   *
    * @param digestAlgo
    *          digest algorithm
    * @param hashValue
@@ -534,7 +534,7 @@ public class PDFBoxSignatureUtils {
 
     return "unknown";
   }
-  
+
   public static DefaultSignedAttributeTableGenerator getPadesSignerInfoGenerator(
       final Certificate signerCert, final ASN1ObjectIdentifier digestAlgo, final boolean includeIssuerSerial)
       throws CertificateException, NoSuchAlgorithmException {

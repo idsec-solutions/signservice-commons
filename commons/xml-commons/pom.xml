@@ -9,7 +9,7 @@
   <parent>
     <groupId>se.idsec.signservice.commons</groupId>
     <artifactId>signservice-commons-parent</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0-SNAPSHOT</version>
   </parent>
 
   <name>IDsec Solutions :: SignService :: Commons :: XML Commons</name>
@@ -59,14 +59,19 @@
     <dependency>
       <groupId>se.idsec.signservice.commons</groupId>
       <artifactId>signservice-commons</artifactId>
-      <version>1.1.1</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>se.swedenconnect.opensaml</groupId>
-      <artifactId>opensaml-security-ext</artifactId>
+      <groupId>se.swedenconnect.security</groupId>
+      <artifactId>credentials-support</artifactId>
     </dependency>
-
+    
+    <dependency>
+      <groupId>se.swedenconnect.security</groupId>
+      <artifactId>algorithm-registry</artifactId>
+    </dependency>    
+    
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
@@ -92,12 +97,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>se.litsec.opensaml</groupId>
-      <artifactId>opensaml3-ext</artifactId>
       <scope>test</scope>
     </dependency>
 

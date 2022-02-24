@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class PDFSigningProcessor {
 
   /**
    * Signs the supplied PDF document. The document is closed by this method (in all cases).
-   * 
+   *
    * @param pdfDocument
    *          the document to sign
    * @param pdfSignatureProvider
@@ -71,7 +71,7 @@ public class PDFSigningProcessor {
     try {
       // Create signature dictionary
       //
-      PDSignature signature = new PDSignature();
+      final PDSignature signature = new PDSignature();
       signature.setFilter(PDSignature.FILTER_ADOBE_PPKLITE);
 
       if (pdfSignatureProvider.isPades()) {
@@ -91,7 +91,7 @@ public class PDFSigningProcessor {
       // Register signature dictionary and sign interface
       //
       if (visibleSignatureImage != null) {
-        final SignatureOptions visibleSignatureOptions =             
+        final SignatureOptions visibleSignatureOptions =
             visibleSignatureImage.getVisibleSignatureOptions(pdfDocument, signingTime.getTime());
         pdfDocument.addSignature(signature, pdfSignatureProvider, visibleSignatureOptions);
       }
@@ -112,7 +112,7 @@ public class PDFSigningProcessor {
         .cmsSignedAttributes(pdfSignatureProvider.getCmsSignedAttributes())
         .build();
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       final String msg = String.format("Failed to sign PDF document - %s", e.getMessage());
       log.error("{}", msg);
       throw new SignatureException(msg, e);
@@ -122,11 +122,11 @@ public class PDFSigningProcessor {
         // If the document already has been closed this is a no-op.
         pdfDocument.close();
       }
-      catch (IOException e) {
+      catch (final IOException e) {
       }
     }
   }
-  
+
   /**
    * Result object for
    * {@link PDFSigningProcessor#signPdfDocument(PDDocument, PDFBoxSignatureInterface, long, VisibleSignatureImage)}.
@@ -134,27 +134,27 @@ public class PDFSigningProcessor {
   @Getter
   @Builder
   public static class Result {
-    
+
     /**
      * The signed document.
-     * 
+     *
      * @return the signed document
      */
-    private byte[] document;
-    
+    private final byte[] document;
+
     /**
      * The CMS SignedData.
-     * 
+     *
      * @return the CMS SignedData
      */
-    private byte[] cmsSignedData;
-    
+    private final byte[] cmsSignedData;
+
     /**
      * The signed attributes.
-     * 
+     *
      * @return the signed attributes
      */
-    private byte[] cmsSignedAttributes;
+    private final byte[] cmsSignedAttributes;
   }
 
 }

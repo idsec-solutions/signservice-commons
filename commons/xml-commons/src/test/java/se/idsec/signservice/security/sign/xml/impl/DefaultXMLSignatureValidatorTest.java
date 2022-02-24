@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import se.idsec.signservice.security.sign.xml.XMLTestBase;
 
 /**
  * Test cases for {@code DefaultXMLSignatureValidator}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -36,22 +36,22 @@ public class DefaultXMLSignatureValidatorTest extends XMLTestBase {
   @Test
   public void testValidate1() throws Exception {
     final Document document = getDocument("signResponse1.xml");
-    
+
     DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(Arrays.asList(getCertificate("konki-sign.crt")));
     validator.setXadesProcessing(false);
-    
+
     List<SignatureValidationResult> result = validator.validate(document);
     Assert.assertEquals(1, result.size());
     Assert.assertTrue(result.get(0).isSuccess());
   }
-  
+
   @Test
   public void testValidateBadDigest() throws Exception {
     final Document document = getDocument("signResponse-badsign.xml");
-    
+
     DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(Arrays.asList(getCertificate("konki-sign.crt")));
     validator.setXadesProcessing(false);
-    
+
     List<SignatureValidationResult> result = validator.validate(document);
     Assert.assertEquals(1, result.size());
     Assert.assertFalse(result.get(0).isSuccess());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,16 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.opensaml.security.crypto.JCAConstants;
-import org.opensaml.xmlsec.algorithm.AlgorithmDescriptor;
-import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
-import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 
 import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.certificate.CertificateUtils;
-import se.idsec.signservice.security.sign.SigningCredential;
+import se.swedenconnect.security.algorithms.Algorithm;
+import se.swedenconnect.security.algorithms.AlgorithmRegistry;
+import se.swedenconnect.security.algorithms.AlgorithmRegistrySingleton;
+import se.swedenconnect.security.algorithms.AlgorithmType;
+import se.swedenconnect.security.algorithms.SignatureAlgorithm;
+import se.swedenconnect.security.credential.BasicCredential;
+import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Utility class that holds pre-generated key pairs.
@@ -80,6 +82,9 @@ public class StaticCredentials {
   /** Certificate for EC private key. */
   private X509Certificate ecCertificate;
 
+  /** The algorithm registry. */
+  private AlgorithmRegistry algorithmRegistry;
+
   /**
    * Constructor.
    */
@@ -102,45 +107,46 @@ public class StaticCredentials {
   }
 
   /**
-   * Returns a {@link SigningCredential} that can be used to sign using the supplied algorithm.
+   * Returns a {@link PkiCredential} that can be used to sign using the supplied algorithm.
    *
    * @param algorithmUri
    *          the signature algorithm URI
-   * @return a SigningCredential instance
+   * @return a PkiCredential instance
    * @throws NoSuchAlgorithmException
    *           if the supplied algorithm is not supported
    */
-  public SigningCredential getSigningCredential(final String algorithmUri) throws NoSuchAlgorithmException {
-    final AlgorithmDescriptor descriptor = AlgorithmSupport.getGlobalAlgorithmRegistry().get(algorithmUri);
-    if (descriptor == null) {
-      final String msg = String.format("Algorithm '%s' is not supported", algorithmUri);
+  public PkiCredential getSigningCredential(final String algorithmUri) throws NoSuchAlgorithmException {
+
+    final Algorithm algorithm = this.getAlgorithmRegistry().getAlgorithm(algorithmUri);
+    if (algorithm == null || algorithm.getType() != AlgorithmType.SIGNATURE) {
+      final String msg = String.format("Algorithm '%s' is not a registered signature algorithm", algorithmUri);
       log.error("{}", msg);
       throw new NoSuchAlgorithmException(msg);
     }
-    if (AlgorithmDescriptor.AlgorithmType.Signature != descriptor.getType()) {
-      final String msg = String.format("Algorithm '%s' is not a valid signature algorithm", algorithmUri);
-      log.error("{}", msg);
-      throw new NoSuchAlgorithmException(msg);
-    }
+
+    final String algoClass = SignatureAlgorithm.class.cast(algorithm).getKeyType();
     try {
-      final String algoKey = ((SignatureAlgorithm) descriptor).getKey();
-      if (JCAConstants.KEY_ALGO_RSA.equals(algoKey)) {
+      BasicCredential cred = null;
+      if ("RSA".equals(algoClass)) {
         synchronized (this) {
-          KeyPair rsaKeyPair = this.getRsaKeyPair();
-          return new DefaultSigningCredential("RSA", rsaKeyPair.getPrivate(), this.getRsaCertificate());
+          final KeyPair rsaKeyPair = this.getRsaKeyPair();
+          cred = new BasicCredential(this.getRsaCertificate(), rsaKeyPair.getPrivate());
+          cred.setName("RSA");
         }
       }
-      else if (JCAConstants.KEY_ALGO_EC.equals(algoKey)) {
+      else if ("EC".equals(algoClass)) {
         synchronized (this) {
-          KeyPair ecKeyPair = this.getEcKeyPair();
-          return new DefaultSigningCredential("EC", ecKeyPair.getPrivate(), this.getEcCertificate());
+          final KeyPair ecKeyPair = this.getEcKeyPair();
+          cred = new BasicCredential(this.getEcCertificate(), ecKeyPair.getPrivate());
+          cred.setName("EC");
         }
       }
       else {
-        final String msg = String.format("Algorithm '%s' is not supported - could not generate key pair", algorithmUri);
+        final String msg = String.format("Algorithm '%s' is not supported", algorithmUri);
         log.error("{}", msg);
         throw new NoSuchAlgorithmException(msg);
       }
+      return cred;
     }
     catch (InvalidParameterException | InvalidAlgorithmParameterException e) {
       throw new NoSuchAlgorithmException("Invalid parameter", e);
@@ -176,6 +182,29 @@ public class StaticCredentials {
   }
 
   /**
+   * Assigns the {@link AlgorithmRegistry} to use. If not assigned, the registry configured for
+   * {@link AlgorithmRegistrySingleton} will be used.
+   *
+   * @param algorithmRegistry
+   *          the registry to use
+   */
+  public void setAlgorithmRegistry(final AlgorithmRegistry algorithmRegistry) {
+    this.algorithmRegistry = algorithmRegistry;
+  }
+
+  /**
+   * Gets the {@link AlgorithmRegistry} to use.
+   *
+   * @return the AlgorithmRegistry
+   */
+  private AlgorithmRegistry getAlgorithmRegistry() {
+    if (this.algorithmRegistry == null) {
+      this.algorithmRegistry = AlgorithmRegistrySingleton.getInstance();
+    }
+    return this.algorithmRegistry;
+  }
+
+  /**
    * Generates a RSA key pair.
    *
    * @param keysize
@@ -190,7 +219,7 @@ public class StaticCredentials {
       KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
       generator.initialize(keysize);
       KeyPair kp = generator.generateKeyPair();
-      this.rsaCertificate = generateV1Certificate(kp, JCAConstants.KEY_ALGO_RSA);
+      this.rsaCertificate = generateV1Certificate(kp, "RSA");
       return kp;
     }
     catch (NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
@@ -213,7 +242,7 @@ public class StaticCredentials {
       KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
       generator.initialize(new ECGenParameterSpec(ecCurve), new SecureRandom());
       KeyPair kp = generator.generateKeyPair();
-      this.ecCertificate = this.generateV1Certificate(kp, JCAConstants.KEY_ALGO_EC);
+      this.ecCertificate = this.generateV1Certificate(kp, "EC");
       return kp;
     }
     catch (NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
@@ -265,7 +294,7 @@ public class StaticCredentials {
       new X500Name("CN=Test Signer"), /* subject */
       pair.getPublic());
 
-    final ContentSigner signer = JCAConstants.KEY_ALGO_RSA.equals(algoKey)
+    final ContentSigner signer = "RSA".equals(algoKey)
         ? new JcaContentSignerBuilder("SHA256WITHRSA").build(pair.getPrivate())
         : new JcaContentSignerBuilder("SHA256WITHECDSA").build(pair.getPrivate());
 

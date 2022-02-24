@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -32,22 +33,19 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.apache.xml.security.utils.Constants;
-import org.opensaml.core.config.ConfigurationService;
-import org.opensaml.xmlsec.SignatureSigningConfiguration;
-import org.opensaml.xmlsec.algorithm.AlgorithmDescriptor;
-import org.opensaml.xmlsec.algorithm.AlgorithmRegistry;
-import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
-import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import lombok.extern.slf4j.Slf4j;
-import net.shibboleth.utilities.java.support.logic.Constraint;
-import se.idsec.signservice.security.sign.SigningCredential;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 import se.idsec.signservice.security.sign.xml.XMLSigner;
 import se.idsec.signservice.security.sign.xml.XMLSignerResult;
+import se.swedenconnect.security.algorithms.AlgorithmPredicates;
+import se.swedenconnect.security.algorithms.AlgorithmRegistry;
+import se.swedenconnect.security.algorithms.AlgorithmRegistrySingleton;
+import se.swedenconnect.security.algorithms.SignatureAlgorithm;
+import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Default implementation of the {@link XMLSigner} interface.
@@ -55,7 +53,7 @@ import se.idsec.signservice.security.sign.xml.XMLSignerResult;
  * If the signature algorithm is not explicitly set the OpenSAML {@link SignatureSigningConfiguration} system
  * configuration will be used to obtain a default.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -66,10 +64,11 @@ public class DefaultXMLSigner implements XMLSigner {
   public static final String DEFAULT_CANONICALIZATION_TRANSFORM = Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS;
 
   /** The default XPath transform (don't include Signature elements). */
-  public static final String DEFAULT_XPATH_TRANSFORM = "not(ancestor-or-self::*[local-name()='Signature' and namespace-uri()='http://www.w3.org/2000/09/xmldsig#'])";
+  public static final String DEFAULT_XPATH_TRANSFORM =
+      "not(ancestor-or-self::*[local-name()='Signature' and namespace-uri()='http://www.w3.org/2000/09/xmldsig#'])";
 
   /** The signing credential. */
-  private final SigningCredential signingCredential;
+  private final PkiCredential signingCredential;
 
   /**
    * An indicator that tells where in the document the resulting Signature element should be inserted. If not set, the
@@ -94,7 +93,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
   /**
    * Should the certificate chain/path be included in the signature (if available from
-   * {@link SigningCredential#getCertificateChain()}). The default is {@code false} (only the entity certificate is
+   * {@link PkiCredential#getCertificateChain()}. The default is {@code false} (only the entity certificate is
    * included).
    */
   private boolean includeCertificateChain = false;
@@ -104,28 +103,31 @@ public class DefaultXMLSigner implements XMLSigner {
    */
   private boolean includeSignatureId = false;
 
+  /** The algorithm registry. */
+  private AlgorithmRegistry algorithmRegistry;
+
   /** For generating ID:s. */
   private static SecureRandom random =
       new SecureRandom(String.valueOf(System.currentTimeMillis()).getBytes(Charset.forName("UTF-8")));
 
   /**
    * Constructor.
-   * 
+   *
    * @param signingCredential
    *          the signing credential to use
    */
-  public DefaultXMLSigner(final SigningCredential signingCredential) {
-    this.signingCredential = Constraint.isNotNull(signingCredential, "signingCredential must not be null");
+  public DefaultXMLSigner(final PkiCredential signingCredential) {
+    this.signingCredential = Objects.requireNonNull(signingCredential, "signingCredential must not be null");
   }
 
   /**
    * Creates a builder for {@code DefaultXMLSigner} objects.
-   * 
+   *
    * @param signingCredential
    *          the signing credential to use
    * @return a builder instance
    */
-  public static DefaultXMLSignerBuilder builder(final SigningCredential signingCredential) {
+  public static DefaultXMLSignerBuilder builder(final PkiCredential signingCredential) {
     return new DefaultXMLSignerBuilder(signingCredential);
   }
 
@@ -156,7 +158,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
       // Get the ID reference.
       //
-      final String signatureUriReference = registerIdAttributes(document); 
+      final String signatureUriReference = registerIdAttributes(document);
 
       // Add the document to sign to the signature
       //
@@ -179,8 +181,8 @@ public class DefaultXMLSigner implements XMLSigner {
         }
         signature.getKeyInfo().add(x509data);
       }
-      else if (this.signingCredential.getSigningCertificate() != null) {
-        signature.addKeyInfo(this.signingCredential.getSigningCertificate());
+      else if (this.signingCredential.getCertificate() != null) {
+        signature.addKeyInfo(this.signingCredential.getCertificate());
       }
       else if (this.signingCredential.getPublicKey() != null) {
         signature.addKeyInfo(this.signingCredential.getPublicKey());
@@ -191,7 +193,7 @@ public class DefaultXMLSigner implements XMLSigner {
       signature.sign(this.signingCredential.getPrivateKey());
 
       final DefaultXMLSignerResult result = new DefaultXMLSignerResult(signature);
-      result.setSignerCertificate(this.signingCredential.getSigningCertificate());
+      result.setSignerCertificate(this.signingCredential.getCertificate());
       if (this.includeCertificateChain) {
         result.setSignerCertificateChain(this.signingCredential.getCertificateChain());
       }
@@ -211,14 +213,14 @@ public class DefaultXMLSigner implements XMLSigner {
 
   /** {@inheritDoc} */
   @Override
-  public SigningCredential getSigningCredential() {
+  public PkiCredential getSigningCredential() {
     return this.signingCredential;
   }
 
   /**
    * Sets the indicator that tells where in the document the resulting Signature element should be inserted. If not set,
    * the default "insert as the last child of the document root element" will be used.
-   * 
+   *
    * @param signatureLocation
    *          location indicator
    */
@@ -230,7 +232,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
   /**
    * Assigns the URI for the signature algorithm to be used.
-   * 
+   *
    * @param signatureAlgorithm
    *          the signature algorithm URI
    * @throws NoSuchAlgorithmException
@@ -242,34 +244,30 @@ public class DefaultXMLSigner implements XMLSigner {
 
     // Assert that the signature algorithm is supported.
     //
-    AlgorithmDescriptor descriptor = AlgorithmSupport.getGlobalAlgorithmRegistry().get(signatureAlgorithm);
-    if (descriptor == null) {
+    final SignatureAlgorithm algorithm = this.getAlgorithmRegistry().getAlgorithm(signatureAlgorithm, SignatureAlgorithm.class);
+    if (algorithm == null) {
       final String msg = String.format("Algorithm '%s' is not supported as a signing algorithm", signatureAlgorithm);
       log.error("{}", msg);
       throw new NoSuchAlgorithmException(msg);
     }
-    if (AlgorithmDescriptor.AlgorithmType.Signature != descriptor.getType()) {
-      final String msg = String.format("Algorithm '%s' is not a valid signature algorithm", signatureAlgorithm);
+    if (algorithm.getUri().equals(XMLSignature.ALGO_ID_SIGNATURE_RSA_PSS)) {
+      final String msg = String.format("Incomplete algorithm '%s' - missing parameters", signatureAlgorithm);
       log.error("{}", msg);
       throw new NoSuchAlgorithmException(msg);
     }
 
-    // Make sure that it isn't blacklisted (we use OpenSAML's system configuration).
+    // Make sure that it isn't blacklisted.
     //
-    final SignatureSigningConfiguration signingConfig = ConfigurationService.get(SignatureSigningConfiguration.class);
-    if (!AlgorithmSupport.validateAlgorithmURI(signatureAlgorithm, signingConfig.getWhitelistedAlgorithms(),
-      signingConfig.getBlacklistedAlgorithms())) {
+    if (algorithm.isBlacklisted()) {
       final String msg =
           String.format("Signature algorithm '%s' is black listed according to the system configuration", signatureAlgorithm);
       log.error("{}", msg);
       throw new NoSuchAlgorithmException(msg);
     }
 
-    // Check that the supplied credential is consistent with the supplied algorithm's specified key algorithm and key
-    // length,
-    // where applicable.
+    // Check that the supplied credential is consistent with the supplied algorithm's specified key algorithm.
     //
-    if (!AlgorithmSupport.checkKeyAlgorithmAndLength(this.signingCredential.getPrivateKey(), descriptor)) {
+    if (!algorithm.getKeyType().equals(this.signingCredential.getPrivateKey().getAlgorithm())) {
       final String msg = String.format(
         "Signature algorithm '%s' can not be used together with configured signing credential", signatureAlgorithm);
       log.error("{}", msg);
@@ -277,16 +275,16 @@ public class DefaultXMLSigner implements XMLSigner {
     }
 
     this.signatureAlgorithm = signatureAlgorithm;
-    this.digestAlgorithm = this.getDigestAlgorithmFromSignatureAlgorithm(signatureAlgorithm);
+    this.digestAlgorithm = algorithm.getMessageDigestAlgorithm().getUri();
   }
 
   /**
    * Gets the signature algorithm to use.
    * <p>
-   * If the digest algorithm is not explicitly set the OpenSAML {@link SignatureSigningConfiguration} system
-   * configuration will be used to obtain a default.
+   * If the digest algorithm is not explicitly set, the default signature algorithm given by the
+   * {@link AlgorithmRegistry} will be used.
    * </p>
-   * 
+   *
    * @return the signature algorithm URI
    */
   public String getSignatureAlgorithm() {
@@ -294,49 +292,37 @@ public class DefaultXMLSigner implements XMLSigner {
       return this.signatureAlgorithm;
     }
 
-    final SignatureSigningConfiguration signingConfig = ConfigurationService.get(SignatureSigningConfiguration.class);
-    for (String algo : signingConfig.getSignatureAlgorithms()) {
-      if (AlgorithmSupport.checkKeyAlgorithmAndLength(this.signingCredential.getPrivateKey(),
-        AlgorithmSupport.getGlobalAlgorithmRegistry().get(algo))) {
-
-        this.signatureAlgorithm = algo;
-        log.info("Using digest algorithm '{}' as the default", this.signatureAlgorithm);
-        return this.signatureAlgorithm;
-      }
+    final SignatureAlgorithm alg = this.getAlgorithmRegistry().getAlgorithm(
+      AlgorithmPredicates.fromKeyType(this.signingCredential.getPrivateKey().getAlgorithm()), SignatureAlgorithm.class);
+    if (alg != null) {
+      this.signatureAlgorithm = alg.getUri();
+      this.digestAlgorithm = alg.getMessageDigestAlgorithm().getUri();
+      log.info("Using signature algorithm '{}' as the default", this.signatureAlgorithm);
+      return this.signatureAlgorithm;
     }
-    // Should never happen
-    throw new SecurityException("No default signature algorithm found");
+    else {
+      // Should never happen
+      throw new SecurityException("No default signature algorithm found");
+    }
   }
 
   /**
    * Gets the digest algorithm to use.
-   * 
+   *
    * @return the digest algorithm URI
    */
   public String getDigestAlgorithm() {
     if (this.digestAlgorithm != null) {
       return this.digestAlgorithm;
     }
-    this.digestAlgorithm = this.getDigestAlgorithmFromSignatureAlgorithm(this.getSignatureAlgorithm());
+    // Will set the digest algorithm as well ...
+    this.getSignatureAlgorithm();
     return this.digestAlgorithm;
   }
 
   /**
-   * Given a signature algorithm URI, the method sets the digest algorithm corresponding to this
-   * 
-   * @param signatureAlgorithm
-   *          the signature algorithm URI
-   * @return the digest algorithm
-   */
-  private String getDigestAlgorithmFromSignatureAlgorithm(final String signatureAlgorithm) {
-    final AlgorithmRegistry registry = AlgorithmSupport.getGlobalAlgorithmRegistry();
-    final AlgorithmDescriptor signDescriptor = registry.get(signatureAlgorithm);
-    return registry.getDigestAlgorithm(((SignatureAlgorithm) signDescriptor).getDigest()).getURI();
-  }
-
-  /**
    * Assigns the canonicalization method to use. Default is {@value #DEFAULT_CANONICALIZATION_TRANSFORM}.
-   * 
+   *
    * @param canonicalizationTransform
    *          canonicalization method URI
    */
@@ -349,7 +335,7 @@ public class DefaultXMLSigner implements XMLSigner {
   /**
    * Sets the XPath expression to be used in an XPath transform. The default is {@value #DEFAULT_XPATH_TRANSFORM}. If
    * {@code null}, no XPath transform is used.
-   * 
+   *
    * @param xPathTransform
    *          XPath expression
    */
@@ -359,30 +345,53 @@ public class DefaultXMLSigner implements XMLSigner {
 
   /**
    * Sets whether the certificate chain/path be included in the signature (if available from
-   * {@link SigningCredential#getCertificateChain()}). The default is {@code false} (only the entity certificate is
+   * {@link PkiCredential#getCertificateChain()}). The default is {@code false} (only the entity certificate is
    * included).
-   * 
+   *
    * @param includeCertificateChain
    *          whether the certificate chain should be included
    */
-  public void setIncludeCertificateChain(boolean includeCertificateChain) {
+  public void setIncludeCertificateChain(final boolean includeCertificateChain) {
     this.includeCertificateChain = includeCertificateChain;
   }
 
   /**
    * Should an ID attribute be written to the resulting ds:Signature element. Default is {@code true}.
-   * 
+   *
    * @param includeSignatureId
    *          whether an ID attribute should be written to the Signature element
    */
   public void setIncludeSignatureId(final boolean includeSignatureId) {
     this.includeSignatureId = includeSignatureId;
   }
-  
+
+  /**
+   * Assigns the {@link AlgorithmRegistry} to use. If not assigned, the registry configured for
+   * {@link AlgorithmRegistrySingleton} will be used.
+   *
+   * @param algorithmRegistry
+   *          the registry to use
+   */
+  public void setAlgorithmRegistry(final AlgorithmRegistry algorithmRegistry) {
+    this.algorithmRegistry = algorithmRegistry;
+  }
+
+  /**
+   * Gets the {@link AlgorithmRegistry} to use.
+   *
+   * @return the AlgorithmRegistry
+   */
+  private AlgorithmRegistry getAlgorithmRegistry() {
+    if (this.algorithmRegistry == null) {
+      this.algorithmRegistry = AlgorithmRegistrySingleton.getInstance();
+    }
+    return this.algorithmRegistry;
+  }
+
   /**
    * Looks for an ID reference in the root element, and if found, registers it using the
    * {@link Element#setIdAttribute(String, boolean)} method.
-   * 
+   *
    * @param document
    *          the document
    * @return the signature URI reference ("" if no ID is found)
@@ -390,15 +399,15 @@ public class DefaultXMLSigner implements XMLSigner {
   public static String registerIdAttributes(final Document document) {
     final Element rootElement = document.getDocumentElement();
     String signatureUriReference = Optional.ofNullable(rootElement.getAttributeNodeNS(null, "ID"))
-        .map(Attr::getValue)
-        .orElse(null);
+      .map(Attr::getValue)
+      .orElse(null);
     if (StringUtils.isNotEmpty(signatureUriReference)) {
       rootElement.setIdAttribute("ID", true);
     }
     else {
       signatureUriReference = Optional.ofNullable(rootElement.getAttributeNodeNS(null, "Id"))
-          .map(Attr::getValue)
-          .orElse(null); 
+        .map(Attr::getValue)
+        .orElse(null);
       if (StringUtils.isNotEmpty(signatureUriReference)) {
         rootElement.setIdAttribute("Id", true);
       }
@@ -407,7 +416,6 @@ public class DefaultXMLSigner implements XMLSigner {
         ? ""
         : (signatureUriReference.trim().startsWith("#") ? signatureUriReference.trim() : "#" + signatureUriReference.trim());
   }
-  
 
   /**
    * Builder for {@link DefaultXMLSigner} objects.
@@ -419,17 +427,17 @@ public class DefaultXMLSigner implements XMLSigner {
 
     /**
      * Constructor.
-     * 
+     *
      * @param signingCredential
      *          the signing credential to use
      */
-    public DefaultXMLSignerBuilder(final SigningCredential signingCredential) {
+    public DefaultXMLSignerBuilder(final PkiCredential signingCredential) {
       this.signer = new DefaultXMLSigner(signingCredential);
     }
 
     /**
      * Builds the signer object.
-     * 
+     *
      * @return the DefaultXMLSigner object
      */
     public DefaultXMLSigner build() {
@@ -438,7 +446,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
     /**
      * See {@link DefaultXMLSigner#setSignatureLocation(XMLSignatureLocation)}.
-     * 
+     *
      * @param signatureLocation
      *          location indicator
      * @return the builder
@@ -450,7 +458,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
     /**
      * See {@link DefaultXMLSigner#setSignatureAlgorithm(String)}.
-     * 
+     *
      * @param signatureAlgorithm
      *          the signature algorithm URI
      * @return the builder
@@ -467,7 +475,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
     /**
      * See {@link DefaultXMLSigner#setCanonicalizationTransform(String)}.
-     * 
+     *
      * @param canonicalizationTransform
      *          canonicalization method URI
      * @return the builder
@@ -479,7 +487,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
     /**
      * See {@link DefaultXMLSigner#setXPathTransform(String)}.
-     * 
+     *
      * @param xPathTransform
      *          XPath expression
      * @return the builder
@@ -491,7 +499,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
     /**
      * See {@link DefaultXMLSigner#setIncludeCertificateChain(boolean)}.
-     * 
+     *
      * @param includeCertificateChain
      *          whether the certificate chain should be included
      * @return the builder
@@ -503,7 +511,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
     /**
      * See {@link DefaultXMLSigner#setIncludeSignatureId(boolean)}.
-     * 
+     *
      * @param includeSignatureId
      *          whether an ID attribute should be written to the Signature element
      * @return the builder

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import se.idsec.signservice.xml.InternalXMLException;
 
 /**
  * Default implementation of the {@link XMLSignerResult}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -39,7 +39,7 @@ public class DefaultXMLSignerResult extends AbstractSignerResult<Document> imple
 
   /**
    * Constructor.
-   * 
+   *
    * @param signature
    *          the signature object
    */

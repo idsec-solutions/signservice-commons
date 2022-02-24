@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import se.idsec.signservice.security.sign.SigningCredential;
-import se.swedenconnect.opensaml.OpenSAMLInitializer;
-import se.swedenconnect.opensaml.OpenSAMLSecurityDefaultsConfig;
-import se.swedenconnect.opensaml.OpenSAMLSecurityExtensionConfig;
-import se.swedenconnect.opensaml.xmlsec.config.SAML2IntSecurityConfiguration;
+import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Test cases for {@link StaticCredentials}.
@@ -38,21 +33,14 @@ import se.swedenconnect.opensaml.xmlsec.config.SAML2IntSecurityConfiguration;
  */
 public class StaticCredentialsTest {
 
-  @BeforeClass
-  public static void initializeOpenSAML() throws Exception {
-    OpenSAMLInitializer.getInstance().initialize(
-      new OpenSAMLSecurityDefaultsConfig(new SAML2IntSecurityConfiguration()),
-      new OpenSAMLSecurityExtensionConfig());
-  }
-
   @Test
   public void generateRsa() throws Exception {
 
     StaticCredentials creds = new StaticCredentials();
 
-    SigningCredential rsa = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+    PkiCredential rsa = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
     Assert.assertNotNull(rsa);
-    SigningCredential rsa2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+    PkiCredential rsa2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
     Assert.assertNotNull(rsa2);
 
     // Assert that the same key is re-used.
@@ -97,9 +85,9 @@ public class StaticCredentialsTest {
   public void generateEc() throws Exception {
     StaticCredentials creds = new StaticCredentials();
 
-    SigningCredential ec = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256");
+    PkiCredential ec = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256");
     Assert.assertNotNull(ec);
-    SigningCredential ec2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512");
+    PkiCredential ec2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512");
     Assert.assertNotNull(ec2);
 
     // Assert that the same key is re-used.
@@ -126,12 +114,6 @@ public class StaticCredentialsTest {
     }
     catch (InvalidAlgorithmParameterException e) {
     }
-  }
-
-  @Test(expected = NoSuchAlgorithmException.class)
-  public void testUnsupported() throws Exception {
-    StaticCredentials creds = new StaticCredentials();
-    creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha777");
   }
   
   @Test(expected = NoSuchAlgorithmException.class)

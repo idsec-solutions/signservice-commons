@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 IDsec Solutions AB
+ * Copyright 2019-2022 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,63 +15,28 @@
  */
 package se.idsec.signservice.security.sign;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Interface representing a signing credential.
  * 
+ * @deprecated use {@link PkiCredential} instead.
+ * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public interface SigningCredential {
+@Deprecated(since = "1.2.0", forRemoval = true)
+public interface SigningCredential extends PkiCredential {
 
   /**
    * Gets the signing certificate.
    * 
    * @return the signing certificate
    */  
-  @Nullable
-  X509Certificate getSigningCertificate();
+  default X509Certificate getSigningCertificate() {
+    return this.getCertificate();
+  }
   
-  /**
-   * Gets the public key.
-   * 
-   * @return the public key
-   * @see X509Certificate#getPublicKey()
-   */
-  @Nonnull
-  PublicKey getPublicKey();
-
-  /**
-   * Gets the private key.
-   * 
-   * @return the private key
-   */
-  @Nonnull
-  PrivateKey getPrivateKey();
-
-  /**
-   * Gets the certificate chain for the signing certificate. The signing certificate is included.
-   * <p>
-   * If no signing certificate is available and empty list is returned.
-   * </p>
-   * 
-   * @return the certificate chain
-   */
-  @Nonnull
-  List<X509Certificate> getCertificateChain();
-
-  /**
-   * Gets the name for the credential (for logging purposes)
-   * 
-   * @return the credential name
-   */
-  String getName();
-
 }
