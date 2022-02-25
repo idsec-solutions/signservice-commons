@@ -56,12 +56,6 @@
 
   <dependencies>
 
-    <!--  -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
-    </dependency>
-
     <!-- XML Security -->
     <dependency>
       <groupId>org.apache.santuario</groupId>
@@ -73,6 +67,11 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+    </dependency>    
         
     <!-- Credentials support -->
     <dependency>
