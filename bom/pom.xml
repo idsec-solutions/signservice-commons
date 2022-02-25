@@ -352,7 +352,6 @@
       <dependency>
         <groupId>se.swedenconnect.security</groupId>
         <artifactId>credentials-support</artifactId>
-        <!-- <version>[1.1.0,)</version> -->
         <version>1.2.0</version>
       </dependency>
       
@@ -363,10 +362,20 @@
       </dependency>      
 
       <!-- Test -->
+      
+      <!-- JUnit 4 -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.13.2</version>
+        <scope>test</scope>
+      </dependency>
+      
+      <!-- JUnit 5 -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.8.2</version>
         <scope>test</scope>
       </dependency>
 
