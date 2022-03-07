@@ -53,6 +53,7 @@
     <pdfbox.version>2.0.25</pdfbox.version>
     <bouncy-castle.version>1.70</bouncy-castle.version>
     <slf4j.version>1.7.35</slf4j.version>
+    <spring.min.version>5.0.0.RELEASE</spring.min.version>
   </properties>
 
   <repositories>
@@ -114,7 +115,65 @@
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4j.version}</version>
         <scope>test</scope>
+      </dependency>
+      
+      <!-- Commons -->
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.6</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.12.0</version>
       </dependency>      
+      
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.11.0</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.15</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.2</version>
+      </dependency>      
+      
+      <!-- Servlet API -->
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.4</version>
+        <scope>provided</scope>
+      </dependency>
+      
+      <!-- Spring -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>[${spring.min.version},)</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>[${spring.min.version},)</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
+        <version>[${spring.min.version},)</version>
+      </dependency>
 
       <!-- For annotation support (nullable, etc) -->
       <dependency>
@@ -156,19 +215,6 @@
         <version>${pdfbox.version}</version>
       </dependency>
       
-      <!-- Commons -->
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.11.0</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>1.15</version>
-      </dependency>
-      
       <!-- Apache HTTP -->
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -202,7 +248,35 @@
         <artifactId>jaxb-runtime</artifactId>
         <version>2.3.6</version>
         <scope>provided</scope>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>txw2</artifactId>
+        <version>2.3.6</version>
+        <scope>provided</scope>
+      </dependency>
+      
+      <dependency>
+        <groupId>com.sun.istack</groupId>
+        <artifactId>istack-commons-tools</artifactId>
+        <version>3.0.12</version>
+        <scope>provided</scope>
+      </dependency>
+      
+      <dependency>
+        <groupId>com.sun.istack</groupId>
+        <artifactId>istack-commons-runtime</artifactId>
+        <version>3.0.12</version>
+        <scope>provided</scope>
       </dependency>      
+      
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>2.2.7</version>
+        <scope>provided</scope>
+      </dependency>
                   
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
@@ -275,32 +349,44 @@
       <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml-core</artifactId>
-        <version>${opensaml.version}</version>
+        <version>[${opensaml.version},)</version>
       </dependency>
             
       <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml-security-api</artifactId>
-        <version>${opensaml.version}</version>
+        <version>[${opensaml.version},)</version>
       </dependency>
       
       <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml-security-impl</artifactId>
-        <version>${opensaml.version}</version>
+        <version>[${opensaml.version},)</version>
       </dependency>
 
       <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml-xmlsec-api</artifactId>
-        <version>${opensaml.version}</version>
+        <version>[${opensaml.version},)</version>
       </dependency>
       
       <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml-xmlsec-impl</artifactId>
-        <version>${opensaml.version}</version>
+        <version>[${opensaml.version},)</version>
       </dependency>
+      
+      <dependency>
+        <groupId>org.opensaml</groupId>
+        <artifactId>opensaml-saml-api</artifactId>
+        <version>[${opensaml.version},)</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.opensaml</groupId>
+        <artifactId>opensaml-saml-impl</artifactId>
+        <version>[${opensaml.version},)</version>
+      </dependency>      
       
       <!-- Sweden Connect Add-ons to OpenSAML -->
       <dependency>
