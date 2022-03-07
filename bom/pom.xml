@@ -49,11 +49,11 @@
 
   <properties>
     <opensaml.version>4.1.1</opensaml.version>    
-    <jackson.version>2.13.1</jackson.version>
+    <jackson.version>2.13.2</jackson.version>
     <pdfbox.version>2.0.25</pdfbox.version>
     <bouncy-castle.version>1.70</bouncy-castle.version>
     <slf4j.version>1.7.35</slf4j.version>
-    <spring.min.version>5.0.0.RELEASE</spring.min.version>
+    <spring.min.version>5.3.0.RELEASE</spring.min.version>
   </properties>
 
   <repositories>
