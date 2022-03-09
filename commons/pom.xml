@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-commons-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
 
   <name>IDsec Solutions :: Parent POM for SignService :: Commons</name>
   <description>Parent POM for SignService Commons libraries</description>
@@ -86,13 +86,6 @@
 
     <dependencies>
     
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-        <version>[5.0.0.RELEASE,)</version>
-        <optional>true</optional>
-      </dependency>
-
       <dependency>
         <groupId>se.idsec.signservice.commons</groupId>
         <artifactId>signservice-bom</artifactId>
