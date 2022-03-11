@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-commons-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.1-SNAPSHOT</version>
+  <version>1.2.1</version>
 
   <name>IDsec Solutions :: Parent POM for SignService :: Commons</name>
   <description>Parent POM for SignService Commons libraries</description>
@@ -89,7 +89,7 @@
       <dependency>
         <groupId>se.idsec.signservice.commons</groupId>
         <artifactId>signservice-bom</artifactId>
-        <version>1.2.1-SNAPSHOT</version>
+        <version>1.2.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
