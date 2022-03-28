@@ -37,9 +37,13 @@ public class ProtocolVersionTest {
     Assert.assertEquals(0, compare("1.2.0", "1.2"));
     Assert.assertEquals(0, compare("1.0.0", "1"));
     Assert.assertTrue(compare("1.15", "1.5") > 0);
+    Assert.assertTrue(compare("1.5", "1.15") < 0);
     Assert.assertTrue(compare("1.5.1.11", "1.5.1.9") > 0);
+    Assert.assertTrue(compare("1.5.1.9", "1.5.1.11") < 0);
     Assert.assertTrue(compare("1.5.1", "1.5") > 0);
+    Assert.assertTrue(compare("1.5", "1.5.1") < 0);
     Assert.assertTrue(compare("2.5", "1.15") > 0);
+    Assert.assertTrue(compare("1.15", "2.5") < 0);
   }
 
   @Test(expected = IllegalArgumentException.class)
