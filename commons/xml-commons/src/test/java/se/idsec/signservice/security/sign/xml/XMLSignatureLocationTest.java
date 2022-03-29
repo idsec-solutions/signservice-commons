@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation.ChildPosition;
 import se.idsec.signservice.xml.DOMUtils;
@@ -219,6 +220,19 @@ public class XMLSignatureLocationTest extends XMLTestBase {
 
     Node node = signRequest.getDocumentElement().getElementsByTagName("OptionalInputs").item(0);
     Assert.assertEquals("Signature", node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName());
+  }
+
+  @Test
+  public void testIgnoreBlanks() throws Exception {
+    final XMLSignatureLocation location = new XMLSignatureLocation("/*/*[local-name()='OptionalInputs']", ChildPosition.LAST);
+    final Document signRequest = getDocument("xml/signRequest3.xml");
+
+    // Assert that the last child is a text node (empty), and that this will be ignored
+    final NodeList childs = signRequest.getDocumentElement().getElementsByTagName("dss:OptionalInputs").item(0).getChildNodes();
+    Assert.assertTrue(childs.item(childs.getLength() - 1).getNodeType() == Node.TEXT_NODE);
+
+    Assert.assertNotNull(location.getSignature(signRequest));
+
   }
 
   private static String getFirstElement(Document doc) {
