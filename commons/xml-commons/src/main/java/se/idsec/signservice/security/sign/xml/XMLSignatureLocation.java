@@ -23,6 +23,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Tells where in an XML document the signature should be inserted or found.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -45,10 +46,10 @@ public class XMLSignatureLocation {
    */
   public enum ChildPosition {
     FIRST, LAST
-  };
+  }
 
   /** Indicator for first or last child of a selected parent node. */
-  private ChildPosition childPosition;
+  private final ChildPosition childPosition;
 
   /**
    * The XPath expression for selecting the parent node (or {@code null} which means the the parent node is the document
@@ -70,7 +71,7 @@ public class XMLSignatureLocation {
    * Constructor setting of the signature location to "the first child of the document root element"
    * ({@code childPosition} == {@link ChildPosition#FIRST} or "the last child of the document root element"
    * ({@code childPosition} == {@link ChildPosition#LAST}.
-   * 
+   *
    * @param childPosition
    *          first of last child of the document root element
    */
@@ -86,7 +87,7 @@ public class XMLSignatureLocation {
    * {@link #getSignature(Document)} may be created using a namespace aware parser and you may want to use the
    * {@code local-name()} XPath construct.
    * </p>
-   * 
+   *
    * @param parentXPath
    *          XPath expression for locating the parent node of the signature element
    * @param childPosition
@@ -106,7 +107,7 @@ public class XMLSignatureLocation {
    * Note: If the owner document of the given {@code Signature} element is not the same as the {@code document}
    * paramater, the element is imported into this document.
    * </p>
-   * 
+   *
    * @param signature
    *          the element to insert
    * @param document
@@ -118,7 +119,7 @@ public class XMLSignatureLocation {
 
     // If the signature element comes from a different document, import it.
     final boolean sameOwner = XMLUtils.getOwnerDocument(signature) == document;
-    Node signatureNode = sameOwner ? signature : document.importNode(signature, true);
+    final Node signatureNode = sameOwner ? signature : document.importNode(signature, true);
 
     Node parentNode = this.xPathExpression != null
         ? (Node) this.xPathExpression.evaluate(document, XPathConstants.NODE)
@@ -126,7 +127,7 @@ public class XMLSignatureLocation {
 
     if (parentNode == null) {
       // Node was not found
-      final String msg = String.format("Could not find XML node for insertion of Signature - XPath: %s", xPath);
+      final String msg = String.format("Could not find XML node for insertion of Signature - XPath: %s", this.xPath);
       log.error(msg);
       throw new XPathExpressionException(msg);
     }
@@ -146,7 +147,7 @@ public class XMLSignatureLocation {
 
   /**
    * Finds a signature element based on this object's settings.
-   * 
+   *
    * @param document
    *          the document to locate the signature element
    * @return the signature element or null if no Signature element is found
@@ -154,9 +155,9 @@ public class XMLSignatureLocation {
    *           for XPath selection errors
    */
   public Element getSignature(final Document document) throws XPathExpressionException {
-    List<Node> nodes = new ArrayList<>();
+    final List<Node> nodes = new ArrayList<>();
     if (this.xPathExpression != null) {
-      NodeList _nodes = (NodeList) this.xPathExpression.evaluate(document, XPathConstants.NODESET);
+      final NodeList _nodes = (NodeList) this.xPathExpression.evaluate(document, XPathConstants.NODESET);
       if (_nodes.getLength() == 0) {
         return null;
       }
@@ -179,11 +180,13 @@ public class XMLSignatureLocation {
       if (childs.getLength() == 0) {
         continue;
       }
-      // Skip comments
+      // Skip comments (and empty text nodes)
       int pos = ChildPosition.LAST == this.childPosition ? childs.getLength() - 1 : 0;
       Node signatureNode = null;
       while (signatureNode == null && pos >= 0 && pos < childs.getLength()) {
-        if (childs.item(pos).getNodeType() == Node.COMMENT_NODE) {
+        final Node n = childs.item(pos);
+        if (n.getNodeType() == Node.COMMENT_NODE
+            || (n.getNodeType() == Node.TEXT_NODE && StringUtils.isBlank(n.getTextContent()))) {
           if (ChildPosition.LAST == this.childPosition) {
             pos--;
           }
@@ -192,7 +195,7 @@ public class XMLSignatureLocation {
           }
         }
         else {
-          signatureNode = childs.item(pos);
+          signatureNode = n;
         }
       }
       if (signatureNode != null && signatureNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -211,7 +214,7 @@ public class XMLSignatureLocation {
 
   /**
    * Method that can be used to verify that the supplied XPath expression can be used for the supplied document.
-   * 
+   *
    * @param document
    *          the document to evaluate the XPath expression against
    * @throws XPathExpressionException
@@ -219,9 +222,9 @@ public class XMLSignatureLocation {
    */
   public void testInsert(final Document document) throws XPathExpressionException {
     if (this.xPathExpression != null) {
-      Node parentNode = (Node) this.xPathExpression.evaluate(document, XPathConstants.NODE);
+      final Node parentNode = (Node) this.xPathExpression.evaluate(document, XPathConstants.NODE);
       if (parentNode == null) {
-        throw new XPathExpressionException(String.format("Could not find XML node for insertion of Signature - XPath: %s", xPath));
+        throw new XPathExpressionException(String.format("Could not find XML node for insertion of Signature - XPath: %s", this.xPath));
       }
       log.debug("XPath expression '{}' evaluated to node '{}'", this.xPath, parentNode.getLocalName());
     }
