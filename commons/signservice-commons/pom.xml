@@ -105,7 +105,6 @@
       </exclusions>
     </dependency>
 
-
     <!-- Credentials support -->
     <dependency>
       <groupId>se.swedenconnect.security</groupId>

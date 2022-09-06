@@ -48,9 +48,9 @@
   </developers>
 
   <properties>
-    <opensaml.version>4.1.1</opensaml.version>    
-    <jackson.version>2.13.2</jackson.version>
-    <pdfbox.version>2.0.25</pdfbox.version>
+    <opensaml.version>4.2.0</opensaml.version>    
+    <jackson.version>2.13.3</jackson.version>
+    <pdfbox.version>2.0.26</pdfbox.version>
     <bouncy-castle.version>1.70</bouncy-castle.version>
     <slf4j.version>1.7.36</slf4j.version>
     <spring.min.version>5.3.0</spring.min.version>
@@ -93,7 +93,7 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.22</version>
+        <version>1.18.24</version>
         <scope>provided</scope>
       </dependency>
 
@@ -205,7 +205,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.13.2.1</version>
+        <version>${jackson.version}</version>
       </dependency>
 
       <dependency>
@@ -412,12 +412,6 @@
         <groupId>se.swedenconnect.opensaml</groupId>
         <artifactId>opensaml-security-ext</artifactId>
         <version>[3.1.0,)</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
@@ -457,7 +451,7 @@
       <dependency>
         <groupId>se.swedenconnect.security</groupId>
         <artifactId>credentials-support</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.3</version>
       </dependency>
       
       <dependency>
@@ -480,7 +474,7 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>5.8.2</version>
+        <version>5.9.0</version>
         <scope>test</scope>
       </dependency>
 

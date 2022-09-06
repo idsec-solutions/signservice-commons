@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Utilities for processing DOM documents.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -109,7 +109,7 @@ public class DOMUtils {
    * "https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXP_DocumentBuilderFactory.2C_SAXParserFactory_and_DOM4J">
    * OWASP recommendations</a> for XML External Entity Prevention.
    * </p>
-   * 
+   *
    * @return a "safe" DocumentBuilder instance
    */
   public static DocumentBuilder createDocumentBuilder() {
@@ -123,7 +123,7 @@ public class DOMUtils {
 
   /**
    * Pretty prints the supplied XML node to a string.
-   * 
+   *
    * @param node
    *          the XML node to pretty print
    * @return a formatted string
@@ -144,7 +144,7 @@ public class DOMUtils {
 
   /**
    * Transforms the supplied XML node into its canonical byte representation.
-   * 
+   *
    * @param node
    *          the XML node to transform
    * @return a byte array holding the XML document bytes
@@ -162,7 +162,7 @@ public class DOMUtils {
 
   /**
    * Transforms the supplied XML node into its canonical byte representation and Base64-encoded these bytes.
-   * 
+   *
    * @param node
    *          the XML node to transform
    * @return the Base64-encoding of the XML node
@@ -173,7 +173,7 @@ public class DOMUtils {
 
   /**
    * Parses an input stream into a DOM document.
-   * 
+   *
    * @param stream
    *          the stream
    * @return a DOM document
@@ -207,7 +207,7 @@ public class DOMUtils {
 
   /**
    * Parses a byte array into a DOM document.
-   * 
+   *
    * @param bytes
    *          the bytes to parse
    * @return a DOM document
@@ -218,7 +218,7 @@ public class DOMUtils {
 
   /**
    * Decodes a Base64 string and parses it into a DOM document.
-   * 
+   *
    * @param base64
    *          the Base64-encoded string
    * @return a DOM document
@@ -234,7 +234,7 @@ public class DOMUtils {
 
   /**
    * Gets a document builder pool (queue) for the given class loader.
-   * 
+   *
    * @param loader
    *          the class loader
    * @return a queue of document builders
@@ -250,7 +250,7 @@ public class DOMUtils {
 
   /**
    * Gets a document builder from the given queue. If no document builder is available a new one is created.
-   * 
+   *
    * @param queue
    *          the queue
    * @return a document builder
@@ -265,7 +265,7 @@ public class DOMUtils {
 
   /**
    * Returns the given document builder to the pool (queue).
-   * 
+   *
    * @param documentBuilder
    *          the document builder
    * @param queue
@@ -280,13 +280,14 @@ public class DOMUtils {
 
   /**
    * Gets the context class loader.
-   * 
+   *
    * @return the context class loader
    */
   private static ClassLoader getContextClassLoader() {
     final SecurityManager sm = System.getSecurityManager();
     if (sm != null) {
       return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        @Override
         public ClassLoader run() {
           return Thread.currentThread().getContextClassLoader();
         }
@@ -297,7 +298,7 @@ public class DOMUtils {
 
   /**
    * Gets the class loader for the given class.
-   * 
+   *
    * @param clazz
    *          the class
    * @return the class loader
@@ -306,6 +307,7 @@ public class DOMUtils {
     final SecurityManager sm = System.getSecurityManager();
     if (sm != null) {
       return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        @Override
         public ClassLoader run() {
           return clazz.getClassLoader();
         }
