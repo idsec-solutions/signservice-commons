@@ -91,11 +91,9 @@ public class PDFBoxSignatureUtils {
   /**
    * This method extracts signed attribute data from a CMS signature
    *
-   * @param signedData
-   *          CMSSignedData object holding signature data
+   * @param signedData CMSSignedData object holding signature data
    * @return The signed attributes of a PDF signature
-   * @throws CMSException
-   *           If the provided input has no signed attribute data
+   * @throws CMSException If the provided input has no signed attribute data
    */
   public static byte[] getCmsSignedAttributes(final CMSSignedData signedData) throws CMSException {
     byte[] cmsSignedAttributes = null;
@@ -118,11 +116,9 @@ public class PDFBoxSignatureUtils {
   /**
    * This method extracts signed attribute data from a CMS signature.
    *
-   * @param contentInfoBytes
-   *          the CMS Content info bytes holding CMS SignedData content
+   * @param contentInfoBytes the CMS Content info bytes holding CMS SignedData content
    * @return The signed attributes of a PDF signature
-   * @throws CMSException
-   *           If the provided input has no signed attribute data
+   * @throws CMSException If the provided input has no signed attribute data
    */
   public static byte[] getCmsSignedAttributes(final byte[] contentInfoBytes) throws CMSException {
     try {
@@ -144,17 +140,12 @@ public class PDFBoxSignatureUtils {
    * A method that updates the PDF SignedData object (Actually a CMS ContentInfo) with a new signature, certificates and
    * SignedAttributes obtained from an external signing service.
    *
-   * @param cmsSignedData
-   *          Input CMS SignedData
-   * @param newTbsBytes
-   *          The new signed attributes bytes signed by the new signature
-   * @param newSigValue
-   *          The new signature value
-   * @param chain
-   *          The new certificate chain
+   * @param cmsSignedData Input CMS SignedData
+   * @param newTbsBytes The new signed attributes bytes signed by the new signature
+   * @param newSigValue The new signature value
+   * @param chain The new certificate chain
    * @return The bytes of an updated PDF signature (Encoded Content info)
-   * @throws CMSException
-   *           for errors
+   * @throws CMSException for errors
    */
   public static byte[] updatePdfPKCS7(final byte[] cmsSignedData, final byte[] newTbsBytes,
       final byte[] newSigValue, final List<X509Certificate> chain) throws CMSException {
@@ -163,17 +154,14 @@ public class PDFBoxSignatureUtils {
       //
       // Basic checks to make sure it's a PKCS#7 SignedData Object
       //
-      final ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(cmsSignedData));
       ASN1Primitive pkcs7 = null;
-      try {
+      try (final ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(cmsSignedData))) {
         pkcs7 = din.readObject();
       }
       catch (IOException e) {
         throw new CMSException("Illegal PKCS7");
       }
-      finally {
-        din.close();
-      }
+
       if (!ASN1Sequence.class.isInstance(pkcs7)) {
         throw new CMSException("Illegal PKCS7");
       }
@@ -211,12 +199,8 @@ public class PDFBoxSignatureUtils {
       // The certificates. The certs are taken from the input parameters to the method
       final ASN1Encodable[] newCerts = new ASN1Encodable[chain.size()];
       for (int i = 0; i < chain.size(); i++) {
-        final ASN1InputStream cin = new ASN1InputStream(new ByteArrayInputStream(chain.get(i).getEncoded()));
-        try {
+        try (final ASN1InputStream cin = new ASN1InputStream(new ByteArrayInputStream(chain.get(i).getEncoded()))) {
           newCerts[i] = cin.readObject();
-        }
-        finally {
-          cin.close();
         }
       }
       nsd.add(new DERTaggedObject(false, 0, new DERSet(newCerts)));
@@ -260,12 +244,8 @@ public class PDFBoxSignatureUtils {
       nsi.add(signerInfo.getObjectAt(siCounter++));
 
       // Add signed attributes from signature service
-      final ASN1InputStream sigAttrIs = new ASN1InputStream(newTbsBytes);
-      try {
+      try (final ASN1InputStream sigAttrIs = new ASN1InputStream(newTbsBytes)) {
         nsi.add(new DERTaggedObject(false, 0, sigAttrIs.readObject()));
-      }
-      finally {
-        sigAttrIs.close();
       }
 
       // Step counter past tagged objects (because signedAttrs i optional in the input data)
@@ -293,17 +273,16 @@ public class PDFBoxSignatureUtils {
       // Add the SignedData sequence as a eplicitly tagged object to the pkcs7 object
       npkcs7.add(new DERTaggedObject(true, 0, new DERSequence(nsd)));
 
-      final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      ASN1OutputStream dout = ASN1OutputStream.create(bout, ASN1Encoding.DER);
-
       byte[] pkcs7Bytes = null;
-      try {
-        dout.writeObject(new DERSequence(npkcs7));
-        pkcs7Bytes = bout.toByteArray();
-      }
-      finally {
-        dout.close();
-        bout.close();
+      try (final ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+        final ASN1OutputStream dout = ASN1OutputStream.create(bout, ASN1Encoding.DER);
+        try {
+          dout.writeObject(new DERSequence(npkcs7));
+          pkcs7Bytes = bout.toByteArray();
+        }
+        finally {
+          dout.close();
+        }
       }
 
       return pkcs7Bytes;
@@ -316,24 +295,19 @@ public class PDFBoxSignatureUtils {
   /**
    * Internal helper method that constructs an IssuerAndSerial object for SignerInfo based on a signer certificate
    *
-   * @param sigCert
-   *          the certificate
+   * @param sigCert the certificate
    * @return an ASN1EncodableVector holding the IssuerAndSerial ASN.1 sequence.
-   * @throws CertificateEncodingException
-   *           for errors encoding the certificate
-   * @throws IOException
-   *           for Bouncy castle errors
+   * @throws CertificateEncodingException for errors encoding the certificate
+   * @throws IOException for Bouncy castle errors
    */
-  private static ASN1EncodableVector getIssuerAndSerial(final Certificate sigCert) throws CertificateEncodingException, IOException {
+  private static ASN1EncodableVector getIssuerAndSerial(final Certificate sigCert)
+      throws CertificateEncodingException, IOException {
 
-    final ASN1InputStream ain = new ASN1InputStream(sigCert.getEncoded());
     ASN1Sequence certSeq = null;
-    try {
+    try (final ASN1InputStream ain = new ASN1InputStream(sigCert.getEncoded())) {
       certSeq = (ASN1Sequence) ain.readObject();
     }
-    finally {
-      ain.close();
-    }
+
     final ASN1Sequence tbsSeq = (ASN1Sequence) certSeq.getObjectAt(0);
 
     int counter = 0;
@@ -357,12 +331,9 @@ public class PDFBoxSignatureUtils {
   /**
    * Sets the signer name and location from the signer certificate subject DN.
    *
-   * @param signature
-   *          the signature object to be updated
-   * @param sigCert
-   *          the certificate being source of data
-   * @throws IOException
-   *           for errors getting the subject attributes from the certificate
+   * @param signature the signature object to be updated
+   * @param sigCert the certificate being source of data
+   * @throws IOException for errors getting the subject attributes from the certificate
    */
   public static void setSubjectNameAndLocality(final PDSignature signature, final Certificate sigCert)
       throws IOException {
@@ -375,22 +346,16 @@ public class PDFBoxSignatureUtils {
   /**
    * Gets a map of recognized subject DN attributes.
    *
-   * @param cert
-   *          X.509 certificate
+   * @param cert X.509 certificate
    * @return subject DN attribute map
-   * @throws IOException
-   *           for errors getting the subject attributes from the certificate
+   * @throws IOException for errors getting the subject attributes from the certificate
    */
   public static Map<SubjectDnAttribute, String> getSubjectAttributes(final Certificate cert) throws IOException {
 
     try {
-      final ASN1InputStream ain = new ASN1InputStream(cert.getEncoded());
       ASN1Sequence certSeq = null;
-      try {
+      try (final ASN1InputStream ain = new ASN1InputStream(cert.getEncoded())) {
         certSeq = (ASN1Sequence) ain.readObject();
-      }
-      finally {
-        ain.close();
       }
       final ASN1Sequence tbsSeq = (ASN1Sequence) certSeq.getObjectAt(0);
 
@@ -400,7 +365,8 @@ public class PDFBoxSignatureUtils {
       }
       // Get subject
       final ASN1Sequence subjectDn = (ASN1Sequence) tbsSeq.getObjectAt(counter + 4);
-      final Map<SubjectDnAttribute, String> subjectDnAttributeMap = PDFBoxSignatureUtils.getSubjectAttributes(subjectDn);
+      final Map<SubjectDnAttribute, String> subjectDnAttributeMap =
+          PDFBoxSignatureUtils.getSubjectAttributes(subjectDn);
 
       return subjectDnAttributeMap;
     }
@@ -412,8 +378,7 @@ public class PDFBoxSignatureUtils {
   /**
    * Gets a map of recognized subject DN attributes.
    *
-   * @param subjectDn
-   *          subject DN
+   * @param subjectDn subject DN
    * @return subject DN attribute map
    */
   public static Map<SubjectDnAttribute, String> getSubjectAttributes(final ASN1Sequence subjectDn) {
@@ -442,28 +407,26 @@ public class PDFBoxSignatureUtils {
   /**
    * Gets the RSA PKCS#10 digest info.
    *
-   * @param digestAlgo
-   *          digest algorithm
-   * @param hashValue
-   *          the hash value
+   * @param digestAlgo digest algorithm
+   * @param hashValue the hash value
    * @return the digest info
-   * @throws IOException
-   *           for errors
+   * @throws IOException for errors
    */
-  public static byte[] getRSAPkcs1DigestInfo(final AlgorithmIdentifier digestAlgo, final byte[] hashValue) throws IOException {
+  public static byte[] getRSAPkcs1DigestInfo(final AlgorithmIdentifier digestAlgo, final byte[] hashValue)
+      throws IOException {
     final ASN1EncodableVector digestInfoSeq = new ASN1EncodableVector();
     digestInfoSeq.add(digestAlgo);
     digestInfoSeq.add(new DEROctetString(hashValue));
 
-    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    final ASN1OutputStream dout = ASN1OutputStream.create(bout, ASN1Encoding.DER);
-    try {
-      dout.writeObject(new DERSequence(digestInfoSeq));
-      return bout.toByteArray();
-    }
-    finally {
-      dout.close();
-      bout.close();
+    try (final ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+      final ASN1OutputStream dout = ASN1OutputStream.create(bout, ASN1Encoding.DER);
+      try {
+        dout.writeObject(new DERSequence(digestInfoSeq));
+        return bout.toByteArray();
+      }
+      finally {
+        dout.close();
+      }
     }
   }
 
@@ -540,7 +503,7 @@ public class PDFBoxSignatureUtils {
       throws CertificateException, NoSuchAlgorithmException {
 
     final ASN1EncodableVector signedCertAttr = PDFBoxSignatureUtils.getSignedCertAttr(
-      digestAlgo, CertificateUtils.decodeCertificate(signerCert.getEncoded()), includeIssuerSerial);
+        digestAlgo, CertificateUtils.decodeCertificate(signerCert.getEncoded()), includeIssuerSerial);
     final ASN1EncodableVector v = new ASN1EncodableVector();
     v.add(new DERSequence(signedCertAttr));
 
@@ -553,7 +516,7 @@ public class PDFBoxSignatureUtils {
 
     try {
       final GeneralNames generalNames = new GeneralNames(
-        new GeneralName(new X509CertificateHolder(certificate.getEncoded()).getIssuer()));
+          new GeneralName(new X509CertificateHolder(certificate.getEncoded()).getIssuer()));
       final BigInteger serialNumber = certificate.getSerialNumber();
       final IssuerSerial issuerSerial = new IssuerSerial(generalNames, serialNumber);
 
@@ -609,15 +572,12 @@ public class PDFBoxSignatureUtils {
     }
   }
 
-  public static byte[] removeSignedAttr(final byte[] signedAttrBytes, final ASN1ObjectIdentifier[] attrOid) throws IOException {
+  public static byte[] removeSignedAttr(final byte[] signedAttrBytes, final ASN1ObjectIdentifier[] attrOid)
+      throws IOException {
 
-    final ASN1InputStream ais = new ASN1InputStream(signedAttrBytes);
     ASN1Set inAttrSet = null;
-    try {
+    try (final ASN1InputStream ais = new ASN1InputStream(signedAttrBytes)) {
       inAttrSet = ASN1Set.getInstance(ais.readObject());
-    }
-    finally {
-      ais.close();
     }
 
     final ASN1EncodableVector newSigAttrSet = new ASN1EncodableVector();
@@ -631,28 +591,25 @@ public class PDFBoxSignatureUtils {
     }
 
     // Der encode the new signed attributes set
-    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    final ASN1OutputStream dout = ASN1OutputStream.create(bout, ASN1Encoding.DER);
-    try {
-      dout.writeObject(new DERSet(newSigAttrSet));
-      return bout.toByteArray();
-    }
-    finally {
-      dout.close();
-      bout.close();
+    try (final ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+      final ASN1OutputStream dout = ASN1OutputStream.create(bout, ASN1Encoding.DER);
+      try {
+        dout.writeObject(new DERSet(newSigAttrSet));
+        return bout.toByteArray();
+      }
+      finally {
+        dout.close();
+      }
     }
   }
 
   public static SignedCertRef getSignedCertRefAttribute(final byte[] signedAttrBytes) throws IOException {
 
-    final ASN1InputStream ais = new ASN1InputStream(signedAttrBytes);
     ASN1Set inAttrSet = null;
-    try {
+    try (final ASN1InputStream ais = new ASN1InputStream(signedAttrBytes)) {
       inAttrSet = ASN1Set.getInstance(ais.readObject());
     }
-    finally {
-      ais.close();
-    }
+
     for (int i = 0; i < inAttrSet.size(); i++) {
       final Attribute attr = Attribute.getInstance(inAttrSet.getObjectAt(i));
 
@@ -663,12 +620,13 @@ public class PDFBoxSignatureUtils {
         final ESSCertIDv2 certsRef = certsRefs[0];
         final AlgorithmIdentifier hashAlgorithm = certsRef.getHashAlgorithm();
         // According to CMS, the hash algorithm is optional and defaults to SHA256
-        final ASN1ObjectIdentifier hashAlgoOid = hashAlgorithm == null ? NISTObjectIdentifiers.id_sha256 : hashAlgorithm.getAlgorithm();
+        final ASN1ObjectIdentifier hashAlgoOid =
+            hashAlgorithm == null ? NISTObjectIdentifiers.id_sha256 : hashAlgorithm.getAlgorithm();
 
         return SignedCertRef.builder()
-          .hashAlgorithm(hashAlgoOid)
-          .signedCertHash(certsRef.getCertHash())
-          .build();
+            .hashAlgorithm(hashAlgoOid)
+            .signedCertHash(certsRef.getCertHash())
+            .build();
       }
       if (attr.getAttrType().equals(new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_SIGNING_CERTIFICATE_V1))) {
         final ASN1Encodable[] attributeValues = attr.getAttributeValues();
@@ -676,9 +634,9 @@ public class PDFBoxSignatureUtils {
         final ESSCertID[] certsRefs = signingCertificate.getCerts();
         final ESSCertID certsRef = certsRefs[0];
         return SignedCertRef.builder()
-          .hashAlgorithm(OIWObjectIdentifiers.idSHA1)
-          .signedCertHash(certsRef.getCertHash())
-          .build();
+            .hashAlgorithm(OIWObjectIdentifiers.idSHA1)
+            .signedCertHash(certsRef.getCertHash())
+            .build();
       }
     }
     return null;

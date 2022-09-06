@@ -96,9 +96,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
   @Override
   public List<SignatureValidationResult> validate(final byte[] document) throws SignatureException {
 
-    PDDocument pdfDocument = null;
-    try {
-      pdfDocument = PDDocument.load(document);
+    try (final PDDocument pdfDocument = PDDocument.load(document)) {
 
       final List<SignatureValidationResult> results = new ArrayList<>();
       final List<PDSignature> signatureDictionaries = pdfDocument.getSignatureDictionaries();
@@ -117,24 +115,13 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       log.error("{}", msg, e);
       throw new SignatureException(msg, e);
     }
-    finally {
-      try {
-        if (pdfDocument != null) {
-          pdfDocument.close();
-        }
-      }
-      catch (final IOException e) {
-      }
-    }
   }
 
   /**
    * Validates the supplied signature.
    *
-   * @param document
-   *          the PDF document holding the signature
-   * @param signature
-   *          the signature
+   * @param document the PDF document holding the signature
+   * @param signature the signature
    * @return a validation result
    */
   protected PDFSignatureValidationResult validatePdfSignature(final byte[] document, final PDSignature signature) {
@@ -145,7 +132,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final byte[] signedDataBytes = signature.getContents(new ByteArrayInputStream(document));
 
       final CMSSignedDataParser signedDataParser = new CMSSignedDataParser(new BcDigestCalculatorProvider(),
-        new CMSTypedStream(new ByteArrayInputStream(signedContentBytes)), signedDataBytes);
+          new CMSTypedStream(new ByteArrayInputStream(signedContentBytes)), signedDataBytes);
       final CMSTypedStream signedContent = signedDataParser.getSignedContent();
       signedContent.drain();
 
@@ -221,13 +208,13 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       final String digestAlgoOid = signerInformation.getDigestAlgOID();
       final String encryptionAlgorithmOid = signerInformation.getEncryptionAlgOID();
       final String signatureAlgorithm = PDFAlgorithmRegistry.getAlgorithmURI(
-        new ASN1ObjectIdentifier(encryptionAlgorithmOid), new ASN1ObjectIdentifier(digestAlgoOid));
+          new ASN1ObjectIdentifier(encryptionAlgorithmOid), new ASN1ObjectIdentifier(digestAlgoOid));
       result.setSignatureAlgorithm(signatureAlgorithm);
 
       // Check if the CMS algorithm protection attribute has been set, and if so, assert algorithm consistency.
       //
       final Attribute cmsAlgorithmProtection = signerInformation.getSignedAttributes()
-        .get(new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_CMS_ALGORITHM_PROTECTION));
+          .get(new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_CMS_ALGORITHM_PROTECTION));
 
       if (cmsAlgorithmProtection != null) {
         final Pair<AlgorithmIdentifier, AlgorithmIdentifier> cmsAlgorithmProtectionAlgs =
@@ -243,20 +230,22 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
         if (!algorithmProperties.getAlgorithmIdentifier().getAlgorithm().equals(protSignAlgo.getAlgorithm())) {
           final String msg = String.format(
-            "CMS algorithm protection signature algorithm (%s) is not consistent with signature algorithm used to sign data (%s)",
-            protSignAlgo.getAlgorithm().getId(), signatureAlgorithm);
+              "CMS algorithm protection signature algorithm (%s) is not consistent with signature algorithm used to sign data (%s)",
+              protSignAlgo.getAlgorithm().getId(), signatureAlgorithm);
           result.setError(Status.ERROR_INVALID_SIGNATURE, msg);
           return result;
         }
-        if (!algorithmProperties.getMessageDigestAlgorithm().getAlgorithmIdentifier().getAlgorithm().equals(protHashAlgo.getAlgorithm())) {
+        if (!algorithmProperties.getMessageDigestAlgorithm().getAlgorithmIdentifier().getAlgorithm()
+            .equals(protHashAlgo.getAlgorithm())) {
           final String msg = String.format(
-            "CMS algorithm protection hash algorithm (%s) is not consistent with signature algorithm used to sign data (%s)",
-            protHashAlgo.getAlgorithm().getId(), signatureAlgorithm);
+              "CMS algorithm protection hash algorithm (%s) is not consistent with signature algorithm used to sign data (%s)",
+              protHashAlgo.getAlgorithm().getId(), signatureAlgorithm);
           result.setError(Status.ERROR_INVALID_SIGNATURE, msg);
           return result;
         }
-        log.debug("CMS algorithm protection attribute attributes ('{}', '{}') are consistent with signature algorithm used ('{}')",
-          protSignAlgo.getAlgorithm().getId(), protHashAlgo.getAlgorithm().getId(), signatureAlgorithm);
+        log.debug(
+            "CMS algorithm protection attribute attributes ('{}', '{}') are consistent with signature algorithm used ('{}')",
+            protSignAlgo.getAlgorithm().getId(), protHashAlgo.getAlgorithm().getId(), signatureAlgorithm);
       }
 
       // Check if this is a PAdES signature, and if so, validate the PAdES properties.
@@ -281,16 +270,12 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
   /**
    * Verifies PAdES properties.
    *
-   * @param signature
-   *          the PDF signature
-   * @param signerInformation
-   *          the signer information
-   * @param signerCertificate
-   *          the signer certificate
+   * @param signature the PDF signature
+   * @param signerInformation the signer information
+   * @param signerCertificate the signer certificate
    * @return true if this is a PAdES signature and it was successfully validated and false if this is not a PAdES
-   *         signature
-   * @throws InternalSignatureValidationException
-   *           for PAdES validation errors
+   *           signature
+   * @throws InternalSignatureValidationException for PAdES validation errors
    */
   private boolean verifyPadesProperties(final PDSignature signature, final SignerInformation signerInformation,
       final X509Certificate signerCertificate) throws InternalSignatureValidationException {
@@ -300,16 +285,17 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       if (PDSignature.SUBFILTER_ETSI_CADES_DETACHED.getName().equals(subFilter)) {
         final PDFBoxSignatureUtils.SignedCertRef signedCertificateRef = PDFBoxSignatureUtils.getSignedCertRefAttribute(
-          signerInformation.getSignedAttributes().toASN1Structure().getEncoded(ASN1Encoding.DER));
+            signerInformation.getSignedAttributes().toASN1Structure().getEncoded(ASN1Encoding.DER));
 
         if (signedCertificateRef == null) {
           throw new InternalSignatureValidationException(Status.ERROR_BAD_FORMAT,
-            "Signature subfilter indicates that the signature is a PAdES signature but no signed certificate reference is present");
+              "Signature subfilter indicates that the signature is a PAdES signature but no signed certificate reference is present");
         }
         final MessageDigest md = MessageDigest.getInstance(signedCertificateRef.getHashAlgorithm().getId());
         final byte[] certificateHash = md.digest(signerCertificate.getEncoded());
         if (!Arrays.equals(certificateHash, signedCertificateRef.getSignedCertHash())) {
-          throw new InternalSignatureValidationException(Status.ERROR_INVALID_SIGNATURE, "PAdES signed certificate reference mismatch");
+          throw new InternalSignatureValidationException(Status.ERROR_INVALID_SIGNATURE,
+              "PAdES signed certificate reference mismatch");
         }
         log.debug("PAdES signature successfully verified");
         return true;
@@ -328,8 +314,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
   /**
    * Obtains the claimed signing time from signed attributes.
    *
-   * @param signer
-   *          signer information
+   * @param signer signer information
    * @return claimed signing time if present or null if absent
    */
   private static Date getClaimedSigningTime(final SignerInformation signer) {
@@ -358,20 +343,20 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
    *
    * @param cmsAlgorithmProtectionAttribute
    * @return a pair of the signature algorithm ID and the hash algoritm id
-   * @throws InternalSignatureValidationException
-   *           for invalid CMS algorithm protection attributes
+   * @throws InternalSignatureValidationException for invalid CMS algorithm protection attributes
    */
   private static Pair<AlgorithmIdentifier, AlgorithmIdentifier> getCmsAlgoritmProtectionData(
       final Attribute cmsAlgorithmProtectionAttribute) throws InternalSignatureValidationException {
 
     try {
-      final ASN1Sequence cmsapSeq = ASN1Sequence.getInstance(cmsAlgorithmProtectionAttribute.getAttrValues().getObjectAt(0));
+      final ASN1Sequence cmsapSeq =
+          ASN1Sequence.getInstance(cmsAlgorithmProtectionAttribute.getAttrValues().getObjectAt(0));
 
       // Get Hash algorithm
       final AlgorithmIdentifier hashAlgorithmId = AlgorithmIdentifier.getInstance(cmsapSeq.getObjectAt(0));
       if (hashAlgorithmId == null) {
         throw new InternalSignatureValidationException(
-          Status.ERROR_BAD_FORMAT, "Missing hash algorithm in CMS algorithm protection attribute");
+            Status.ERROR_BAD_FORMAT, "Missing hash algorithm in CMS algorithm protection attribute");
       }
 
       // Get Signature algorithm
@@ -388,35 +373,24 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       }
       if (signatureAlgorithmId == null) {
         throw new InternalSignatureValidationException(
-          Status.ERROR_BAD_FORMAT, "Missing signature algorithm in CMS algorithm protection attribute");
+            Status.ERROR_BAD_FORMAT, "Missing signature algorithm in CMS algorithm protection attribute");
       }
       return new Pair<>(signatureAlgorithmId, hashAlgorithmId);
     }
     catch (final IllegalArgumentException e) {
       throw new InternalSignatureValidationException(
-        Status.ERROR_BAD_FORMAT, "Error processing CMS algorithm protection attribute - " + e.getMessage(), e);
+          Status.ERROR_BAD_FORMAT, "Error processing CMS algorithm protection attribute - " + e.getMessage(), e);
     }
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isSigned(final byte[] document) throws IllegalArgumentException {
-    PDDocument pdfDocument = null;
-    try {
-      pdfDocument = PDDocument.load(document);
+    try (final PDDocument pdfDocument = PDDocument.load(document)) {
       return !pdfDocument.getSignatureDictionaries().isEmpty();
     }
     catch (final IOException e) {
       throw new IllegalArgumentException("Invalid document", e);
-    }
-    finally {
-      try {
-        if (pdfDocument != null) {
-          pdfDocument.close();
-        }
-      }
-      catch (final IOException e) {
-      }
     }
   }
 

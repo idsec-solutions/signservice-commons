@@ -122,11 +122,7 @@ public class DefaultPDFSigner implements PDFSigner {
     if (parameters == null) {
       return this.sign(document);
     }
-
-    PDDocument pdfDocument = null;
-    try {
-      pdfDocument = PDDocument.load(document);
-
+    try (final PDDocument pdfDocument = PDDocument.load(document)) {
       final List<X509Certificate> signingCertChain = this.includeCertificateChain
           ? this.signingCredential.getCertificateChain()
           : Arrays.asList(this.signingCredential.getCertificate());
@@ -157,16 +153,6 @@ public class DefaultPDFSigner implements PDFSigner {
       final String msg = String.format("Failed to load PDF document to sign - %s", e.getMessage());
       log.error("{}", msg, e);
       throw new SignatureException(msg, e);
-    }
-    finally {
-      if (pdfDocument != null) {
-        try {
-          // Closing an already closed document is a no-op
-          pdfDocument.close();
-        }
-        catch (final IOException e) {
-        }
-      }
     }
   }
 

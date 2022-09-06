@@ -24,17 +24,18 @@ import se.idsec.signservice.security.sign.VoidSignerParameters;
 
 /**
  * Interface for XML signatures.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public interface XMLSigner extends Signer<Document, XMLSignerResult, VoidSignerParameters> {
-  
+
   /**
    * This implementation does not support any type of parameters. Will invoke {@code sign(Document)}.
    */
+  @Override
   default XMLSignerResult sign(final Document document, final VoidSignerParameters parameters) throws SignatureException {
     return this.sign(document);
   }
-  
+
 }
