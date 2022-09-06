@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.2-SNAPSHOT</version>
+  <version>1.2.2</version>
 
   <name>IDsec Solutions :: BOM for SignService</name>
   <description>BOM for SignService</description>
