@@ -1,1 +1,2 @@
 ignoreFiles = [ "**/test/**", "**/docs/**", "**/*.min.js" ]
+build = "mvn"
