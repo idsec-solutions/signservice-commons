@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.2</version>
+  <version>1.2.3-SNAPSHOT</version>
 
   <name>IDsec Solutions :: BOM for SignService</name>
   <description>BOM for SignService</description>
@@ -49,8 +49,8 @@
 
   <properties>
     <opensaml.version>4.2.0</opensaml.version>    
-    <jackson.version>2.13.3</jackson.version>
-    <pdfbox.version>2.0.26</pdfbox.version>
+    <jackson.version>2.13.4</jackson.version>
+    <pdfbox.version>2.0.27</pdfbox.version>
     <bouncy-castle.version>1.70</bouncy-castle.version>
     <slf4j.version>1.7.36</slf4j.version>
     <spring.min.version>5.3.0</spring.min.version>
@@ -152,7 +152,7 @@
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
-        <version>2.4</version>
+        <version>2.5</version>
         <scope>provided</scope>
       </dependency>
       
@@ -192,7 +192,7 @@
       <dependency>
         <groupId>org.apache.santuario</groupId>
         <artifactId>xmlsec</artifactId>
-        <version>2.3.0</version>
+        <version>2.3.2</version>
       </dependency>
 
       <!-- Jackson -->
@@ -288,49 +288,49 @@
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>saml-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>oasis-dss-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>etsi-xades-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas</groupId>
         <artifactId>etsi-xades-ext-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
             
       <dependency>
         <groupId>se.swedenconnect.schemas.csig</groupId>
         <artifactId>dss-ext11-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas.csig</groupId>
         <artifactId>sap11-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas.cert</groupId>
         <artifactId>authcontextinfo10-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       
       <dependency>
         <groupId>se.swedenconnect.schemas.cert</groupId>
         <artifactId>ext-auth-info10-jaxb</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       
       <!-- Bouncy Castle -->
@@ -351,8 +351,14 @@
         <artifactId>bcmail-jdk15on</artifactId>
         <version>${bouncy-castle.version}</version>
       </dependency>
+      
+      <dependency>
+        <groupId>org.cryptacular</groupId>
+        <artifactId>cryptacular</artifactId>
+        <version>1.2.4</version>
+      </dependency>      
 
-      <!-- OpenSAML -->
+      <!-- OpenSAML -->            
       <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml-core</artifactId>
@@ -411,13 +417,13 @@
       <dependency>
         <groupId>se.swedenconnect.opensaml</groupId>
         <artifactId>opensaml-security-ext</artifactId>
-        <version>[3.1.0,)</version>
+        <version>3.1.1</version>
       </dependency>
 
       <dependency>
         <groupId>se.swedenconnect.opensaml</groupId>
         <artifactId>opensaml-addons</artifactId>
-        <version>[1.2.3,)</version>
+        <version>1.2.4</version>
         <exclusions>
           <exclusion>
             <groupId>se.swedenconnect.opensaml</groupId>
@@ -429,7 +435,7 @@
       <dependency>
         <groupId>se.swedenconnect.opensaml</groupId>
         <artifactId>opensaml-swedish-eid</artifactId>
-        <version>[1.2.2,)</version>
+        <version>1.2.2</version>
         <exclusions>
           <exclusion>
             <groupId>se.swedenconnect.opensaml</groupId>
@@ -451,7 +457,7 @@
       <dependency>
         <groupId>se.swedenconnect.security</groupId>
         <artifactId>credentials-support</artifactId>
-        <version>1.2.3</version>
+        <version>1.2.4</version>
       </dependency>
       
       <dependency>
