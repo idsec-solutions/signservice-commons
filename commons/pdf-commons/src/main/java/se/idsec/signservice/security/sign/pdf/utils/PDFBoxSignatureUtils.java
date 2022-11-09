@@ -182,7 +182,6 @@ public class PDFBoxSignatureUtils {
        */
 
       // Get the SignedData sequence
-      @SuppressWarnings("deprecation")
       final ASN1Sequence signedDataSeq = (ASN1Sequence) ((ASN1TaggedObject) signedData.getObjectAt(1)).getObject();
       int sdObjCount = 0;
 
