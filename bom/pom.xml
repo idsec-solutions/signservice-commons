@@ -6,7 +6,7 @@
   <groupId>se.idsec.signservice.commons</groupId>
   <artifactId>signservice-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.3-SNAPSHOT</version>
+  <version>1.2.3</version>
 
   <name>IDsec Solutions :: BOM for SignService</name>
   <description>BOM for SignService</description>
@@ -49,11 +49,11 @@
 
   <properties>
     <opensaml.version>4.2.0</opensaml.version>    
-    <jackson.version>2.13.4</jackson.version>
+    <jackson.version>2.14.0</jackson.version>
     <pdfbox.version>2.0.27</pdfbox.version>
     <bouncy-castle.version>1.70</bouncy-castle.version>
     <slf4j.version>1.7.36</slf4j.version>
-    <spring.min.version>5.3.0</spring.min.version>
+    <spring.min.version>5.3.20</spring.min.version>
   </properties>
 
   <repositories>
@@ -146,7 +146,13 @@
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>1.2</version>
-      </dependency>      
+      </dependency>
+      
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>1.9.4</version>
+      </dependency>
       
       <!-- Servlet API -->
       <dependency>
@@ -205,8 +211,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <!-- <version>${jackson.version}</version> -->
-        <version>[2.14.0-rc1,)</version>
+        <version>${jackson.version}</version>
       </dependency>
 
       <dependency>
@@ -242,6 +247,12 @@
         <groupId>org.jvnet.jaxb2_commons</groupId>
         <artifactId>jaxb2-basics-runtime</artifactId>
         <version>1.11.1</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.jvnet.jaxb2_commons</groupId>
+        <artifactId>jaxb2-basics-tools</artifactId>
+        <version>0.13.1</version>
       </dependency>
       
       <dependency>
@@ -481,7 +492,7 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>5.9.0</version>
+        <version>5.9.1</version>
         <scope>test</scope>
       </dependency>
 
