@@ -1,2 +1,7 @@
-ignoreFiles = [ "**/test/**", "**/docs/**", "**/*.min.js" ]
+ignoreFiles = """
+**/test/**
+**/docs/**
+**/*.min.js
+**/target/**
+"""
 build = "mvn"
