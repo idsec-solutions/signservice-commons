@@ -50,7 +50,7 @@
   <properties>    
     <jackson.version>2.14.1</jackson.version>
     <pdfbox.version>2.0.27</pdfbox.version>
-    <bouncy-castle.version>1.72</bouncy-castle.version>
+    <bouncy-castle.version>1.74</bouncy-castle.version>
     <slf4j.version>1.7.36</slf4j.version>
     <spring.min.version>5.3.20</spring.min.version>
   </properties>
