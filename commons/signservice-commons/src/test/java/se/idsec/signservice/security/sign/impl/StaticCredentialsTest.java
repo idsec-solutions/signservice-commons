@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import java.security.InvalidParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Test cases for {@link StaticCredentials}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -36,96 +36,91 @@ public class StaticCredentialsTest {
   @Test
   public void generateRsa() throws Exception {
 
-    StaticCredentials creds = new StaticCredentials();
+    final StaticCredentials creds = new StaticCredentials();
 
-    PkiCredential rsa = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-    Assert.assertNotNull(rsa);
-    PkiCredential rsa2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
-    Assert.assertNotNull(rsa2);
+    final PkiCredential rsa = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+    Assertions.assertNotNull(rsa);
+    final PkiCredential rsa2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+    Assertions.assertNotNull(rsa2);
 
     // Assert that the same key is re-used.
-    Assert.assertArrayEquals(rsa.getPublicKey().getEncoded(), rsa2.getPublicKey().getEncoded());
+    Assertions.assertArrayEquals(rsa.getPublicKey().getEncoded(), rsa2.getPublicKey().getEncoded());
 
     // Invalid parameter
-    creds = new StaticCredentials(65, null);
-
-    try {
-      creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-      Assert.fail("Expected NoSuchAlgorithmException");
-    }
-    catch (NoSuchAlgorithmException e) {
-      Assert.assertTrue(InvalidParameterException.class.isInstance(e.getCause()));
-    }
+    final Exception e = Assertions.assertThrows(NoSuchAlgorithmException.class, () -> {
+      final StaticCredentials creds2 = new StaticCredentials(65, null);
+      creds2.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+    });
+    Assertions.assertTrue(InvalidParameterException.class.isInstance(e.getCause()));
   }
 
   @Test
   public void generateRsaCustom() throws Exception {
     StaticCredentials creds = new StaticCredentials(StaticCredentials.DEFAULT_RSA_KEY_SIZE, null);
 
-    Assert.assertEquals(StaticCredentials.DEFAULT_RSA_KEY_SIZE,
-      ((RSAPublicKey) (creds.getRsaKeyPair().getPublic())).getModulus().bitLength());
+    Assertions.assertEquals(StaticCredentials.DEFAULT_RSA_KEY_SIZE,
+        ((RSAPublicKey) creds.getRsaKeyPair().getPublic()).getModulus().bitLength());
 
     creds = new StaticCredentials(1024, null);
-    Assert.assertEquals(1024,
-      ((RSAPublicKey) (creds.getRsaKeyPair().getPublic())).getModulus().bitLength());
+    Assertions.assertEquals(1024, ((RSAPublicKey) creds.getRsaKeyPair().getPublic()).getModulus().bitLength());
     creds = new StaticCredentials(4096, null);
-    Assert.assertEquals(4096,
-      ((RSAPublicKey) (creds.getRsaKeyPair().getPublic())).getModulus().bitLength());
+    Assertions.assertEquals(4096, ((RSAPublicKey) creds.getRsaKeyPair().getPublic()).getModulus().bitLength());
 
-    creds = new StaticCredentials(34, null);
-    try {
-      creds.getRsaKeyPair();
-      Assert.fail("Expected InvalidParameterException");
-    }
-    catch (InvalidParameterException e) {
-    }
+    Assertions.assertThrows(InvalidParameterException.class, () -> {
+      final StaticCredentials creds2 = new StaticCredentials(34, null);
+      creds2.getRsaKeyPair();
+    });
   }
 
   @Test
   public void generateEc() throws Exception {
     StaticCredentials creds = new StaticCredentials();
 
-    PkiCredential ec = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256");
-    Assert.assertNotNull(ec);
-    PkiCredential ec2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512");
-    Assert.assertNotNull(ec2);
+    final PkiCredential ec = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256");
+    Assertions.assertNotNull(ec);
+    final PkiCredential ec2 = creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512");
+    Assertions.assertNotNull(ec2);
 
     // Assert that the same key is re-used.
-    Assert.assertArrayEquals(ec.getPublicKey().getEncoded(), ec2.getPublicKey().getEncoded());
+    Assertions.assertArrayEquals(ec.getPublicKey().getEncoded(), ec2.getPublicKey().getEncoded());
 
     creds = new StaticCredentials(2048, "NotACurve");
     try {
       creds.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256");
-      Assert.fail("Expected NoSuchAlgorithmException");
+      Assertions.fail("Expected NoSuchAlgorithmException");
     }
-    catch (NoSuchAlgorithmException e) {
-      Assert.assertTrue(InvalidAlgorithmParameterException.class.isInstance(e.getCause()));
+    catch (final NoSuchAlgorithmException e) {
+      Assertions.assertTrue(InvalidAlgorithmParameterException.class.isInstance(e.getCause()));
     }
   }
 
   @Test
   public void generateEcCustom() throws Exception {
 
-    StaticCredentials creds = new StaticCredentials(2048, "NotACurve");
+    final StaticCredentials creds = new StaticCredentials(2048, "NotACurve");
 
     try {
       creds.getEcKeyPair();
-      Assert.fail("Expected InvalidAlgorithmParameterException");
+      Assertions.fail("Expected InvalidAlgorithmParameterException");
     }
-    catch (InvalidAlgorithmParameterException e) {
+    catch (final InvalidAlgorithmParameterException e) {
     }
   }
-  
-  @Test(expected = NoSuchAlgorithmException.class)
+
+  @Test
   public void testDSAUnsupported() throws Exception {
-    StaticCredentials creds = new StaticCredentials();
-    creds.getSigningCredential("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
+    final StaticCredentials creds = new StaticCredentials();
+    Assertions.assertThrows(NoSuchAlgorithmException.class, () -> {
+      creds.getSigningCredential("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
+    });
   }
-  
-  @Test(expected = NoSuchAlgorithmException.class)
+
+  @Test
   public void testNotASignatureAlgo() throws Exception {
-    StaticCredentials creds = new StaticCredentials();
-    creds.getSigningCredential("http://www.w3.org/2001/04/xmlenc#sha256");
+    final StaticCredentials creds = new StaticCredentials();
+    Assertions.assertThrows(NoSuchAlgorithmException.class, () -> {
+      creds.getSigningCredential("http://www.w3.org/2001/04/xmlenc#sha256");
+    });
   }
 
 }

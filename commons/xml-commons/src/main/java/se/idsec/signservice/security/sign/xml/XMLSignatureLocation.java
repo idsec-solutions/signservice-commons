@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -72,8 +72,7 @@ public class XMLSignatureLocation {
    * ({@code childPosition} == {@link ChildPosition#FIRST} or "the last child of the document root element"
    * ({@code childPosition} == {@link ChildPosition#LAST}.
    *
-   * @param childPosition
-   *          first of last child of the document root element
+   * @param childPosition first of last child of the document root element
    */
   public XMLSignatureLocation(final ChildPosition childPosition) {
     this.childPosition = childPosition;
@@ -88,14 +87,12 @@ public class XMLSignatureLocation {
    * {@code local-name()} XPath construct.
    * </p>
    *
-   * @param parentXPath
-   *          XPath expression for locating the parent node of the signature element
-   * @param childPosition
-   *          whether to insert/find the signature as the first or last child of the given parent node
-   * @throws XPathExpressionException
-   *           for illegal XPath expressions
+   * @param parentXPath XPath expression for locating the parent node of the signature element
+   * @param childPosition whether to insert/find the signature as the first or last child of the given parent node
+   * @throws XPathExpressionException for illegal XPath expressions
    */
-  public XMLSignatureLocation(final String parentXPath, final ChildPosition childPosition) throws XPathExpressionException {
+  public XMLSignatureLocation(final String parentXPath, final ChildPosition childPosition)
+      throws XPathExpressionException {
     this.childPosition = childPosition;
     this.xPath = parentXPath;
     this.xPathExpression = XPathFactory.newInstance().newXPath().compile(parentXPath);
@@ -108,12 +105,9 @@ public class XMLSignatureLocation {
    * paramater, the element is imported into this document.
    * </p>
    *
-   * @param signature
-   *          the element to insert
-   * @param document
-   *          the document to which the signature element should be inserted
-   * @throws XPathExpressionException
-   *           for XPath selection errors
+   * @param signature the element to insert
+   * @param document the document to which the signature element should be inserted
+   * @throws XPathExpressionException for XPath selection errors
    */
   public void insertSignature(final Element signature, final Document document) throws XPathExpressionException {
 
@@ -148,11 +142,9 @@ public class XMLSignatureLocation {
   /**
    * Finds a signature element based on this object's settings.
    *
-   * @param document
-   *          the document to locate the signature element
+   * @param document the document to locate the signature element
    * @return the signature element or null if no Signature element is found
-   * @throws XPathExpressionException
-   *           for XPath selection errors
+   * @throws XPathExpressionException for XPath selection errors
    */
   public Element getSignature(final Document document) throws XPathExpressionException {
     final List<Node> nodes = new ArrayList<>();
@@ -215,16 +207,15 @@ public class XMLSignatureLocation {
   /**
    * Method that can be used to verify that the supplied XPath expression can be used for the supplied document.
    *
-   * @param document
-   *          the document to evaluate the XPath expression against
-   * @throws XPathExpressionException
-   *           if the XPath expression is incorrect (does not find a node)
+   * @param document the document to evaluate the XPath expression against
+   * @throws XPathExpressionException if the XPath expression is incorrect (does not find a node)
    */
   public void testInsert(final Document document) throws XPathExpressionException {
     if (this.xPathExpression != null) {
       final Node parentNode = (Node) this.xPathExpression.evaluate(document, XPathConstants.NODE);
       if (parentNode == null) {
-        throw new XPathExpressionException(String.format("Could not find XML node for insertion of Signature - XPath: %s", this.xPath));
+        throw new XPathExpressionException(
+            String.format("Could not find XML node for insertion of Signature - XPath: %s", this.xPath));
       }
       log.debug("XPath expression '{}' evaluated to node '{}'", this.xPath, parentNode.getLocalName());
     }

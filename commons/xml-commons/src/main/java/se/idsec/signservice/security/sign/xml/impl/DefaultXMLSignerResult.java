@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package se.idsec.signservice.security.sign.xml.impl;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
@@ -24,7 +25,6 @@ import org.w3c.dom.Element;
 
 import se.idsec.signservice.security.sign.impl.AbstractSignerResult;
 import se.idsec.signservice.security.sign.xml.XMLSignerResult;
-import se.idsec.signservice.xml.InternalXMLException;
 
 /**
  * Default implementation of the {@link XMLSignerResult}.
@@ -40,8 +40,7 @@ public class DefaultXMLSignerResult extends AbstractSignerResult<Document> imple
   /**
    * Constructor.
    *
-   * @param signature
-   *          the signature object
+   * @param signature the signature object
    */
   public DefaultXMLSignerResult(final XMLSignature signature) {
     this.signature = signature;
@@ -67,9 +66,13 @@ public class DefaultXMLSignerResult extends AbstractSignerResult<Document> imple
     try {
       return this.signature.getSignedInfo().getCanonicalizedOctetStream();
     }
-    catch (XMLSecurityException | IOException e) {
-      throw new InternalXMLException("Failed to canonicalize SignedInfo", e);
+    catch (XMLSecurityException e) {
+      throw new SecurityException("Failed to canonicalize SignedInfo", e);
     }
+    catch (IOException e) {
+      throw new UncheckedIOException("Failed to canonicalize SignedInfo", e);
+    }
+
   }
 
 }
