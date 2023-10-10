@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package se.idsec.signservice.security.sign.xml;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
@@ -34,7 +34,7 @@ import se.swedenconnect.security.credential.utils.X509Utils;
  */
 public abstract class XMLTestBase {
 
-  @BeforeClass
+  @BeforeAll
   public static void init() {
     org.apache.xml.security.Init.init();
   }

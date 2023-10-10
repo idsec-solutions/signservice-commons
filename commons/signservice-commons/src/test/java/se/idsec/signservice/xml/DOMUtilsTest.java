@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,120 +21,112 @@ import java.util.Base64;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.xml.security.utils.ClassLoaderUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 
 /**
  * Test cases for DOMUtils.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public class DOMUtilsTest {
 
-  private Resource resource = new ClassPathResource("signResponse.xml");
-
   @Test
   public void testCreateDocumentBuilder() throws Exception {
-    DocumentBuilder b = DOMUtils.createDocumentBuilder();
-    Assert.assertNotNull(b);
+    final DocumentBuilder b = DOMUtils.createDocumentBuilder();
+    Assertions.assertNotNull(b);
   }
 
   @Test
   public void testPrettyPrint() throws Exception {
 
-    Document doc = DOMUtils.inputStreamToDocument(resource.getInputStream());
+    final Document doc = DOMUtils.inputStreamToDocument(
+        ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
 
     String s = DOMUtils.prettyPrint(doc);
-    Assert.assertTrue(StringUtils.hasText(s));
-    Assert.assertTrue(s.contains("<dss:SignResponse"));
+    Assertions.assertFalse(StringUtils.isBlank(s));
+    Assertions.assertTrue(s.contains("<dss:SignResponse"));
 
     s = DOMUtils.prettyPrint(doc.getDocumentElement());
-    Assert.assertTrue(StringUtils.hasText(s));
-    
+    Assertions.assertFalse(StringUtils.isBlank(s));
+
     s = DOMUtils.prettyPrint(null);
-    Assert.assertTrue(s.isEmpty());
+    Assertions.assertTrue(s.isEmpty());
   }
 
   @Test
   public void testNodeToBytes() throws Exception {
-    Document doc = DOMUtils.inputStreamToDocument(resource.getInputStream());
+    final Document doc = DOMUtils.inputStreamToDocument(
+        ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
 
-    byte[] bytes = DOMUtils.nodeToBytes(doc.getDocumentElement());
-    Assert.assertNotNull(bytes);
-    Assert.assertTrue(bytes.length > 0);
+    final byte[] bytes = DOMUtils.nodeToBytes(doc.getDocumentElement());
+    Assertions.assertNotNull(bytes);
+    Assertions.assertTrue(bytes.length > 0);
 
-    Document doc2 = DOMUtils.bytesToDocument(bytes);
-    Assert.assertEquals("SignResponse", doc2.getDocumentElement().getLocalName());
+    final Document doc2 = DOMUtils.bytesToDocument(bytes);
+    Assertions.assertEquals("SignResponse", doc2.getDocumentElement().getLocalName());
   }
 
   @Test
   public void testNodeToBase64() throws Exception {
-    Document doc = DOMUtils.inputStreamToDocument(resource.getInputStream());
+    final Document doc = DOMUtils.inputStreamToDocument(
+        ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
 
-    String base64 = DOMUtils.nodeToBase64(doc.getDocumentElement());
-    Assert.assertTrue(StringUtils.hasText(base64));
+    final String base64 = DOMUtils.nodeToBase64(doc.getDocumentElement());
+    Assertions.assertFalse(StringUtils.isBlank(base64));
 
-    byte[] bytes = Base64.getDecoder().decode(base64);
-    Assert.assertArrayEquals(DOMUtils.nodeToBytes(doc.getDocumentElement()), bytes);
+    final byte[] bytes = Base64.getDecoder().decode(base64);
+    Assertions.assertArrayEquals(DOMUtils.nodeToBytes(doc.getDocumentElement()), bytes);
   }
-  
+
   @Test
   public void testInputStreamToDocument() throws Exception {
-    Document doc = DOMUtils.inputStreamToDocument(resource.getInputStream());
-    Assert.assertEquals("SignResponse", doc.getDocumentElement().getLocalName());
-    
-    InputStream notXml = new ByteArrayInputStream("<not-valid-xml>".getBytes());
-    try {
+    final Document doc = DOMUtils.inputStreamToDocument(
+        ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
+
+    Assertions.assertEquals("SignResponse", doc.getDocumentElement().getLocalName());
+
+    final InputStream notXml = new ByteArrayInputStream("<not-valid-xml>".getBytes());
+
+    Assertions.assertThrows(DOMException.class, () -> {
       DOMUtils.inputStreamToDocument(notXml);
-      Assert.fail("Expected InternalXMLException");
-    }
-    catch (InternalXMLException e) {      
-    }
+    });
   }
-  
+
   @Test
   public void testBytesToDocument() throws Exception {
-    String xml = "<Sample>Hej</Sample>";
-    Document doc = DOMUtils.bytesToDocument(xml.getBytes());
-    Assert.assertEquals("Sample", doc.getDocumentElement().getLocalName());
-    Assert.assertEquals("Hej", doc.getDocumentElement().getTextContent());
-    
-    try {
+    final String xml = "<Sample>Hej</Sample>";
+    final Document doc = DOMUtils.bytesToDocument(xml.getBytes());
+    Assertions.assertEquals("Sample", doc.getDocumentElement().getLocalName());
+    Assertions.assertEquals("Hej", doc.getDocumentElement().getTextContent());
+
+    Assertions.assertThrows(DOMException.class, () -> {
       DOMUtils.bytesToDocument("bbashjhiahdua".getBytes());
-      Assert.fail("Expected InternalXMLException");
-    }
-    catch (InternalXMLException e) {      
-    }
+    });
   }
-  
+
   @Test
   public void testBase64ToDocument() throws Exception {
-    String xml = "<Sample>Hej</Sample>";
-    String b64 = Base64.getEncoder().encodeToString(xml.getBytes());
-    
-    Document doc = DOMUtils.base64ToDocument(b64);
-    Assert.assertEquals("Sample", doc.getDocumentElement().getLocalName());
-    Assert.assertEquals("Hej", doc.getDocumentElement().getTextContent());
-    
-    try {
+    final String xml = "<Sample>Hej</Sample>";
+    final String b64 = Base64.getEncoder().encodeToString(xml.getBytes());
+
+    final Document doc = DOMUtils.base64ToDocument(b64);
+    Assertions.assertEquals("Sample", doc.getDocumentElement().getLocalName());
+    Assertions.assertEquals("Hej", doc.getDocumentElement().getTextContent());
+
+    Assertions.assertThrows(DOMException.class, () -> {
       DOMUtils.base64ToDocument(
-        Base64.getEncoder().encodeToString("bbashjhiahdua".getBytes()));
-      Assert.fail("Expected InternalXMLException");
-    }
-    catch (InternalXMLException e) {      
-    }
-    
-    try {
+          Base64.getEncoder().encodeToString("bbashjhiahdua".getBytes()));
+    });
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
       DOMUtils.base64ToDocument("NOT-BASE-64");
-      Assert.fail("Expected InternalXMLException");
-    }
-    catch (InternalXMLException e) {      
-    }
+    });
   }
 
 }
