@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package se.idsec.signservice.security.sign.xml.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 import se.idsec.signservice.security.sign.SignatureValidationResult;
@@ -37,25 +37,26 @@ public class DefaultXMLSignatureValidatorTest extends XMLTestBase {
   public void testValidate1() throws Exception {
     final Document document = getDocument("signResponse1.xml");
 
-    DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(Arrays.asList(getCertificate("konki-sign.crt")));
+    final DefaultXMLSignatureValidator validator =
+        new DefaultXMLSignatureValidator(Arrays.asList(this.getCertificate("konki-sign.crt")));
     validator.setXadesProcessing(false);
 
-    List<SignatureValidationResult> result = validator.validate(document);
-    Assert.assertEquals(1, result.size());
-    Assert.assertTrue(result.get(0).isSuccess());
+    final List<SignatureValidationResult> result = validator.validate(document);
+    Assertions.assertEquals(1, result.size());
+    Assertions.assertTrue(result.get(0).isSuccess());
   }
 
   @Test
   public void testValidateBadDigest() throws Exception {
     final Document document = getDocument("signResponse-badsign.xml");
 
-    DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(Arrays.asList(getCertificate("konki-sign.crt")));
+    final DefaultXMLSignatureValidator validator =
+        new DefaultXMLSignatureValidator(Arrays.asList(this.getCertificate("konki-sign.crt")));
     validator.setXadesProcessing(false);
 
-    List<SignatureValidationResult> result = validator.validate(document);
-    Assert.assertEquals(1, result.size());
-    Assert.assertFalse(result.get(0).isSuccess());
+    final List<SignatureValidationResult> result = validator.validate(document);
+    Assertions.assertEquals(1, result.size());
+    Assertions.assertFalse(result.get(0).isSuccess());
   }
-
 
 }

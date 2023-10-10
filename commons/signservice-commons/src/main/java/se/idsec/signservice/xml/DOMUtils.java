@@ -20,8 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Map;
@@ -40,6 +38,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -62,12 +61,11 @@ public class DOMUtils {
   private static Transformer transformer;
 
   /** We lovingly borrow from Apache's xmlsec ... States the parser pool size. */
-  private static int parserPoolSize = AccessController.doPrivileged(
-    (PrivilegedAction<Integer>) () -> Integer.getInteger("org.apache.xml.security.parser.pool-size", 20));
+  private static int parserPoolSize = Integer.getInteger("org.apache.xml.security.parser.pool-size", 20);
 
   /** Map of classloaders and queues of document builders. */
   private static final Map<ClassLoader, Queue<DocumentBuilder>> documentBuilders = Collections.synchronizedMap(
-    new WeakHashMap<ClassLoader, Queue<DocumentBuilder>>());
+      new WeakHashMap<>());
 
   static {
     try {
@@ -80,12 +78,12 @@ public class DOMUtils {
       documentBuilderFactory.setXIncludeAware(false);
       documentBuilderFactory.setExpandEntityReferences(false);
     }
-    catch (ParserConfigurationException e) {
-      throw new InternalXMLException("Failed to setup document builder factory", e);
+    catch (final ParserConfigurationException e) {
+      throw new RuntimeException("Failed to setup document builder factory", e);
     }
 
     try {
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      final TransformerFactory transformerFactory = TransformerFactory.newInstance();
       prettyPrintTransformer = transformerFactory.newTransformer();
       prettyPrintTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
       prettyPrintTransformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
@@ -97,8 +95,8 @@ public class DOMUtils {
       transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
     }
-    catch (TransformerConfigurationException e) {
-      throw new InternalXMLException("Failed to setup transformer", e);
+    catch (final TransformerConfigurationException e) {
+      throw new RuntimeException("Failed to setup transformer", e);
     }
   }
 
@@ -116,16 +114,15 @@ public class DOMUtils {
     try {
       return documentBuilderFactory.newDocumentBuilder();
     }
-    catch (ParserConfigurationException e) {
-      throw new InternalXMLException("Failed to create document builder", e);
+    catch (final ParserConfigurationException e) {
+      throw new DOMException(DOMException.NOT_SUPPORTED_ERR, "Failed to create document builder");
     }
   }
 
   /**
    * Pretty prints the supplied XML node to a string.
    *
-   * @param node
-   *          the XML node to pretty print
+   * @param node the XML node to pretty print
    * @return a formatted string
    */
   public static String prettyPrint(final Node node) {
@@ -137,7 +134,7 @@ public class DOMUtils {
       prettyPrintTransformer.transform(new DOMSource(node), new StreamResult(writer));
       return writer.toString();
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       return "";
     }
   }
@@ -145,26 +142,24 @@ public class DOMUtils {
   /**
    * Transforms the supplied XML node into its canonical byte representation.
    *
-   * @param node
-   *          the XML node to transform
+   * @param node the XML node to transform
    * @return a byte array holding the XML document bytes
    */
   public static byte[] nodeToBytes(final Node node) {
     try {
-      ByteArrayOutputStream output = new ByteArrayOutputStream();
+      final ByteArrayOutputStream output = new ByteArrayOutputStream();
       transformer.transform(new DOMSource(node), new StreamResult(output));
       return output.toByteArray();
     }
-    catch (TransformerException e) {
-      throw new InternalXMLException("Failed to transform XML node to bytes", e);
+    catch (final TransformerException e) {
+      throw new DOMException(DOMException.NOT_SUPPORTED_ERR, "Failed to transform XML node to bytes");
     }
   }
 
   /**
    * Transforms the supplied XML node into its canonical byte representation and Base64-encoded these bytes.
    *
-   * @param node
-   *          the XML node to transform
+   * @param node the XML node to transform
    * @return the Base64-encoding of the XML node
    */
   public static String nodeToBase64(final Node node) {
@@ -174,22 +169,21 @@ public class DOMUtils {
   /**
    * Parses an input stream into a DOM document.
    *
-   * @param stream
-   *          the stream
+   * @param stream the stream
    * @return a DOM document
    */
   public static Document inputStreamToDocument(final InputStream stream) {
 
-    ClassLoader loader = getContextClassLoader();
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
     if (loader == null) {
-      loader = getClassLoader(DOMUtils.class);
+      loader = DOMUtils.class.getClassLoader();
     }
     if (loader == null) {
       try {
         return createDocumentBuilder().parse(stream);
       }
       catch (SAXException | IOException e) {
-        throw new InternalXMLException("Failed to decode bytes into DOM document", e);
+        throw new DOMException(DOMException.SYNTAX_ERR, "Failed to decode bytes into DOM document");
       }
     }
     final Queue<DocumentBuilder> queue = getDocumentBuilderPool(loader);
@@ -198,7 +192,7 @@ public class DOMUtils {
       return documentBuilder.parse(stream);
     }
     catch (SAXException | IOException e) {
-      throw new InternalXMLException("Failed to decode bytes into DOM document", e);
+      throw new DOMException(DOMException.SYNTAX_ERR, "Failed to decode bytes into DOM document");
     }
     finally {
       returnToPool(documentBuilder, queue);
@@ -208,8 +202,7 @@ public class DOMUtils {
   /**
    * Parses a byte array into a DOM document.
    *
-   * @param bytes
-   *          the bytes to parse
+   * @param bytes the bytes to parse
    * @return a DOM document
    */
   public static Document bytesToDocument(final byte[] bytes) {
@@ -219,24 +212,17 @@ public class DOMUtils {
   /**
    * Decodes a Base64 string and parses it into a DOM document.
    *
-   * @param base64
-   *          the Base64-encoded string
+   * @param base64 the Base64-encoded string
    * @return a DOM document
    */
   public static Document base64ToDocument(final String base64) {
-    try {
-      return bytesToDocument(Base64.getDecoder().decode(base64));
-    }
-    catch (IllegalArgumentException e) {
-      throw new InternalXMLException("Invalid Base64");
-    }
+    return bytesToDocument(Base64.getDecoder().decode(base64));
   }
 
   /**
    * Gets a document builder pool (queue) for the given class loader.
    *
-   * @param loader
-   *          the class loader
+   * @param loader the class loader
    * @return a queue of document builders
    */
   private static Queue<DocumentBuilder> getDocumentBuilderPool(final ClassLoader loader) {
@@ -251,8 +237,7 @@ public class DOMUtils {
   /**
    * Gets a document builder from the given queue. If no document builder is available a new one is created.
    *
-   * @param queue
-   *          the queue
+   * @param queue the queue
    * @return a document builder
    */
   private static DocumentBuilder getDocumentBuilder(final Queue<DocumentBuilder> queue) {
@@ -266,54 +251,14 @@ public class DOMUtils {
   /**
    * Returns the given document builder to the pool (queue).
    *
-   * @param documentBuilder
-   *          the document builder
-   * @param queue
-   *          the pool
+   * @param documentBuilder the document builder
+   * @param queue the pool
    */
   private static void returnToPool(final DocumentBuilder documentBuilder, final Queue<DocumentBuilder> queue) {
     if (queue != null) {
       documentBuilder.reset();
       queue.offer(documentBuilder);
     }
-  }
-
-  /**
-   * Gets the context class loader.
-   *
-   * @return the context class loader
-   */
-  private static ClassLoader getContextClassLoader() {
-    final SecurityManager sm = System.getSecurityManager();
-    if (sm != null) {
-      return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-        @Override
-        public ClassLoader run() {
-          return Thread.currentThread().getContextClassLoader();
-        }
-      });
-    }
-    return Thread.currentThread().getContextClassLoader();
-  }
-
-  /**
-   * Gets the class loader for the given class.
-   *
-   * @param clazz
-   *          the class
-   * @return the class loader
-   */
-  private static ClassLoader getClassLoader(final Class<?> clazz) {
-    final SecurityManager sm = System.getSecurityManager();
-    if (sm != null) {
-      return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-        @Override
-        public ClassLoader run() {
-          return clazz.getClassLoader();
-        }
-      });
-    }
-    return clazz.getClassLoader();
   }
 
   // Hidden constructor

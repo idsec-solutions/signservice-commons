@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package se.idsec.signservice.security.sign.impl;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
@@ -28,7 +28,7 @@ import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**
  * Test cases for DefaultSignatureValidationResult.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -38,42 +38,45 @@ public class DefaultSignatureValidationResultTest {
   public void testSignatureValidationResult() throws Exception {
 
     DefaultSignatureValidationResult result = new DefaultSignatureValidationResult();
-    Assert.assertFalse(result.isSuccess());
-    Assert.assertEquals(SignatureValidationResult.Status.INTERDETERMINE, result.getStatus());
+    Assertions.assertFalse(result.isSuccess());
+    Assertions.assertEquals(SignatureValidationResult.Status.INTERDETERMINE, result.getStatus());
 
     result = new DefaultSignatureValidationResult();
     result.setStatus(SignatureValidationResult.Status.SUCCESS);
-    Assert.assertTrue(result.isSuccess());
-//    Assert.assertTrue(result.getAdditionalCertificates().isEmpty());
-    Assert.assertNotNull(result.toString());
+    Assertions.assertTrue(result.isSuccess());
+//    Assertions.assertTrue(result.getAdditionalCertificates().isEmpty());
+    Assertions.assertNotNull(result.toString());
 
     result = new DefaultSignatureValidationResult();
     result.setError(SignatureValidationResult.Status.ERROR_SIGNER_INVALID, "Invalid signer");
-    Assert.assertFalse(result.isSuccess());
-    Assert.assertEquals(SignatureValidationResult.Status.ERROR_SIGNER_INVALID, result.getStatus());
-    Assert.assertNotNull(result.getStatusMessage());
-    Assert.assertNull(result.getException());
-    Assert.assertNotNull(result.toString());
+    Assertions.assertFalse(result.isSuccess());
+    Assertions.assertEquals(SignatureValidationResult.Status.ERROR_SIGNER_INVALID, result.getStatus());
+    Assertions.assertNotNull(result.getStatusMessage());
+    Assertions.assertNull(result.getException());
+    Assertions.assertNotNull(result.toString());
 
     result = new DefaultSignatureValidationResult();
-    result.setError(SignatureValidationResult.Status.ERROR_SIGNER_INVALID, "Invalid signer", new SecurityException("S"));
-    Assert.assertFalse(result.isSuccess());
-    Assert.assertEquals(SignatureValidationResult.Status.ERROR_SIGNER_INVALID, result.getStatus());
-    Assert.assertNotNull(result.getStatusMessage());
-    Assert.assertEquals(SecurityException.class.getSimpleName(), result.getException().getClass().getSimpleName());
-    Assert.assertNotNull(result.toString());
+    result.setError(SignatureValidationResult.Status.ERROR_SIGNER_INVALID, "Invalid signer",
+        new SecurityException("S"));
+    Assertions.assertFalse(result.isSuccess());
+    Assertions.assertEquals(SignatureValidationResult.Status.ERROR_SIGNER_INVALID, result.getStatus());
+    Assertions.assertNotNull(result.getStatusMessage());
+    Assertions.assertEquals(SecurityException.class.getSimpleName(), result.getException().getClass().getSimpleName());
+    Assertions.assertNotNull(result.toString());
 
     result = new DefaultSignatureValidationResult();
     result.setStatus(SignatureValidationResult.Status.SUCCESS);
-    X509Certificate root = CertificateUtils.decodeCertificate((new ClassPathResource("certs/DigiCert-Global-Root-CA.crt")).getInputStream());
-    X509Certificate cert = CertificateUtils.decodeCertificate((new ClassPathResource("certs/idsec.se.cer")).getInputStream());
+    final X509Certificate root = CertificateUtils
+        .decodeCertificate(new ClassPathResource("certs/DigiCert-Global-Root-CA.crt").getInputStream());
+    final X509Certificate cert =
+        CertificateUtils.decodeCertificate(new ClassPathResource("certs/idsec.se.cer").getInputStream());
     result.setCertificateValidationResult(new DefaultCertificateValidationResult(Arrays.asList(cert, root)));
     result.setSignerCertificate(cert);
 
-    Assert.assertNotNull(result.getCertificateValidationResult());
-    //Assert.assertEquals(1, result.getAdditionalCertificates().size());
-    Assert.assertNotNull(result.getSignerCertificate());
-    Assert.assertNotNull(result.toString());
+    Assertions.assertNotNull(result.getCertificateValidationResult());
+    // Assertions.assertEquals(1, result.getAdditionalCertificates().size());
+    Assertions.assertNotNull(result.getSignerCertificate());
+    Assertions.assertNotNull(result.toString());
   }
 
 }

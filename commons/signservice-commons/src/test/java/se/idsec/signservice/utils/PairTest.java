@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@ package se.idsec.signservice.utils;
 
 import java.util.HashMap;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for Pair.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -32,30 +31,30 @@ public class PairTest {
   @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testPair() throws Exception {
-    
+
     // Not much to test, but it is nice with 100% code coverage.
-    
-    Pair<String, String> p1 = new Pair<>("a1", "b1");
-    Assert.assertEquals("a1", p1.getFirst());
-    Assert.assertEquals("b1", p1.getSecond());
-    Pair<String, String> p11 = new Pair<>("a1", "b1");
-    
-    Pair<String, String> p2 = new Pair<>("c", "d");
-    Pair<String, String> p3 = new Pair<>("c", null);
-    
-    Assert.assertTrue(p1.equals(p1));
-    Assert.assertTrue(p1.equals(p11));
-    Assert.assertFalse(p1.equals(p2));
-    Assert.assertFalse(p1.equals(null));
-    Assert.assertFalse(p1.equals(new HashMap<>()));
-    Assert.assertFalse(p2.equals(p3));
-    
-    String s1 = p1.toString();
-    Assert.assertTrue(s1.contains("a1") && s1.contains("b1"));
-    String s3 = p3.toString();
-    Assert.assertTrue(s3.contains("c") && s3.contains("null"));
-    
-    Assert.assertEquals(p1.hashCode(), p11.hashCode());
+
+    final Pair<String, String> p1 = new Pair<>("a1", "b1");
+    Assertions.assertEquals("a1", p1.getFirst());
+    Assertions.assertEquals("b1", p1.getSecond());
+    final Pair<String, String> p11 = new Pair<>("a1", "b1");
+
+    final Pair<String, String> p2 = new Pair<>("c", "d");
+    final Pair<String, String> p3 = new Pair<>("c", null);
+
+    Assertions.assertTrue(p1.equals(p1));
+    Assertions.assertTrue(p1.equals(p11));
+    Assertions.assertFalse(p1.equals(p2));
+    Assertions.assertFalse(p1.equals(null));
+    Assertions.assertFalse(p1.equals(new HashMap<>()));
+    Assertions.assertFalse(p2.equals(p3));
+
+    final String s1 = p1.toString();
+    Assertions.assertTrue(s1.contains("a1") && s1.contains("b1"));
+    final String s3 = p3.toString();
+    Assertions.assertTrue(s3.contains("c") && s3.contains("null"));
+
+    Assertions.assertEquals(p1.hashCode(), p11.hashCode());
   }
-  
+
 }

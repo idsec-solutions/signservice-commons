@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  */
 package se.idsec.signservice.security.sign.xml.impl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 
@@ -32,18 +33,20 @@ import se.swedenconnect.security.credential.PkiCredential;
 public class DefaultXMLSignerTest extends XMLTestBase {
 
   @Test
-  public void testDefaultSignature() throws Exception {
-    Document document = getDocument("xml/simple.xml");
-    PkiCredential credential = getSigningCredential();
+  public void testDefaultSignature() {
+    Assertions.assertDoesNotThrow(() -> {
+      Document document = getDocument("xml/simple.xml");
+      PkiCredential credential = getSigningCredential();
 
-    DefaultXMLSigner operation = new DefaultXMLSigner(credential);
+      DefaultXMLSigner operation = new DefaultXMLSigner(credential);
 
-    operation.sign(document);
+      operation.sign(document);
+    });
   }
 
   private PkiCredential getSigningCredential() throws Exception {
     final KeyStoreCredential cred = new KeyStoreCredential(new ClassPathResource("test-credentials.jks"),
-      "secret".toCharArray(), "test", "secret".toCharArray());
+        "secret".toCharArray(), "test", "secret".toCharArray());
     cred.init();
     return cred;
   }

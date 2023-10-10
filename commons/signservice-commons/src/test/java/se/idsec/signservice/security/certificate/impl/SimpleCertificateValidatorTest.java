@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import se.idsec.signservice.security.certificate.CertificateUtils;
@@ -37,45 +37,49 @@ import se.idsec.signservice.security.certificate.CertificateValidationResult;
 
 /**
  * Test cases for SimpleCertificateValidator.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public class SimpleCertificateValidatorTest {
 
   // The validation date
-  private Date validationDate;
+  private final Date validationDate;
 
   // Test certs (DigiCert)
-  private X509Certificate digiCertRoot;
-  private X509Certificate digiCertIntermediate;
-  private X509Certificate nist;
-  private X509Certificate nistBadSignature;
+  private final X509Certificate digiCertRoot;
+  private final X509Certificate digiCertIntermediate;
+  private final X509Certificate nist;
+  private final X509Certificate nistBadSignature;
 
   // Test certs (Let's encrypt)
-  private X509Certificate dstRoot;
-  
+  private final X509Certificate dstRoot;
+
   // Dummy CRL (not used)
-  private X509CRL crl;
+  private final X509CRL crl;
 
   public SimpleCertificateValidatorTest() throws CertificateException, CRLException, IOException {
 
     // Set validation date
-    Calendar c = Calendar.getInstance();
+    final Calendar c = Calendar.getInstance();
     c.set(2020, 2, 12, 19, 39, 45);
     this.validationDate = c.getTime();
 
-    this.digiCertRoot = CertificateUtils.decodeCertificate((new ClassPathResource("certs/DigiCert-Global-Root-CA.crt")).getInputStream());
+    this.digiCertRoot = CertificateUtils
+        .decodeCertificate(new ClassPathResource("certs/DigiCert-Global-Root-CA.crt").getInputStream());
     this.digiCertIntermediate =
-        CertificateUtils.decodeCertificate((new ClassPathResource("certs/DigiCert-SHA2-Secure-Server-CA.crt")).getInputStream());
-    this.nist = CertificateUtils.decodeCertificate((new ClassPathResource("certs/nvd.nist.gov.crt")).getInputStream());
-    this.dstRoot = CertificateUtils.decodeCertificate((new ClassPathResource("certs/DST-Root-CA-X3.crt")).getInputStream());
-    
-    byte[] nistEncoding = FileUtils.readFileToByteArray((new ClassPathResource("certs/nvd.nist.gov.crt")).getFile());
+        CertificateUtils
+            .decodeCertificate(new ClassPathResource("certs/DigiCert-SHA2-Secure-Server-CA.crt").getInputStream());
+    this.nist = CertificateUtils.decodeCertificate(new ClassPathResource("certs/nvd.nist.gov.crt").getInputStream());
+    this.dstRoot =
+        CertificateUtils.decodeCertificate(new ClassPathResource("certs/DST-Root-CA-X3.crt").getInputStream());
+
+    final byte[] nistEncoding =
+        FileUtils.readFileToByteArray(new ClassPathResource("certs/nvd.nist.gov.crt").getFile());
     nistEncoding[nistEncoding.length - 1] = (byte) ~nistEncoding[nistEncoding.length - 1];
     this.nistBadSignature = CertificateUtils.decodeCertificate(new ByteArrayInputStream(nistEncoding));
-    
-    this.crl = CertificateUtils.decodeCrl((new ClassPathResource("certs/sample.crl")).getInputStream());
+
+    this.crl = CertificateUtils.decodeCrl(new ClassPathResource("certs/sample.crl").getInputStream());
   }
 
   @Test
@@ -83,138 +87,117 @@ public class SimpleCertificateValidatorTest {
     SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.digiCertRoot));
-    
-    Assert.assertFalse(validator.isRevocationCheckingActive());
-    Assert.assertEquals(1, validator.getDefaultTrustAnchors().size());
 
-    CertificateValidationResult result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), Arrays.asList(crl));
-    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
-    
+    Assertions.assertFalse(validator.isRevocationCheckingActive());
+    Assertions.assertEquals(1, validator.getDefaultTrustAnchors().size());
+
+    CertificateValidationResult result =
+        validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), Arrays.asList(this.crl));
+    Assertions.assertEquals(this.digiCertRoot,
+        result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+
     // The same with several roots in trust
     validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Arrays.asList(this.dstRoot, this.digiCertRoot));
 
     result = validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null);
-    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assertions.assertEquals(this.digiCertRoot,
+        result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
   }
 
   @Test
   public void testSuccessTrustAnyRoot() throws Exception {
-    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+    final SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.dstRoot));
 
-    CertificateValidationResult result =
+    final CertificateValidationResult result =
         validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate, this.digiCertRoot), null, null);
-    Assert.assertEquals(this.digiCertRoot, result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
+    Assertions.assertEquals(this.digiCertRoot,
+        result.getPKIXCertPathValidatorResult().getTrustAnchor().getTrustedCert());
   }
 
   @Test
   public void testRootNotFound() throws Exception {
-    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+    final SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.dstRoot));
 
-    try {
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, Arrays.asList(this.digiCertRoot, this.digiCertIntermediate), null, null);
-      Assert.fail("Expected CertPathBuilderException");
-    }
-    catch (CertPathBuilderException e) {
-    }
+    });
   }
-    
+
   @Test
   public void testNoTrustAnchorsAvailable() throws Exception {
-    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+    final SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
-    
-    Assert.assertTrue(validator.getDefaultTrustAnchors().isEmpty());
-    Assert.assertEquals(this.validationDate, validator.getValidationDate());
-    
-    try {
+
+    Assertions.assertTrue(validator.getDefaultTrustAnchors().isEmpty());
+    Assertions.assertEquals(this.validationDate, validator.getValidationDate());
+
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, null, null, null);
-      Assert.fail("Expected CertPathBuilderException");
-    }
-    catch (CertPathBuilderException e) {
-    }
-    
-    try {
+    });
+
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, Collections.emptyList(), null, null);
-      Assert.fail("Expected CertPathBuilderException");
-    }
-    catch (CertPathBuilderException e) {
-    }
-    
-    try {
+    });
+
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null, null);
-      Assert.fail("Expected CertPathBuilderException");
-    }
-    catch (CertPathBuilderException e) {
-    }
+    });
   }
 
   @Test
   public void testBadSignature() throws Exception {
-    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+    final SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.digiCertRoot));
 
-    try {
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nistBadSignature, Arrays.asList(this.digiCertIntermediate), null);
-    }
-    catch (CertPathBuilderException e) {
-    }
+    });
   }
-  
+
   @Test
   public void testExpired() throws Exception {
-    Calendar c = Calendar.getInstance();
+    final Calendar c = Calendar.getInstance();
     c.set(2024, 2, 12, 19, 39, 45);
-    
-    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+
+    final SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(c.getTime());
     validator.setDefaultTrustAnchors(Collections.singletonList(this.digiCertRoot));
 
-    try {
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null);
-    }
-    catch (CertPathBuilderException e) {      
-    }
-  } 
-  
+    });
+  }
+
   @Test
   public void testNoRootFound() throws Exception {
-    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+    final SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.dstRoot));
 
-    try {
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, Arrays.asList(this.digiCertIntermediate), null);
-      Assert.fail("Expected CertPathBuilderException");
-    }
-    catch (CertPathBuilderException e) {
-    }
+    });
   }
 
   @Test
   public void testMissingIntermediate() throws Exception {
-    SimpleCertificateValidator validator = new SimpleCertificateValidator();
+    final SimpleCertificateValidator validator = new SimpleCertificateValidator();
     validator.setValidationDate(this.validationDate);
     validator.setDefaultTrustAnchors(Collections.singletonList(this.digiCertRoot));
 
-    try {
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, Collections.emptyList(), null);
-      Assert.fail("Expected CertPathBuilderException");
-    }
-    catch (CertPathBuilderException e) {
-    }
-    
-    try {
+    });
+
+    Assertions.assertThrows(CertPathBuilderException.class, () -> {
       validator.validate(this.nist, null, null);
-      Assert.fail("Expected CertPathBuilderException");
-    }
-    catch (CertPathBuilderException e) {
-    }
+    });
   }
 }

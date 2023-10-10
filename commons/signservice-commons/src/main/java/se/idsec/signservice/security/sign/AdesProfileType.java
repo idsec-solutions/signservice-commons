@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 IDsec Solutions AB
+ * Copyright 2019-2023 IDsec Solutions AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package se.idsec.signservice.security.sign;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * An enumeration representing the different ETSI AdES types.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -36,7 +36,7 @@ public enum AdesProfileType {
 
   /**
    * Gets the string representation of the enum.
-   * 
+   *
    * @return the string representation
    */
   public String getStringValue() {
@@ -48,12 +48,10 @@ public enum AdesProfileType {
    * <p>
    * If provided with {@code null} or an empty string {@link #None} is returned.
    * </p>
-   * 
-   * @param stringValue
-   *          string representation
+   *
+   * @param stringValue string representation
    * @return the enum
-   * @throws IllegalArgumentException
-   *           if an invalid string is provided
+   * @throws IllegalArgumentException if an invalid string is provided
    */
   public static AdesProfileType fromStringValue(final String stringValue) throws IllegalArgumentException {
     if (StringUtils.isBlank(stringValue)) {
@@ -69,9 +67,8 @@ public enum AdesProfileType {
 
   /**
    * Constructor.
-   * 
-   * @param stringValue
-   *          the string representation of the enum.
+   *
+   * @param stringValue the string representation of the enum.
    */
   private AdesProfileType(final String stringValue) {
     this.stringValue = stringValue;
