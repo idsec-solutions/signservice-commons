@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"se.idsec.signservice.security.sign.xml"},{"l":"se.idsec.signservice.security.sign.xml.impl"}]
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"se.idsec.signservice.security.sign.xml"},{"l":"se.idsec.signservice.security.sign.xml.impl"}];updateSearchResults();
