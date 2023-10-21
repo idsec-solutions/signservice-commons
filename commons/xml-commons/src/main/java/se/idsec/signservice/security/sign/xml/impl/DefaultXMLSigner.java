@@ -50,7 +50,7 @@ import se.swedenconnect.security.credential.PkiCredential;
 /**
  * Default implementation of the {@link XMLSigner} interface.
  * <p>
- * If the signature algorithm is not explicitly set the OpenSAML {@link SignatureSigningConfiguration} system
+ * If the signature algorithm is not explicitly set the OpenSAML {@code SignatureSigningConfiguration} system
  * configuration will be used to obtain a default.
  * </p>
  *
