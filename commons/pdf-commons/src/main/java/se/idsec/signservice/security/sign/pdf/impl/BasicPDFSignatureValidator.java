@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -96,7 +97,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
   @Override
   public List<SignatureValidationResult> validate(final byte[] document) throws SignatureException {
 
-    try (final PDDocument pdfDocument = PDDocument.load(document)) {
+    try (final PDDocument pdfDocument = Loader.loadPDF(document)) {
 
       final List<SignatureValidationResult> results = new ArrayList<>();
       final List<PDSignature> signatureDictionaries = pdfDocument.getSignatureDictionaries();
@@ -386,7 +387,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
   /** {@inheritDoc} */
   @Override
   public boolean isSigned(final byte[] document) throws IllegalArgumentException {
-    try (final PDDocument pdfDocument = PDDocument.load(document)) {
+    try (final PDDocument pdfDocument = Loader.loadPDF(document)) {
       return !pdfDocument.getSignatureDictionaries().isEmpty();
     }
     catch (final IOException e) {

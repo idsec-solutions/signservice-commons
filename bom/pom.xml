@@ -49,7 +49,7 @@
 
   <properties>
     <jackson.version>2.17.1</jackson.version>
-    <pdfbox.version>2.0.32</pdfbox.version>
+    <pdfbox.version>3.0.3</pdfbox.version>
     <bouncy-castle.version>1.78.1</bouncy-castle.version>
     <slf4j.version>2.0.13</slf4j.version>
   </properties>
@@ -295,6 +295,13 @@
         <groupId>se.swedenconnect.security</groupId>
         <artifactId>algorithm-registry</artifactId>
         <version>1.1.0</version>
+      </dependency>
+
+      <!-- Nimbus -->
+      <dependency>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>nimbus-jose-jwt</artifactId>
+        <version>9.40</version>
       </dependency>
 
       <!-- Test -->

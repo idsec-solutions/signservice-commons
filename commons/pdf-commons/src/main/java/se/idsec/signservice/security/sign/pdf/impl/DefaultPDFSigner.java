@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
@@ -122,7 +123,7 @@ public class DefaultPDFSigner implements PDFSigner {
     if (parameters == null) {
       return this.sign(document);
     }
-    try (final PDDocument pdfDocument = PDDocument.load(document)) {
+    try (final PDDocument pdfDocument = Loader.loadPDF(document)) {
       final List<X509Certificate> signingCertChain = this.includeCertificateChain
           ? this.signingCredential.getCertificateChain()
           : Arrays.asList(this.signingCredential.getCertificate());
