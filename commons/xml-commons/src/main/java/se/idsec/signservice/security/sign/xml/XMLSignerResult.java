@@ -17,12 +17,11 @@ package se.idsec.signservice.security.sign.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import se.idsec.signservice.security.sign.SignerResult;
 
 /**
  * Represents the result from an XML signature operation.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  * @see XMLSigner
@@ -31,7 +30,7 @@ public interface XMLSignerResult extends SignerResult<Document> {
 
   /**
    * Gets the {@code ds:Signature} element of the signed document ({@link #getSignedDocument()}).
-   * 
+   *
    * @return the Signature element
    */
   Element getSignatureElement();
@@ -39,7 +38,7 @@ public interface XMLSignerResult extends SignerResult<Document> {
   /**
    * Gets the {@code ds:SignedInfo} element from the {@code ds:Signature} element of the signed document
    * ({@link #getSignedDocument()}).
-   * 
+   *
    * @return the SignedInfo element
    */
   Element getSignedInfo();
@@ -47,7 +46,7 @@ public interface XMLSignerResult extends SignerResult<Document> {
   /**
    * Gets the canonicalized bytes of the {@code ds:SignedInfo} element from the {@code ds:Signature} element of the
    * signed document ({@link #getSignedDocument()}).
-   * 
+   *
    * @return a byte array
    */
   byte[] getCanonicalizedSignedInfo();

@@ -19,12 +19,9 @@ import java.util.Objects;
 
 /**
  * Representation of a Pair.
- * 
- * @param <T1>
- *          type of the first element
- * @param <T2>
- *          type of the second element
- * 
+ *
+ * @param <T1> type of the first element
+ * @param <T2> type of the second element
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -38,11 +35,9 @@ public class Pair<T1, T2> {
 
   /**
    * Constructor.
-   * 
-   * @param first
-   *          the first element
-   * @param second
-   *          the second element
+   *
+   * @param first the first element
+   * @param second the second element
    */
   public Pair(final T1 first, final T2 second) {
     this.first = first;
@@ -51,7 +46,7 @@ public class Pair<T1, T2> {
 
   /**
    * Get the first element.
-   * 
+   *
    * @return the first element
    */
   public T1 getFirst() {
@@ -60,7 +55,7 @@ public class Pair<T1, T2> {
 
   /**
    * Gets the second element.
-   * 
+   *
    * @return the second element
    */
   public T2 getSecond() {
@@ -82,10 +77,9 @@ public class Pair<T1, T2> {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof Pair)) {
+    if (!(obj instanceof final Pair<?, ?> other)) {
       return false;
     }
-    Pair<?, ?> other = (Pair<?, ?>) obj;
     return Objects.equals(this.first, other.first) && Objects.equals(this.second, other.second);
   }
 

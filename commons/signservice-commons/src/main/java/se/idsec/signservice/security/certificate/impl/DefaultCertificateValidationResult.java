@@ -40,7 +40,7 @@ public class DefaultCertificateValidationResult implements CertificateValidation
 
   /**
    * Constructor assigning the validated certificate path.
-   * 
+   *
    * @param validatedCertificatePath
    *          the certificate path
    */
@@ -65,7 +65,7 @@ public class DefaultCertificateValidationResult implements CertificateValidation
 
   /**
    * Assigns the PKIX path validation result.
-   * 
+   *
    * @param pkixCertPathValidatorResult
    *          PKIX path validation result
    */
@@ -76,7 +76,7 @@ public class DefaultCertificateValidationResult implements CertificateValidation
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     sb.append("validatedCertificatePath=[");
     for (int i = 0; i < this.validatedCertificatePath.size(); i++) {
       if (i > 0) {
@@ -89,4 +89,3 @@ public class DefaultCertificateValidationResult implements CertificateValidation
   }
 
 }
- 

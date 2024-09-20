@@ -57,7 +57,7 @@ public enum AdesProfileType {
     if (StringUtils.isBlank(stringValue)) {
       return AdesProfileType.None;
     }
-    for (AdesProfileType a : AdesProfileType.values()) {
+    for (final AdesProfileType a : AdesProfileType.values()) {
       if (a.getStringValue().equalsIgnoreCase(stringValue)) {
         return a;
       }
@@ -70,7 +70,7 @@ public enum AdesProfileType {
    *
    * @param stringValue the string representation of the enum.
    */
-  private AdesProfileType(final String stringValue) {
+  AdesProfileType(final String stringValue) {
     this.stringValue = stringValue;
   }
 

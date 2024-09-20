@@ -15,19 +15,17 @@
  */
 package se.idsec.signservice.security.sign;
 
+import se.idsec.signservice.security.certificate.CertificateValidator;
+
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import se.idsec.signservice.security.certificate.CertificateValidator;
-
 /**
  * Generic interface representing a signature validator instance that supports validating documents having one more
  * signatures.
- * 
- * @param <T>
- *          the type of document that is validated
- * 
+ *
+ * @param <T> the type of document that is validated
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -35,35 +33,30 @@ public interface SignatureValidator<T> {
 
   /**
    * Validates the signature(s) of supplied document.
-   * 
-   * @param document
-   *          the document to validate
+   *
+   * @param document the document to validate
    * @return a validation result containing the details from a signature validation
-   * @throws SignatureException
-   *           for errors during the validation process (pure signature validation errors are reported in the returned
-   *           result)
+   * @throws SignatureException for errors during the validation process (pure signature validation errors are
+   *     reported in the returned result)
    */
   List<SignatureValidationResult> validate(final T document) throws SignatureException;
 
   /**
    * Predicate that tells if all the supplied result objects indicate a successful validation.
-   * 
-   * @param results
-   *          a (non-empty) list of result objects
+   *
+   * @param results a (non-empty) list of result objects
    * @return true if all result objects indicate success and false otherwise
    */
   static boolean isCompleteSuccess(final List<SignatureValidationResult> results) {
-    return !results.stream().filter(r -> !r.isSuccess()).findAny().isPresent();
+    return results.stream().allMatch(SignatureValidationResult::isSuccess);
   }
 
   /**
    * Predicate that tells if the supplied document is signed.
-   * 
-   * @param document
-   *          the document to check
+   *
+   * @param document the document to check
    * @return true if the document is signed, and false otherwise
-   * @throws IllegalArgumentException
-   *           if the document can not be parsed
+   * @throws IllegalArgumentException if the document can not be parsed
    */
   boolean isSigned(final T document) throws IllegalArgumentException;
 
@@ -75,7 +68,7 @@ public interface SignatureValidator<T> {
    * performed (provided {@link #getCertificateValidator()} is non null). If no certificate validator is installed the
    * signature will be accepted without checking any certificates (provided that the signature itself is valid).
    * </p>
-   * 
+   *
    * @return a (possibly empty) list of "accepted" certificates
    */
   List<X509Certificate> getRequiredSignerCertificates();
@@ -91,7 +84,7 @@ public interface SignatureValidator<T> {
    * If no certificate validator is configured the signature will be accepted without checking any certificates
    * (provided that the signature itself is valid).
    * </p>
-   * 
+   *
    * @return the certificate validator or null
    */
   CertificateValidator getCertificateValidator();

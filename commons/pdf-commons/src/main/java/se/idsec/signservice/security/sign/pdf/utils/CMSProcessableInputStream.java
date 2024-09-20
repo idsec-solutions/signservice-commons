@@ -15,14 +15,13 @@
  */
 package se.idsec.signservice.security.sign.pdf.utils;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.cms.CMSTypedData;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSTypedData;
 
 /**
  * Wraps an {@link InputStream} into a CMSProcessable object for Bouncy Castle. It's an alternative to the
@@ -39,8 +38,7 @@ public class CMSProcessableInputStream implements CMSTypedData {
   /**
    * Constructor that defaults to use the 1.2.840.113549.1.7.1 OID (PKCS#7 data).
    *
-   * @param is
-   *          the input stream
+   * @param is the input stream
    */
   public CMSProcessableInputStream(final InputStream is) {
     this(new ASN1ObjectIdentifier(CMSObjectIdentifiers.data.getId()), is);
@@ -49,10 +47,8 @@ public class CMSProcessableInputStream implements CMSTypedData {
   /**
    * Constructor.
    *
-   * @param type
-   *          the OID of the object
-   * @param is
-   *          the input stream
+   * @param type the OID of the object
+   * @param is the input stream
    */
   public CMSProcessableInputStream(final ASN1ObjectIdentifier type, final InputStream is) {
     this.contentType = type;
@@ -67,7 +63,7 @@ public class CMSProcessableInputStream implements CMSTypedData {
 
   /** {@inheritDoc} */
   @Override
-  public void write(final OutputStream out) throws IOException, CMSException {
+  public void write(final OutputStream out) throws IOException {
     // read the content only one time
     final byte[] buffer = new byte[8 * 1024];
     int read;

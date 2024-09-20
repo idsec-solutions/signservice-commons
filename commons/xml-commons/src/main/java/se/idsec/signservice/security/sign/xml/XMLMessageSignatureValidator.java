@@ -15,17 +15,17 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
+import org.w3c.dom.Document;
+
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-
-import org.w3c.dom.Document;
 
 /**
  * A validator for validing an XML message that is signed. This is a simpler validator that the
  * {@link XMLSignatureValidator} that can handle signed XML objects containing more than one signature. The
  * {@code XMLMessageSignatureValidator} is intended to be used when verifying the signature on a received XML message.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -42,13 +42,10 @@ public interface XMLMessageSignatureValidator {
    * If {@code signatureLocation} is {@code null} and the document contains more than one Signature element the
    * validation will fail.
    * </p>
-   * 
-   * @param document
-   *          the XML document to validate
-   * @param expectedSignerCertificates
-   *          the expected signer certificates
-   * @throws SignatureException
-   *           for validation errors
+   *
+   * @param document the XML document to validate
+   * @param expectedSignerCertificates the expected signer certificates
+   * @throws SignatureException for validation errors
    */
   void validate(final Document document,
       final List<X509Certificate> expectedSignerCertificates,

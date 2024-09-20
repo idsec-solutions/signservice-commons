@@ -16,7 +16,6 @@
 package se.idsec.signservice.security.sign.pdf.impl;
 
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
-
 import se.idsec.signservice.security.sign.impl.DefaultSignatureValidationResult;
 import se.idsec.signservice.security.sign.pdf.PDFSignatureValidationResult;
 
@@ -26,7 +25,8 @@ import se.idsec.signservice.security.sign.pdf.PDFSignatureValidationResult;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidationResult implements PDFSignatureValidationResult {
+public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidationResult
+    implements PDFSignatureValidationResult {
 
   /** The PDF signature. */
   private PDSignature pdfSignature;
@@ -49,8 +49,7 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
   /**
    * Assigns the PDF signature object (that was validated).
    *
-   * @param pdfSignature
-   *          the PDF signature object
+   * @param pdfSignature the PDF signature object
    */
   public void setPdfSignature(final PDSignature pdfSignature) {
     this.pdfSignature = pdfSignature;
@@ -66,8 +65,8 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
    * Assigns the flag that tells if the signature has the CMS algorithm protection signed attribute set. The default is
    * {@code false}.
    *
-   * @param cmsAlgorithmProtection
-   *          flag telling if the signature has the CMS algorithm protection signed attribute set
+   * @param cmsAlgorithmProtection flag telling if the signature has the CMS algorithm protection signed attribute
+   *     set
    */
   public void setCmsAlgorithmProtection(final boolean cmsAlgorithmProtection) {
     this.cmsAlgorithmProtection = cmsAlgorithmProtection;
@@ -76,13 +75,9 @@ public class DefaultPDFSignatureValidationResult extends DefaultSignatureValidat
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(super.toString());
-    sb.append(",pdfSignature=<").append(this.pdfSignature != null ? "set" : "not set").append(">");
-    sb.append(",claimedSigningTime='").append(this.getClaimedSigningTime());
-    sb.append("',signatureAlgorithm='").append(this.getSignatureAlgorithm());
-    sb.append("',cmsAlgorithmProtection='").append(this.cmsAlgorithmProtection);
-    sb.append("',isPades='").append(this.isEtsiAdes()).append("'");
-    return sb.toString();
+    return "%s, pdf-signature=<%s>, claimed-signing-time='%s', signature-aAlgorithm='%s', cms-algorithm-protection='%s', is-pades='%s'"
+        .formatted(super.toString(), this.pdfSignature != null ? "set" : "not set", this.getClaimedSigningTime(),
+            this.getSignatureAlgorithm(), this.cmsAlgorithmProtection, this.isEtsiAdes());
   }
 
 }

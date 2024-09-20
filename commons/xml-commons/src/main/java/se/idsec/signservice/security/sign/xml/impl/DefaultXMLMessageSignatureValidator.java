@@ -28,7 +28,7 @@ import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 
 /**
  * Implementation of the {@link XMLMessageSignatureValidator} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -41,10 +41,10 @@ public class DefaultXMLMessageSignatureValidator implements XMLMessageSignatureV
       final List<X509Certificate> expectedSignerCertificates,
       final XMLSignatureLocation signatureLocation) throws SignatureException {
 
-    DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(expectedSignerCertificates);
+    final DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(expectedSignerCertificates);
     validator.setXadesProcessing(false);
 
-    List<SignatureValidationResult> result = validator.validate(document, signatureLocation);
+    final List<SignatureValidationResult> result = validator.validate(document, signatureLocation);
     if (result.size() > 1) {
       throw new SignatureException("Document contains multiple Signature elements - use XPath expression");
     }

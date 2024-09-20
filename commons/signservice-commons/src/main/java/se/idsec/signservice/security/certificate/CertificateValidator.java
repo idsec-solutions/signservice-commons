@@ -24,11 +24,11 @@ import java.util.List;
 
 /**
  * An interface for verifying a certificate up until a trusted root.
- * 
+ *
  * The interface is an abstraction of the
  * <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/certpath/CertPathProgGuide.html">Java
  * Certification Path API</a>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -36,45 +36,34 @@ public interface CertificateValidator {
 
   /**
    * Validates the supplied subject certificate.
-   * 
-   * @param subjectCertificate
-   *          the certificate to validate
-   * @param additionalCertificates
-   *          other certificates that may be useful when building a certificate path (may be null or empty)
-   * @param crls
-   *          optional list of CRL:s that may be useful during path validation (may be null or empty)
+   *
+   * @param subjectCertificate the certificate to validate
+   * @param additionalCertificates other certificates that may be useful when building a certificate path (may be
+   *     null or empty)
+   * @param crls optional list of CRL:s that may be useful during path validation (may be null or empty)
    * @return a validator result
-   * @throws CertPathBuilderException
-   *           if a valid certificate path could not be built
-   * @throws CertPathValidatorException
-   *           if the path failed to verify
-   * @throws GeneralSecurityException
-   *           for general errors
+   * @throws CertPathBuilderException if a valid certificate path could not be built
+   * @throws CertPathValidatorException if the path failed to verify
+   * @throws GeneralSecurityException for general errors
    */
   CertificateValidationResult validate(final X509Certificate subjectCertificate,
-      final List<X509Certificate> additionalCertificates, 
+      final List<X509Certificate> additionalCertificates,
       final List<X509CRL> crls)
       throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException;
 
   /**
    * Validates the supplied subject certificate. The supplied trust anchors overrides the trust configured for this
    * validator ({@link #getDefaultTrustAnchors()}).
-   * 
-   * @param subjectCertificate
-   *          the certificate to validate
-   * @param additionalCertificates
-   *          other certificates that may be useful when building a certificate path (may be null or empty)
-   * @param crls
-   *          optional list of CRL:s that may be useful during path validation (may be null or empty)
-   * @param trustAnchors
-   *          the trust anchors to use during validation (null or empty list means "trust any root")
+   *
+   * @param subjectCertificate the certificate to validate
+   * @param additionalCertificates other certificates that may be useful when building a certificate path (may be
+   *     null or empty)
+   * @param crls optional list of CRL:s that may be useful during path validation (may be null or empty)
+   * @param trustAnchors the trust anchors to use during validation (null or empty list means "trust any root")
    * @return a validator result
-   * @throws CertPathBuilderException
-   *           if a valid certificate path could not be built
-   * @throws CertPathValidatorException
-   *           if the path failed to verify
-   * @throws GeneralSecurityException
-   *           for general errors
+   * @throws CertPathBuilderException if a valid certificate path could not be built
+   * @throws CertPathValidatorException if the path failed to verify
+   * @throws GeneralSecurityException for general errors
    */
   CertificateValidationResult validate(final X509Certificate subjectCertificate,
       final List<X509Certificate> additionalCertificates,
@@ -84,7 +73,7 @@ public interface CertificateValidator {
 
   /**
    * Predicate that tells whether this instance checks certificate revocation as part of the validation process.
-   * 
+   *
    * @return true if revocation checking is active and false otherwise
    */
   boolean isRevocationCheckingActive();
@@ -95,7 +84,7 @@ public interface CertificateValidator {
    * Note: These anchors may be overridden by supplying an alternative set to
    * {@link #validate(X509Certificate, List, List, List)}.
    * </p>
-   * 
+   *
    * @return trusted certificates
    */
   List<X509Certificate> getDefaultTrustAnchors();

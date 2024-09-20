@@ -15,24 +15,7 @@
  */
 package se.idsec.signservice.security.sign.pdf.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
@@ -57,8 +40,6 @@ import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.CollectionStore;
-
-import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.certificate.CertificateUtils;
 import se.idsec.signservice.security.certificate.CertificateValidator;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
@@ -71,6 +52,24 @@ import se.idsec.signservice.security.sign.pdf.configuration.PDFObjectIdentifiers
 import se.idsec.signservice.security.sign.pdf.utils.PDFBoxSignatureUtils;
 import se.idsec.signservice.utils.Pair;
 import se.swedenconnect.security.algorithms.SignatureAlgorithm;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Verifies the signature(s) on a PDF document.
@@ -179,7 +178,6 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
 
       // Get hold of signer certificate ...
       //
-      @SuppressWarnings("unchecked")
       final Collection<?> certCollection = certStore.getMatches(signerInformation.getSID());
       if (certCollection.isEmpty()) {
         throw new CMSException("No signer certificate available");
@@ -259,7 +257,8 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       log.error("{}", e.getMessage(), e);
       result.setError(e);
     }
-    catch (IOException | CMSException | CertificateException | NoSuchAlgorithmException | OperatorCreationException e) {
+    catch (final IOException | CMSException | CertificateException | NoSuchAlgorithmException |
+        OperatorCreationException e) {
       final String msg = String.format("PDF signature validation processing error - %s", e.getMessage());
       log.error("{}", msg, e);
       result.setError(Status.ERROR_BAD_FORMAT, msg, e);
@@ -274,8 +273,8 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
    * @param signature the PDF signature
    * @param signerInformation the signer information
    * @param signerCertificate the signer certificate
-   * @return true if this is a PAdES signature and it was successfully validated and false if this is not a PAdES
-   *           signature
+   * @return true if this is a PAdES signature, and it was successfully validated and false if this is not a PAdES
+   *     signature
    * @throws InternalSignatureValidationException for PAdES validation errors
    */
   private boolean verifyPadesProperties(final PDSignature signature, final SignerInformation signerInformation,
@@ -306,7 +305,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
         return false;
       }
     }
-    catch (IOException | NoSuchAlgorithmException | CertificateEncodingException e) {
+    catch (final IOException | NoSuchAlgorithmException | CertificateEncodingException e) {
       final String msg = String.format("Failure verifying PAdES signature - %s", e.getMessage());
       throw new InternalSignatureValidationException(Status.ERROR_BAD_FORMAT, msg, e);
     }
@@ -325,9 +324,9 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
       return null;
     }
     final ASN1Encodable[] attributeValues = sigTimeAttr.getAttributeValues();
-    if (attributeValues.length > 0 && ASN1UTCTime.class.isInstance(attributeValues[0])) {
+    if (attributeValues.length > 0 && attributeValues[0] instanceof ASN1UTCTime) {
       try {
-        return ASN1UTCTime.class.cast(attributeValues[0]).getDate();
+        return ((ASN1UTCTime) attributeValues[0]).getDate();
       }
       catch (final ParseException e) {
         log.error("Imvalid format for claimed signing time - {}", e.getMessage(), e);
@@ -342,7 +341,7 @@ public class BasicPDFSignatureValidator implements PDFSignatureValidator {
   /**
    * Gets the signature and hash algorithms from the CMS algorithm protection attribute.
    *
-   * @param cmsAlgorithmProtectionAttribute
+   * @param cmsAlgorithmProtectionAttribute protection attribute
    * @return a pair of the signature algorithm ID and the hash algoritm id
    * @throws InternalSignatureValidationException for invalid CMS algorithm protection attributes
    */

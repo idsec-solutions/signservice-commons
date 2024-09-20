@@ -15,18 +15,18 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
+import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
+import se.idsec.signservice.security.sign.SignatureValidationResult;
+
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import se.idsec.signservice.security.certificate.CertificateUtils;
-import se.idsec.signservice.security.certificate.CertificateValidationResult;
-import se.idsec.signservice.security.sign.SignatureValidationResult;
-
 /**
  * Default implementation of the {@link SignatureValidationResult} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -70,11 +70,9 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Sets the status and status message during errors.
-   * 
-   * @param status
-   *          status code
-   * @param statusMessage
-   *          message
+   *
+   * @param status status code
+   * @param statusMessage message
    */
   public void setError(final Status status, final String statusMessage) {
     this.setError(status, statusMessage, null);
@@ -82,13 +80,10 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Sets the status, status message and exception for errors
-   * 
-   * @param status
-   *          status code
-   * @param statusMessage
-   *          message
-   * @param exception
-   *          exception
+   *
+   * @param status status code
+   * @param statusMessage message
+   * @param exception exception
    */
   public void setError(final Status status, final String statusMessage, final Exception exception) {
     this.setStatus(status);
@@ -98,9 +93,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Sets the error status based on the supplied {@link InternalSignatureValidationException} exception object.
-   * 
-   * @param validationException
-   *          the exception
+   *
+   * @param validationException the exception
    */
   public void setError(final InternalSignatureValidationException validationException) {
     this.setError(validationException.getStatus(), validationException.getMessage(), validationException);
@@ -114,9 +108,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Assigns the status for the validation.
-   * 
-   * @param status
-   *          status code
+   *
+   * @param status status code
    */
   public void setStatus(final Status status) {
     this.status = status;
@@ -136,9 +129,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Assigns the status message.
-   * 
-   * @param statusMessage
-   *          status message
+   *
+   * @param statusMessage status message
    */
   public void setStatusMessage(final String statusMessage) {
     this.statusMessage = statusMessage;
@@ -152,9 +144,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Gets the exception that led to a non-successful status.
-   * 
-   * @param exception
-   *          underlying exception
+   *
+   * @param exception underlying exception
    */
   public void setException(final Exception exception) {
     this.exception = exception;
@@ -168,9 +159,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Assigns the signer certificate from the signature.
-   * 
-   * @param signerCertificate
-   *          signer certificate
+   *
+   * @param signerCertificate signer certificate
    */
   public void setSignerCertificate(final X509Certificate signerCertificate) {
     this.signerCertificate = signerCertificate;
@@ -178,7 +168,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Gets the certificates that are above the signer certificate in the chain (if received in the signature).
-   * 
+   *
    * @return a list of additional certificates
    */
   public List<X509Certificate> getAdditionalCertificates() {
@@ -187,9 +177,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Assigns the certificates that are above the signer certificate in the chain (if received in the signature).
-   * 
-   * @param additionalCertificates
-   *          a list of additional certificates
+   *
+   * @param additionalCertificates a list of additional certificates
    */
   public void setAdditionalCertificates(final List<X509Certificate> additionalCertificates) {
     this.additionalCertificates = additionalCertificates;
@@ -203,9 +192,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Assigns the certificate validation result for the signer certificate.
-   * 
-   * @param certificateValidationResult
-   *          validation result
+   *
+   * @param certificateValidationResult validation result
    */
   public void setCertificateValidationResult(final CertificateValidationResult certificateValidationResult) {
     this.certificateValidationResult = certificateValidationResult;
@@ -214,14 +202,13 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
   /** {@inheritDoc} */
   @Override
   public String getSignatureAlgorithm() {
-    return signatureAlgorithm;
+    return this.signatureAlgorithm;
   }
 
   /**
    * Assigns the signature algorithm URI of the signature.
-   * 
-   * @param signatureAlgorithm
-   *          signature algorithm URI
+   *
+   * @param signatureAlgorithm signature algorithm URI
    */
   public void setSignatureAlgorithm(final String signatureAlgorithm) {
     this.signatureAlgorithm = signatureAlgorithm;
@@ -230,14 +217,13 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
   /** {@inheritDoc} */
   @Override
   public Date getClaimedSigningTime() {
-    return claimedSigningTime;
+    return this.claimedSigningTime;
   }
 
   /**
    * Assigns the claimed signing time for the signature.
-   * 
-   * @param claimedSigningTime
-   *          claimed signing time
+   *
+   * @param claimedSigningTime claimed signing time
    */
   public void setClaimedSigningTime(final Date claimedSigningTime) {
     this.claimedSigningTime = claimedSigningTime;
@@ -251,9 +237,8 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
 
   /**
    * Assigns the ETSI AdES signature profile compliance status.
-   * 
-   * @param etsiAdes
-   *          true if this is an ETSI AdES compliant signature
+   *
+   * @param etsiAdes true if this is an ETSI AdES compliant signature
    */
   public void setEtsiAdes(final boolean etsiAdes) {
     this.etsiAdes = etsiAdes;
@@ -262,17 +247,17 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer(super.toString());
+    final StringBuilder sb = new StringBuilder(super.toString());
     sb.append("status='").append(this.status);
     if (this.statusMessage != null) {
       sb.append(",statusMessage='").append(this.statusMessage);
     }
     if (this.exception != null) {
       sb.append(",exception=[")
-        .append(exception.getClass().getSimpleName())
-        .append(":")
-        .append(exception.getMessage())
-        .append("]");
+          .append(this.exception.getClass().getSimpleName())
+          .append(":")
+          .append(this.exception.getMessage())
+          .append("]");
     }
     if (this.signerCertificate != null) {
       sb.append(",signerCertificate=[").append(CertificateUtils.toLogString(this.signerCertificate)).append("]");
@@ -287,7 +272,7 @@ public class DefaultSignatureValidationResult implements SignatureValidationResu
       sb.append(",claimedSigningTime=").append(this.claimedSigningTime);
     }
     sb.append("isEtsiAdes=").append(this.etsiAdes);
-    
+
     return sb.toString();
   }
 

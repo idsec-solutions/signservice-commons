@@ -15,16 +15,15 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
-
 import se.idsec.signservice.security.certificate.CertificateUtils;
 import se.idsec.signservice.security.certificate.impl.DefaultCertificateValidationResult;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
+
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 /**
  * Test cases for DefaultSignatureValidationResult.
@@ -44,7 +43,7 @@ public class DefaultSignatureValidationResultTest {
     result = new DefaultSignatureValidationResult();
     result.setStatus(SignatureValidationResult.Status.SUCCESS);
     Assertions.assertTrue(result.isSuccess());
-//    Assertions.assertTrue(result.getAdditionalCertificates().isEmpty());
+    //    Assertions.assertTrue(result.getAdditionalCertificates().isEmpty());
     Assertions.assertNotNull(result.toString());
 
     result = new DefaultSignatureValidationResult();

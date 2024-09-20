@@ -48,37 +48,27 @@ public class ProtocolVersionTest {
 
   @Test
   public void testIllegalVersionString1() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      ProtocolVersion.valueOf("1.sdfsdfsdf");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> ProtocolVersion.valueOf("1.sdfsdfsdf"));
   }
 
   @Test
   public void testIllegalVersionString2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      ProtocolVersion.valueOf("not a number");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> ProtocolVersion.valueOf("not a number"));
   }
 
   @Test
   public void testIllegalVersionString3() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      ProtocolVersion.valueOf("");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> ProtocolVersion.valueOf(""));
   }
 
   @Test
   public void testIllegalVersionString4() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      ProtocolVersion.valueOf(".");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> ProtocolVersion.valueOf("."));
   }
 
   @Test
   public void testIllegalVersionString5() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      ProtocolVersion.valueOf("1..6");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> ProtocolVersion.valueOf("1..6"));
   }
 
   private int compare(final String version, final String otherVersion) {

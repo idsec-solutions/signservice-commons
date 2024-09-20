@@ -16,17 +16,17 @@
 package se.idsec.signservice.security.sign.xml.impl;
 
 import org.w3c.dom.Element;
-
 import se.idsec.signservice.security.sign.impl.DefaultSignatureValidationResult;
 import se.idsec.signservice.security.sign.xml.XMLSignatureValidationResult;
 
 /**
  * Implementation of the {@link XMLSignatureValidationResult} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-public class DefaultXMLSignatureValidationResult extends DefaultSignatureValidationResult implements XMLSignatureValidationResult {
+public class DefaultXMLSignatureValidationResult extends DefaultSignatureValidationResult
+    implements XMLSignatureValidationResult {
 
   /** The signature element. */
   private Element signatureElement;
@@ -46,9 +46,8 @@ public class DefaultXMLSignatureValidationResult extends DefaultSignatureValidat
 
   /**
    * Assigns the signature element.
-   * 
-   * @param signatureElement
-   *          the signature element
+   *
+   * @param signatureElement the signature element
    */
   public void setSignatureElement(final Element signatureElement) {
     this.signatureElement = signatureElement;

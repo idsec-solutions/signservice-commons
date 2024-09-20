@@ -35,14 +35,13 @@ public class DefaultPDFSignerResult extends AbstractSignerResult<byte[]> impleme
   /** {@inheritDoc} */
   @Override
   public byte[] getSignedAttributes() {
-    return signedAttributes;
+    return this.signedAttributes;
   }
 
   /**
    * Assigns the signed attributes bytes.
    *
-   * @param signedAttributes
-   *          CMS signed attributes
+   * @param signedAttributes CMS signed attributes
    */
   public void setSignedAttributes(final byte[] signedAttributes) {
     this.signedAttributes = signedAttributes;
@@ -57,8 +56,7 @@ public class DefaultPDFSignerResult extends AbstractSignerResult<byte[]> impleme
   /**
    * Assigns the CMS signed data.
    *
-   * @param signedData
-   *          the signed data bytes
+   * @param signedData the signed data bytes
    */
   public void setSignedData(final byte[] signedData) {
     this.signedData = signedData;

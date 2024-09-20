@@ -15,6 +15,11 @@
  */
 package se.idsec.signservice.security.certificate.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
+import se.idsec.signservice.security.certificate.CertificateValidator;
+
 import java.security.GeneralSecurityException;
 import java.security.cert.CertPathBuilder;
 import java.security.cert.CertPathBuilderException;
@@ -36,20 +41,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
-import se.idsec.signservice.security.certificate.CertificateUtils;
-import se.idsec.signservice.security.certificate.CertificateValidationResult;
-import se.idsec.signservice.security.certificate.CertificateValidator;
-
 /**
  * A simple validator that does not perform revocation checking and only relies upon the supplied certificates when
  * building the chain.
- * 
+ *
  * <p>
  * Note: If no trust anchors are defined, the path root must be available as the last element of the
  * {@code additionalCertificates} parameter. This certificate must be self-signed.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -64,8 +64,9 @@ public class SimpleCertificateValidator implements CertificateValidator {
 
   /** {@inheritDoc} */
   @Override
-  public CertificateValidationResult validate(final X509Certificate subjectCertificate, final List<X509Certificate> additionalCertificates,
-      final List<X509CRL> crls) throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException {
+  public CertificateValidationResult validate(final X509Certificate subjectCertificate,
+      final List<X509Certificate> additionalCertificates, final List<X509CRL> crls)
+      throws CertPathBuilderException, CertPathValidatorException, GeneralSecurityException {
     return this.validate(subjectCertificate, additionalCertificates, crls, this.defaultTrustAnchors);
   }
 
@@ -87,7 +88,7 @@ public class SimpleCertificateValidator implements CertificateValidator {
     //
     final List<CertStore> certStores = this.getCertStores(subjectCertificate, additionalCertificates, crls);
 
-    // Setup the builder and validation params...
+    // Set up the builder and validation params...
     //
     final PKIXBuilderParameters params = this.buildParameters(subjectCertificate, trusted, certStores);
 
@@ -99,12 +100,14 @@ public class SimpleCertificateValidator implements CertificateValidator {
     // Finally, validate the path ...
     //
     final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
-    PKIXCertPathValidatorResult pkixResult = (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
+    final PKIXCertPathValidatorResult pkixResult =
+        (PKIXCertPathValidatorResult) validator.validate(builderResult.getCertPath(), params);
 
-    DefaultCertificateValidationResult result = new DefaultCertificateValidationResult(
-      builderResult.getCertPath().getCertificates().stream().map(X509Certificate.class::cast).collect(Collectors.toList()));
+    final DefaultCertificateValidationResult result = new DefaultCertificateValidationResult(
+        builderResult.getCertPath().getCertificates().stream().map(X509Certificate.class::cast)
+            .collect(Collectors.toList()));
     result.setPkixCertPathValidatorResult(pkixResult);
-    
+
     log.debug("Successful validation of [{}]", CertificateUtils.toLogString(subjectCertificate));
     return result;
   }
@@ -117,14 +120,11 @@ public class SimpleCertificateValidator implements CertificateValidator {
    * If no trust anchors is available, this implementation uses the last certificate from the supplied
    * {@code additionalCertificates} parameter as the root.
    * </p>
-   * 
-   * @param trustAnchors
-   *          the trust anchors
-   * @param additionalCertificates
-   *          additional certs
+   *
+   * @param trustAnchors the trust anchors
+   * @param additionalCertificates additional certs
    * @return a set of trust anchors
-   * @throws CertPathBuilderException
-   *           if trust can not be setup
+   * @throws CertPathBuilderException if trust can not be setup
    */
   protected Set<TrustAnchor> setupTrustAnchors(final List<X509Certificate> trustAnchors,
       final List<X509Certificate> additionalCertificates) throws CertPathBuilderException {
@@ -155,27 +155,24 @@ public class SimpleCertificateValidator implements CertificateValidator {
    * Gets the certificate stores that should be used during path building and validation. The default implementation
    * builds one store holding the certificates supplied in {@code subjectCertificate} and
    * {@code additionalCertificates}.
-   * 
-   * @param subjectCertificate
-   *          the certificate to validate
-   * @param additionalCertificates
-   *          other certificates that may be useful when building a certificate path
-   * @param crls
-   *          optional list of CRL:s that may be useful during path validation
+   *
+   * @param subjectCertificate the certificate to validate
+   * @param additionalCertificates other certificates that may be useful when building a certificate path
+   * @param crls optional list of CRL:s that may be useful during path validation
    * @return a list of cert stores
-   * @throws GeneralSecurityException
-   *           for cert store creation errors
+   * @throws GeneralSecurityException for cert store creation errors
    */
-  protected List<CertStore> getCertStores(final X509Certificate subjectCertificate, final List<X509Certificate> additionalCertificates,
+  protected List<CertStore> getCertStores(final X509Certificate subjectCertificate,
+      final List<X509Certificate> additionalCertificates,
       final List<X509CRL> crls) throws GeneralSecurityException {
 
     final List<Object> list = new ArrayList<>();
     list.add(subjectCertificate);
     if (additionalCertificates != null) {
-      additionalCertificates.forEach(list::add);
+      list.addAll(additionalCertificates);
     }
     if (crls != null) {
-      crls.forEach(list::add);
+      list.addAll(crls);
     }
     return Collections.singletonList(CertStore.getInstance("Collection", new CollectionCertStoreParameters(list)));
   }
@@ -183,21 +180,19 @@ public class SimpleCertificateValidator implements CertificateValidator {
   /**
    * Builds the parameters for path building and validation. This implementation disables revocation checking and uses
    * default settings from the {@link PKIXBuilderParameters} class.
-   * 
-   * @param subjectCertificate
-   *          the subject certificate
-   * @param trustAnchors
-   *          the trust anchors
-   * @param certStores
-   *          the cert stores
+   *
+   * @param subjectCertificate the subject certificate
+   * @param trustAnchors the trust anchors
+   * @param certStores the cert stores
    * @return a PKIXBuilderParameters object
-   * @throws GeneralSecurityException
-   *           for errors setting up the params
+   * @throws GeneralSecurityException for errors setting up the params
    */
-  protected PKIXBuilderParameters buildParameters(final X509Certificate subjectCertificate, final Set<TrustAnchor> trustAnchors,
+  protected PKIXBuilderParameters buildParameters(final X509Certificate subjectCertificate,
+      final Set<TrustAnchor> trustAnchors,
       final List<CertStore> certStores) throws GeneralSecurityException {
 
-    final PKIXBuilderParameters params = new PKIXBuilderParameters(trustAnchors, this.toCertSelector(subjectCertificate));
+    final PKIXBuilderParameters params =
+        new PKIXBuilderParameters(trustAnchors, this.toCertSelector(subjectCertificate));
     params.setCertStores(certStores);
     params.setRevocationEnabled(false);
     if (this.validationDate != null) {
@@ -208,13 +203,12 @@ public class SimpleCertificateValidator implements CertificateValidator {
 
   /**
    * Creates a {@link X509CertSelector} for the supplied subject certificate.
-   * 
-   * @param subjectCertificate
-   *          the certificate
+   *
+   * @param subjectCertificate the certificate
    * @return a X509CertSelector
    */
   protected X509CertSelector toCertSelector(final X509Certificate subjectCertificate) {
-    X509CertSelector selector = new X509CertSelector();
+    final X509CertSelector selector = new X509CertSelector();
     selector.setCertificate(subjectCertificate);
     return selector;
   }
@@ -235,9 +229,8 @@ public class SimpleCertificateValidator implements CertificateValidator {
 
   /**
    * Assigns the default trust anchors for this validator.
-   * 
-   * @param defaultTrustAnchors
-   *          trusted root certificates
+   *
+   * @param defaultTrustAnchors trusted root certificates
    */
   public void setDefaultTrustAnchors(final List<X509Certificate> defaultTrustAnchors) {
     this.defaultTrustAnchors = defaultTrustAnchors;
@@ -246,7 +239,7 @@ public class SimpleCertificateValidator implements CertificateValidator {
   /**
    * The date/time when the certificate status should be determined. For testing mainly. If {@code null} is returned,
    * this indicates "now".
-   * 
+   *
    * @return the validation date/time, or null for "now"
    */
   public Date getValidationDate() {
@@ -256,9 +249,8 @@ public class SimpleCertificateValidator implements CertificateValidator {
   /**
    * Assigns the date/time when the certificate status should be determined. For testing mainly. If {@code null}, which
    * is the default, is assigned this indicates "now".
-   * 
-   * @param validationDate
-   *          the validation date/time, or null for "now"
+   *
+   * @param validationDate the validation date/time, or null for "now"
    */
   public void setValidationDate(final Date validationDate) {
     this.validationDate = validationDate;

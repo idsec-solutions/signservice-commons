@@ -15,17 +15,17 @@
  */
 package se.idsec.signservice.security.certificate;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * Test cases for CertificateUtils.
@@ -49,9 +49,8 @@ public class CertificateUtilsTest {
     Assertions.assertNotNull(cert, "Failed to decode swedenconnect.pem");
 
     // Not a certificate ...
-    Assertions.assertThrows(CertificateException.class, () -> {
-      CertificateUtils.decodeCertificate(this.getResource("simplelogger.properties"));
-    });
+    Assertions.assertThrows(CertificateException.class,
+        () -> CertificateUtils.decodeCertificate(this.getResource("simplelogger.properties")));
   }
 
   @Test
@@ -69,9 +68,8 @@ public class CertificateUtilsTest {
     Assertions.assertNotNull(cert, "Failed to decode swedenconnect.pem");
 
     // Not a certificate ...
-    Assertions.assertThrows(CertificateException.class, () -> {
-      CertificateUtils.decodeCertificate(IOUtils.toByteArray(this.getResource("simplelogger.properties")));
-    });
+    Assertions.assertThrows(CertificateException.class,
+        () -> CertificateUtils.decodeCertificate(IOUtils.toByteArray(this.getResource("simplelogger.properties"))));
   }
 
   @Test
@@ -81,9 +79,8 @@ public class CertificateUtilsTest {
     Assertions.assertNotNull(crl, "Failed to decode sample.crl");
 
     // Not a CRL ...
-    Assertions.assertThrows(CRLException.class, () -> {
-      CertificateUtils.decodeCrl(this.getResource("certs/idsec.se.cer"));
-    });
+    Assertions.assertThrows(CRLException.class,
+        () -> CertificateUtils.decodeCrl(this.getResource("certs/idsec.se.cer")));
   }
 
   @Test
@@ -93,9 +90,8 @@ public class CertificateUtilsTest {
     Assertions.assertNotNull(crl, "Failed to decode sample.crl");
 
     // Not a CRL ...
-    Assertions.assertThrows(CRLException.class, () -> {
-      CertificateUtils.decodeCrl(IOUtils.toByteArray(this.getResource("certs/idsec.se.cer")));
-    });
+    Assertions.assertThrows(CRLException.class,
+        () -> CertificateUtils.decodeCrl(IOUtils.toByteArray(this.getResource("certs/idsec.se.cer"))));
   }
 
   @Test

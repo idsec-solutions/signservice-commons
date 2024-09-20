@@ -15,18 +15,17 @@
  */
 package se.idsec.signservice.xml;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Base64;
-
-import javax.xml.parsers.DocumentBuilder;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Base64;
 
 /**
  * Test cases for DOMUtils.
@@ -37,13 +36,13 @@ import org.w3c.dom.Document;
 public class DOMUtilsTest {
 
   @Test
-  public void testCreateDocumentBuilder() throws Exception {
+  public void testCreateDocumentBuilder() {
     final DocumentBuilder b = DOMUtils.createDocumentBuilder();
     Assertions.assertNotNull(b);
   }
 
   @Test
-  public void testPrettyPrint() throws Exception {
+  public void testPrettyPrint() {
 
     final Document doc = DOMUtils.inputStreamToDocument(
         ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
@@ -60,7 +59,7 @@ public class DOMUtilsTest {
   }
 
   @Test
-  public void testNodeToBytes() throws Exception {
+  public void testNodeToBytes() {
     final Document doc = DOMUtils.inputStreamToDocument(
         ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
 
@@ -73,7 +72,7 @@ public class DOMUtilsTest {
   }
 
   @Test
-  public void testNodeToBase64() throws Exception {
+  public void testNodeToBase64() {
     final Document doc = DOMUtils.inputStreamToDocument(
         ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
 
@@ -85,7 +84,7 @@ public class DOMUtilsTest {
   }
 
   @Test
-  public void testInputStreamToDocument() throws Exception {
+  public void testInputStreamToDocument() {
     final Document doc = DOMUtils.inputStreamToDocument(
         ClassLoaderUtils.getResourceAsStream("/signResponse.xml", DOMUtilsTest.class));
 
@@ -93,25 +92,21 @@ public class DOMUtilsTest {
 
     final InputStream notXml = new ByteArrayInputStream("<not-valid-xml>".getBytes());
 
-    Assertions.assertThrows(DOMException.class, () -> {
-      DOMUtils.inputStreamToDocument(notXml);
-    });
+    Assertions.assertThrows(DOMException.class, () -> DOMUtils.inputStreamToDocument(notXml));
   }
 
   @Test
-  public void testBytesToDocument() throws Exception {
+  public void testBytesToDocument() {
     final String xml = "<Sample>Hej</Sample>";
     final Document doc = DOMUtils.bytesToDocument(xml.getBytes());
     Assertions.assertEquals("Sample", doc.getDocumentElement().getLocalName());
     Assertions.assertEquals("Hej", doc.getDocumentElement().getTextContent());
 
-    Assertions.assertThrows(DOMException.class, () -> {
-      DOMUtils.bytesToDocument("bbashjhiahdua".getBytes());
-    });
+    Assertions.assertThrows(DOMException.class, () -> DOMUtils.bytesToDocument("bbashjhiahdua".getBytes()));
   }
 
   @Test
-  public void testBase64ToDocument() throws Exception {
+  public void testBase64ToDocument() {
     final String xml = "<Sample>Hej</Sample>";
     final String b64 = Base64.getEncoder().encodeToString(xml.getBytes());
 
@@ -119,14 +114,10 @@ public class DOMUtilsTest {
     Assertions.assertEquals("Sample", doc.getDocumentElement().getLocalName());
     Assertions.assertEquals("Hej", doc.getDocumentElement().getTextContent());
 
-    Assertions.assertThrows(DOMException.class, () -> {
-      DOMUtils.base64ToDocument(
-          Base64.getEncoder().encodeToString("bbashjhiahdua".getBytes()));
-    });
+    Assertions.assertThrows(DOMException.class, () -> DOMUtils.base64ToDocument(
+        Base64.getEncoder().encodeToString("bbashjhiahdua".getBytes())));
 
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      DOMUtils.base64ToDocument("NOT-BASE-64");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> DOMUtils.base64ToDocument("NOT-BASE-64"));
   }
 
 }

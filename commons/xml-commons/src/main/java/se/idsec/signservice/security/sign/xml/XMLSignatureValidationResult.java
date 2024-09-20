@@ -16,12 +16,11 @@
 package se.idsec.signservice.security.sign.xml;
 
 import org.w3c.dom.Element;
-
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**
  * Signature validation result for validating XML signatures.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -29,7 +28,7 @@ public interface XMLSignatureValidationResult extends SignatureValidationResult 
 
   /**
    * Gets the signature element.
-   * 
+   *
    * @return the signature element
    */
   Element getSignatureElement();

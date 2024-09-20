@@ -49,7 +49,7 @@ public interface CertificateValidationResult {
    * target certificate to a trusted trust anchor certificate. If method returns {@code null} does not mean that
    * certificate validation failed.
    * </p>
-   * 
+   *
    * @return a PKIXCertPathValidatorResult object or null if no path validation result is available
    */
   PKIXCertPathValidatorResult getPKIXCertPathValidatorResult();
