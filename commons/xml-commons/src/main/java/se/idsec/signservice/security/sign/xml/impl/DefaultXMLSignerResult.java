@@ -35,7 +35,7 @@ import se.idsec.signservice.security.sign.xml.XMLSignerResult;
 public class DefaultXMLSignerResult extends AbstractSignerResult<Document> implements XMLSignerResult {
 
   /** The signature object. */
-  private XMLSignature signature;
+  private final XMLSignature signature;
 
   /**
    * Constructor.
@@ -66,10 +66,10 @@ public class DefaultXMLSignerResult extends AbstractSignerResult<Document> imple
     try {
       return this.signature.getSignedInfo().getCanonicalizedOctetStream();
     }
-    catch (XMLSecurityException e) {
+    catch (final XMLSecurityException e) {
       throw new SecurityException("Failed to canonicalize SignedInfo", e);
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       throw new UncheckedIOException("Failed to canonicalize SignedInfo", e);
     }
 

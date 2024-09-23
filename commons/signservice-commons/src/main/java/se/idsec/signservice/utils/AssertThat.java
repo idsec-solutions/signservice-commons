@@ -15,10 +15,10 @@
  */
 package se.idsec.signservice.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Collection;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class that helps us make assertions, for example when checking that all required properties have been
@@ -96,7 +96,8 @@ public class AssertThat {
   }
 
   /**
-   * Asserts that an array contains elements, meaning it must not be {@code null} and must contain at least one element.
+   * Asserts that an array contains elements, meaning it must not be {@code null} and must contain at least one
+   * element.
    *
    * @param array the array to check
    * @param message the exception message to use if the assertion fails
@@ -129,7 +130,7 @@ public class AssertThat {
    * @param message the exception message to use if the assertion fails
    * @throws IllegalArgumentException if the map is null or contains no entries
    */
-  public static void isNotEmpty(final Map<?, ?> map, String message) {
+  public static void isNotEmpty(final Map<?, ?> map, final String message) {
     if (map == null || map.isEmpty()) {
       throw new IllegalArgumentException(message);
     }

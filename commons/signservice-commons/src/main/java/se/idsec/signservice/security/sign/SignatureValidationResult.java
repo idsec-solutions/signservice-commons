@@ -15,14 +15,14 @@
  */
 package se.idsec.signservice.security.sign;
 
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
+
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import se.idsec.signservice.security.certificate.CertificateValidationResult;
-
 /**
  * Interface representing the (successful) result of a signature validation operation.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -31,7 +31,7 @@ public interface SignatureValidationResult {
   /**
    * Representation of the validation status of a signature.
    */
-  public enum Status {
+  enum Status {
     /** The signature validation was successful. */
     SUCCESS,
 
@@ -59,14 +59,14 @@ public interface SignatureValidationResult {
 
   /**
    * Gets the overall validation status.
-   * 
+   *
    * @return the validation status
    */
   Status getStatus();
 
   /**
    * Predicate that tells if this result object represents a successful validation.
-   * 
+   *
    * @return true if this result object represents a successful validation and false otherwise
    */
   boolean isSuccess();
@@ -76,7 +76,7 @@ public interface SignatureValidationResult {
    * <p>
    * For non-successful results a message is always returned.
    * </p>
-   * 
+   *
    * @return status message
    */
   String getStatusMessage();
@@ -84,7 +84,7 @@ public interface SignatureValidationResult {
   /**
    * If this status represents a non-successful result, this method may return an exception object describing the
    * underlying validation error.
-   * 
+   *
    * @return an exception describing the underlying error or null
    */
   Exception getException();
@@ -95,14 +95,14 @@ public interface SignatureValidationResult {
    * May be {@code null} in the rare cases when the certificate is not included in the signature, and when no validation
    * certificates were supplied to the validation process.
    * </p>
-   * 
+   *
    * @return the signature certificate
    */
   X509Certificate getSignerCertificate();
 
   /**
    * In case a successful certificate validation was performed, this method returns the result from this operation.
-   * 
+   *
    * @return the certificate validation result
    */
   CertificateValidationResult getCertificateValidationResult();

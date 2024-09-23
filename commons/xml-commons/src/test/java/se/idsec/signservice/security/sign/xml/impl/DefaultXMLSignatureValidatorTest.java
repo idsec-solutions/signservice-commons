@@ -16,6 +16,7 @@
 package se.idsec.signservice.security.sign.xml.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +39,7 @@ public class DefaultXMLSignatureValidatorTest extends XMLTestBase {
     final Document document = getDocument("signResponse1.xml");
 
     final DefaultXMLSignatureValidator validator =
-        new DefaultXMLSignatureValidator(Arrays.asList(this.getCertificate("konki-sign.crt")));
+        new DefaultXMLSignatureValidator(Collections.singletonList(this.getCertificate("konki-sign.crt")));
     validator.setXadesProcessing(false);
 
     final List<SignatureValidationResult> result = validator.validate(document);
@@ -51,7 +52,7 @@ public class DefaultXMLSignatureValidatorTest extends XMLTestBase {
     final Document document = getDocument("signResponse-badsign.xml");
 
     final DefaultXMLSignatureValidator validator =
-        new DefaultXMLSignatureValidator(Arrays.asList(this.getCertificate("konki-sign.crt")));
+        new DefaultXMLSignatureValidator(Collections.singletonList(this.getCertificate("konki-sign.crt")));
     validator.setXadesProcessing(false);
 
     final List<SignatureValidationResult> result = validator.validate(document);

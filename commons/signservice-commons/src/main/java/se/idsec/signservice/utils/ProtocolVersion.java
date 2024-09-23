@@ -37,19 +37,18 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
   /**
    * Constructor
    *
-   * @param version
-   *          the version as a string of integer values separated by "."
+   * @param version the version as a string of integer values separated by "."
    */
   public ProtocolVersion(final String version) {
     this.versionString = Optional.ofNullable(version)
-      .map(String::trim)
-      .orElseThrow(() -> new IllegalArgumentException("version must not be null"));
+        .map(String::trim)
+        .orElseThrow(() -> new IllegalArgumentException("version must not be null"));
 
     try {
       this.versionComponents = new ArrayList<>();
       final String[] components = version.split("\\.");
       for (final String s : components) {
-        final Integer i = Integer.valueOf(s);
+        final int i = Integer.parseInt(s);
         if (i < 0) {
           throw new IllegalArgumentException("Negative version components are not allowed");
         }
@@ -67,8 +66,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
   /**
    * Creates a {@code ProtocolVersion} object given a version in string format.
    *
-   * @param version
-   *          the version string
+   * @param version the version string
    * @return a ProtocolVersion object
    */
   public static ProtocolVersion valueOf(final String version) {
@@ -81,8 +79,8 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     final int maxCount = Math.max(this.versionComponents.size(), o.versionComponents.size());
 
     for (int i = 0; i < maxCount; i++) {
-      final Integer thisValue = i < this.versionComponents.size() ? this.versionComponents.get(i) : 0;
-      final Integer compareValue = i < o.versionComponents.size() ? o.versionComponents.get(i) : 0;
+      final int thisValue = i < this.versionComponents.size() ? this.versionComponents.get(i) : 0;
+      final int compareValue = i < o.versionComponents.size() ? o.versionComponents.get(i) : 0;
       if (thisValue != compareValue) {
         return thisValue - compareValue;
       }
@@ -93,10 +91,9 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
   /**
    * Compares the given version string with this object. See {@link #compareTo(ProtocolVersion)}.
    *
-   * @param o
-   *          the version string to compare with this object
+   * @param o the version string to compare with this object
    * @return a negative value if this object is less than the specified version, 0 if they are equal, and a positive
-   *         value if this object is greater than the supplied version
+   *     value if this object is greater than the supplied version
    */
   public int compareTo(final String o) {
     return this.compareTo(ProtocolVersion.valueOf(o));

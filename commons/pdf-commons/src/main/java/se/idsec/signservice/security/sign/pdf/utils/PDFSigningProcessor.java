@@ -15,23 +15,22 @@
  */
 package se.idsec.signservice.security.sign.pdf.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.SignatureException;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
 import se.idsec.signservice.security.sign.pdf.PDFBoxSignatureInterface;
 import se.idsec.signservice.security.sign.pdf.document.VisibleSignatureImage;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.SignatureException;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * This class provides a PDF signing processor that provides the basic functionality to use a
@@ -50,17 +49,12 @@ public class PDFSigningProcessor {
   /**
    * Signs the supplied PDF document. The document is closed by this method (in all cases).
    *
-   * @param pdfDocument
-   *          the document to sign
-   * @param pdfSignatureProvider
-   *          the PDFBox signature provider
-   * @param signTimeAndID
-   *          the signing time (and ID)
-   * @param visibleSignatureImage
-   *          optional signature image
+   * @param pdfDocument the document to sign
+   * @param pdfSignatureProvider the PDFBox signature provider
+   * @param signTimeAndID the signing time (and ID)
+   * @param visibleSignatureImage optional signature image
    * @return a result
-   * @throws SignatureException
-   *           for signature errors
+   * @throws SignatureException for signature errors
    */
   public static Result signPdfDocument(
       final PDDocument pdfDocument,
@@ -68,7 +62,7 @@ public class PDFSigningProcessor {
       final long signTimeAndID,
       final VisibleSignatureImage visibleSignatureImage) throws SignatureException {
 
-    try {
+    try (pdfDocument) {
       // Create signature dictionary
       //
       final PDSignature signature = new PDSignature();
@@ -107,23 +101,15 @@ public class PDFSigningProcessor {
       pdfDocument.close();
 
       return Result.builder()
-        .document(output.toByteArray())
-        .cmsSignedData(pdfSignatureProvider.getCmsSignedData())
-        .cmsSignedAttributes(pdfSignatureProvider.getCmsSignedAttributes())
-        .build();
+          .document(output.toByteArray())
+          .cmsSignedData(pdfSignatureProvider.getCmsSignedData())
+          .cmsSignedAttributes(pdfSignatureProvider.getCmsSignedAttributes())
+          .build();
     }
     catch (final IOException e) {
       final String msg = String.format("Failed to sign PDF document - %s", e.getMessage());
       log.error("{}", msg);
       throw new SignatureException(msg, e);
-    }
-    finally {
-      try {
-        // If the document already has been closed this is a no-op.
-        pdfDocument.close();
-      }
-      catch (final IOException e) {
-      }
     }
   }
 
@@ -135,25 +121,13 @@ public class PDFSigningProcessor {
   @Builder
   public static class Result {
 
-    /**
-     * The signed document.
-     *
-     * @return the signed document
-     */
+    /** The signed document. */
     private final byte[] document;
 
-    /**
-     * The CMS SignedData.
-     *
-     * @return the CMS SignedData
-     */
+    /** The CMS SignedData. */
     private final byte[] cmsSignedData;
 
-    /**
-     * The signed attributes.
-     *
-     * @return the signed attributes
-     */
+    /** The signed attributes. */
     private final byte[] cmsSignedAttributes;
   }
 

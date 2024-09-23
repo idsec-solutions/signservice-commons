@@ -15,13 +15,14 @@
  */
 package se.idsec.signservice.utils;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for {@code AssertThat}.
@@ -33,131 +34,94 @@ public class AssertThatTest {
 
   @Test
   public void testIsTrue1() {
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.isTrue(true, "Msg");
-    });
+    Assertions.assertDoesNotThrow(() -> AssertThat.isTrue(true, "Msg"));
   }
 
   @Test
   public void testIsTrue2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isTrue(1 == 5, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isTrue(1 == 5, "Msg"));
   }
 
   @Test
   public void testIsFalse1() {
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.isFalse(false, "Msg");
-    });
+    Assertions.assertDoesNotThrow(() -> AssertThat.isFalse(false, "Msg"));
   }
 
   @Test
   public void testIsFalse2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isFalse(true, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isFalse(true, "Msg"));
   }
 
   @Test
   public void testIsNotNull1() {
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.isNotNull(new String(), "Msg");
-    });
+    Assertions.assertDoesNotThrow(() -> AssertThat.isNotNull("", "Msg"));
   }
 
   @Test
   public void testIsNotNull2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNotNull(null, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isNotNull(null, "Msg"));
   }
 
   @Test
   public void testIsNull1() {
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.isNull(null, "Msg");
-    });
+    Assertions.assertDoesNotThrow(() -> AssertThat.isNull(null, "Msg"));
   }
 
   @Test
   public void testIsNull2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNull(new String(), "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isNull("", "Msg"));
   }
 
   @Test
   public void testHasText1() {
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.hasText("This is text", "Msg");
-    });
+    Assertions.assertDoesNotThrow(() -> AssertThat.hasText("This is text", "Msg"));
   }
 
   @Test
   public void testHasText2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.hasText(null, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.hasText(null, "Msg"));
   }
 
   @Test
   public void testHasText3() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.hasText(new String(), "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.hasText("", "Msg"));
   }
 
   @Test
   public void testHasText4() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.hasText(new String("   "), "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.hasText("   ", "Msg"));
   }
 
   @Test
   public void testIsNotEmpty_Array1() {
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.isNotEmpty(new Integer[] { 1 }, "Msg");
-    });
+    Assertions.assertDoesNotThrow(() -> AssertThat.isNotEmpty(new Integer[] { 1 }, "Msg"));
   }
 
   @Test
   public void testIsNotEmpty_Array2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNotEmpty((Integer[]) null, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isNotEmpty((Integer[]) null, "Msg"));
   }
 
   @Test
   public void testIsNotEmpty_Array3() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNotEmpty(new Integer[] {}, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isNotEmpty(new Integer[] {}, "Msg"));
   }
 
   @Test
   public void testIsNotEmpty_Collection1() {
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.isNotEmpty(Collections.singleton(Integer.valueOf(1)), "Msg");
-    });
-    Assertions.assertDoesNotThrow(() -> {
-      AssertThat.isNotEmpty(Collections.singletonList(Integer.valueOf(1)), "Msg");
-    });
+    Assertions.assertDoesNotThrow(() -> AssertThat.isNotEmpty(Collections.singleton(1), "Msg"));
+    Assertions.assertDoesNotThrow(() -> AssertThat.isNotEmpty(List.of(1), "Msg"));
   }
 
   @Test
   public void testIsNotEmpty_Collection2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNotEmpty((Collection<?>) null, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isNotEmpty((Collection<?>) null, "Msg"));
   }
 
   @Test
   public void testIsNotEmpty_Collection3() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNotEmpty(Collections.emptyList(), "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class,
+        () -> AssertThat.isNotEmpty(Collections.emptyList(), "Msg"));
   }
 
   @Test
@@ -171,16 +135,12 @@ public class AssertThatTest {
 
   @Test
   public void testIsNotEmpty_Map2() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNotEmpty((Map<?, ?>) null, "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isNotEmpty((Map<?, ?>) null, "Msg"));
   }
 
   @Test
   public void testIsNotEmpty_Map3() {
-    Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      AssertThat.isNotEmpty(new HashMap<>(), "Msg");
-    });
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AssertThat.isNotEmpty(new HashMap<>(), "Msg"));
   }
 
 }

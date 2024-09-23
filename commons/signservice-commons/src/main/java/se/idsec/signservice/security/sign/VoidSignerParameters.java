@@ -18,7 +18,7 @@ package se.idsec.signservice.security.sign;
 /**
  * Instance of a void {@link SignerParameters} instance. To be used by implementations that does not support signer
  * parameters.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */

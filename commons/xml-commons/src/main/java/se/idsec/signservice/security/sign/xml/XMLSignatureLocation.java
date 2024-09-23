@@ -15,14 +15,7 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
@@ -30,7 +23,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tells where in an XML document the signature should be inserted or found.
@@ -45,14 +43,18 @@ public class XMLSignatureLocation {
    * Enum for indicating the point within a selected parent node.
    */
   public enum ChildPosition {
-    FIRST, LAST
+    /** First in the document. */
+    FIRST,
+
+    /** Last in the document. */
+    LAST
   }
 
   /** Indicator for first or last child of a selected parent node. */
   private final ChildPosition childPosition;
 
   /**
-   * The XPath expression for selecting the parent node (or {@code null} which means the the parent node is the document
+   * The XPath expression for selecting the parent node (or {@code null} which means the parent node is the document
    * root element).
    */
   private XPathExpression xPathExpression;
@@ -87,7 +89,7 @@ public class XMLSignatureLocation {
    * {@code local-name()} XPath construct.
    * </p>
    *
-   * @param parentXPath XPath expression for locating the parent node of the signature element
+   * @param parentXPath the XPath expression for locating the parent node of the signature element
    * @param childPosition whether to insert/find the signature as the first or last child of the given parent node
    * @throws XPathExpressionException for illegal XPath expressions
    */

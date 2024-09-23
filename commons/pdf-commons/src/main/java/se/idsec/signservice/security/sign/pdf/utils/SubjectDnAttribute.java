@@ -82,7 +82,7 @@ public enum SubjectDnAttribute {
    * @return a SubjectDnAttribute enum
    */
   public static SubjectDnAttribute getSubjectDnFromOid(final String oid) {
-    for (SubjectDnAttribute subjDn : values()) {
+    for (final SubjectDnAttribute subjDn : values()) {
       if (oid.equalsIgnoreCase(subjDn.getOid())) {
         return subjDn;
       }
@@ -96,7 +96,7 @@ public enum SubjectDnAttribute {
    * @param oid
    *          the object identifier of the attribute
    */
-  private SubjectDnAttribute(final String oid) {
+  SubjectDnAttribute(final String oid) {
     this.oid = oid;
   }
 

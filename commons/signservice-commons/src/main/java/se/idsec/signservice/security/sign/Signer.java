@@ -15,20 +15,16 @@
  */
 package se.idsec.signservice.security.sign;
 
-import java.security.SignatureException;
-
 import se.swedenconnect.security.credential.PkiCredential;
+
+import java.security.SignatureException;
 
 /**
  * Interface that represents a signer, i.e. an instance that given a set of signature properties signs documents.
- * 
- * @param <T>
- *          the type for the document that is signed
- * @param <R>
- *          the type of signing result
- * @param <P>
- *          the type of signer parameters
- * 
+ *
+ * @param <T> the type for the document that is signed
+ * @param <R> the type of signing result
+ * @param <P> the type of signer parameters
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -39,12 +35,10 @@ public interface Signer<T, R extends SignerResult<T>, P extends SignerParameters
    * <p>
    * Corresponds to invoking {@link #sign(Object, SignerParameters)} with the parameters set to {@code null}.
    * </p>
-   * 
-   * @param document
-   *          the document to sign
+   *
+   * @param document the document to sign
    * @return a signature result (including the signed document)
-   * @throws SignatureException
-   *           for signature errors
+   * @throws SignatureException for signature errors
    * @see #sign(Object, SignerParameters)
    */
   R sign(final T document) throws SignatureException;
@@ -52,21 +46,18 @@ public interface Signer<T, R extends SignerResult<T>, P extends SignerParameters
   /**
    * Signs the document using the installed signing credential ({@link #getSigningCredential()}) and the supplied signer
    * parameters.
-   * 
-   * @param document
-   *          the document to sign
-   * @param parameters
-   *          optional signer parameters
+   *
+   * @param document the document to sign
+   * @param parameters optional signer parameters
    * @return a signature result (including the signed document)
-   * @throws SignatureException
-   *           for signature errors
+   * @throws SignatureException for signature errors
    * @see #sign(Object)
    */
   R sign(final T document, final P parameters) throws SignatureException;
 
   /**
    * Gets the signing credential that is used for the signing operation.
-   * 
+   *
    * @return the signing credential
    */
   PkiCredential getSigningCredential();

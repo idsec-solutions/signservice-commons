@@ -15,6 +15,23 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509v1CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509v1CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.swedenconnect.security.algorithms.Algorithm;
+import se.swedenconnect.security.algorithms.AlgorithmRegistry;
+import se.swedenconnect.security.algorithms.AlgorithmRegistrySingleton;
+import se.swedenconnect.security.algorithms.AlgorithmType;
+import se.swedenconnect.security.algorithms.SignatureAlgorithm;
+import se.swedenconnect.security.credential.BasicCredential;
+import se.swedenconnect.security.credential.PkiCredential;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -27,24 +44,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
-
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509v1CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509v1CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-
-import lombok.extern.slf4j.Slf4j;
-import se.idsec.signservice.security.certificate.CertificateUtils;
-import se.swedenconnect.security.algorithms.Algorithm;
-import se.swedenconnect.security.algorithms.AlgorithmRegistry;
-import se.swedenconnect.security.algorithms.AlgorithmRegistrySingleton;
-import se.swedenconnect.security.algorithms.AlgorithmType;
-import se.swedenconnect.security.algorithms.SignatureAlgorithm;
-import se.swedenconnect.security.credential.BasicCredential;
-import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Utility class that holds pre-generated key pairs.
@@ -94,10 +93,8 @@ public class StaticCredentials {
   /**
    * Constructor setting the key size for RSA and curve for EC to use.
    *
-   * @param rsaKeySize
-   *          RSA key size in bits (default is {@value #DEFAULT_RSA_KEY_SIZE})
-   * @param ecCurve
-   *          identifier for EC curve to use (default is {@value #DEFAULT_EC_CURVE})
+   * @param rsaKeySize RSA key size in bits (default is {@value #DEFAULT_RSA_KEY_SIZE})
+   * @param ecCurve identifier for EC curve to use (default is {@value #DEFAULT_EC_CURVE})
    */
   public StaticCredentials(final int rsaKeySize, final String ecCurve) {
     this.rsaKeySize = rsaKeySize;
@@ -109,11 +106,9 @@ public class StaticCredentials {
   /**
    * Returns a {@link PkiCredential} that can be used to sign using the supplied algorithm.
    *
-   * @param algorithmUri
-   *          the signature algorithm URI
+   * @param algorithmUri the signature algorithm URI
    * @return a PkiCredential instance
-   * @throws NoSuchAlgorithmException
-   *           if the supplied algorithm is not supported
+   * @throws NoSuchAlgorithmException if the supplied algorithm is not supported
    */
   public PkiCredential getSigningCredential(final String algorithmUri) throws NoSuchAlgorithmException {
 
@@ -124,9 +119,9 @@ public class StaticCredentials {
       throw new NoSuchAlgorithmException(msg);
     }
 
-    final String algoClass = SignatureAlgorithm.class.cast(algorithm).getKeyType();
+    final String algoClass = ((SignatureAlgorithm) algorithm).getKeyType();
     try {
-      BasicCredential cred = null;
+      final BasicCredential cred;
       if ("RSA".equals(algoClass)) {
         synchronized (this) {
           final KeyPair rsaKeyPair = this.getRsaKeyPair();
@@ -148,7 +143,7 @@ public class StaticCredentials {
       }
       return cred;
     }
-    catch (InvalidParameterException | InvalidAlgorithmParameterException e) {
+    catch (final InvalidParameterException | InvalidAlgorithmParameterException e) {
       throw new NoSuchAlgorithmException("Invalid parameter", e);
     }
   }
@@ -157,8 +152,7 @@ public class StaticCredentials {
    * Gets the generated RSA key pair.
    *
    * @return the RSA key pair.
-   * @throws InvalidParameterException
-   *           if the keysize is incorrect
+   * @throws InvalidParameterException if the keysize is incorrect
    */
   public synchronized KeyPair getRsaKeyPair() throws InvalidParameterException {
     if (this.rsaKeyPair == null) {
@@ -171,8 +165,7 @@ public class StaticCredentials {
    * Gets the generated EC key pair.
    *
    * @return the EC key pair
-   * @throws InvalidAlgorithmParameterException
-   *           for unsupported curve
+   * @throws InvalidAlgorithmParameterException for unsupported curve
    */
   public synchronized KeyPair getEcKeyPair() throws InvalidAlgorithmParameterException {
     if (this.ecKeyPair == null) {
@@ -185,8 +178,7 @@ public class StaticCredentials {
    * Assigns the {@link AlgorithmRegistry} to use. If not assigned, the registry configured for
    * {@link AlgorithmRegistrySingleton} will be used.
    *
-   * @param algorithmRegistry
-   *          the registry to use
+   * @param algorithmRegistry the registry to use
    */
   public void setAlgorithmRegistry(final AlgorithmRegistry algorithmRegistry) {
     this.algorithmRegistry = algorithmRegistry;
@@ -205,24 +197,22 @@ public class StaticCredentials {
   }
 
   /**
-   * Generates a RSA key pair.
+   * Generates an RSA key pair.
    *
-   * @param keysize
-   *          the keysize in bits
+   * @param keysize the keysize in bits
    * @return RSA key pair
-   * @throws InvalidParameterException
-   *           if the bit size is incorrect
+   * @throws InvalidParameterException if the bit size is incorrect
    */
   private KeyPair generateRsaKeyPair(final int keysize) throws InvalidParameterException {
     log.debug("Generating RSA key pair ...");
     try {
-      KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+      final KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
       generator.initialize(keysize);
-      KeyPair kp = generator.generateKeyPair();
-      this.rsaCertificate = generateV1Certificate(kp, "RSA");
+      final KeyPair kp = generator.generateKeyPair();
+      this.rsaCertificate = this.generateV1Certificate(kp, "RSA");
       return kp;
     }
-    catch (NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
+    catch (final NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
       throw new SecurityException(e);
     }
   }
@@ -230,22 +220,20 @@ public class StaticCredentials {
   /**
    * Generates an EC keypair.
    *
-   * @param ecCurve
-   *          the curve
+   * @param ecCurve the curve
    * @return EC keypair
-   * @throws InvalidAlgorithmParameterException
-   *           for invalid curve
+   * @throws InvalidAlgorithmParameterException for invalid curve
    */
   private KeyPair generateEcKeyPair(final String ecCurve) throws InvalidAlgorithmParameterException {
     log.debug("Generating EC key pair ...");
     try {
-      KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
+      final KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
       generator.initialize(new ECGenParameterSpec(ecCurve), new SecureRandom());
-      KeyPair kp = generator.generateKeyPair();
+      final KeyPair kp = generator.generateKeyPair();
       this.ecCertificate = this.generateV1Certificate(kp, "EC");
       return kp;
     }
-    catch (NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
+    catch (final NoSuchAlgorithmException | OperatorCreationException | CertificateException | IOException e) {
       throw new SecurityException(e);
     }
   }
@@ -269,30 +257,25 @@ public class StaticCredentials {
   }
 
   /**
-   * Generates self signed certificate.
+   * Generates self-signed certificate.
    *
-   * @param pair
-   *          key pair
-   * @param algoKey
-   *          algorithm type
+   * @param pair key pair
+   * @param algoKey algorithm type
    * @return certificate for the key pair
-   * @throws OperatorCreationException
-   *           on error
-   * @throws IOException
-   *           on error
-   * @throws CertificateException
-   *           on error
+   * @throws OperatorCreationException on error
+   * @throws IOException on error
+   * @throws CertificateException on error
    */
   private X509Certificate generateV1Certificate(final KeyPair pair, final String algoKey)
       throws OperatorCreationException, IOException, CertificateException {
 
     final X509v1CertificateBuilder certGenerator = new JcaX509v1CertificateBuilder(
-      new X500Name("CN=Test Signer"), /* issuer */
-      BigInteger.valueOf(System.currentTimeMillis()), /* serial */
-      new Date(System.currentTimeMillis() - 7200000L), /* notBefore */
-      new Date(System.currentTimeMillis() + (5 * 365 * 24 * 3600000L)), /* notAfter */
-      new X500Name("CN=Test Signer"), /* subject */
-      pair.getPublic());
+        new X500Name("CN=Test Signer"), /* issuer */
+        BigInteger.valueOf(System.currentTimeMillis()), /* serial */
+        new Date(System.currentTimeMillis() - 7200000L), /* notBefore */
+        new Date(System.currentTimeMillis() + (5 * 365 * 24 * 3600000L)), /* notAfter */
+        new X500Name("CN=Test Signer"), /* subject */
+        pair.getPublic());
 
     final ContentSigner signer = "RSA".equals(algoKey)
         ? new JcaContentSignerBuilder("SHA256WITHRSA").build(pair.getPrivate())

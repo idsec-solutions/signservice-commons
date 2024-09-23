@@ -15,17 +15,7 @@
  */
 package se.idsec.signservice.security.sign.xml.impl;
 
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.SignatureException;
-import java.security.cert.X509Certificate;
-import java.util.Objects;
-import java.util.Optional;
-
-import javax.xml.xpath.XPathExpressionException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
@@ -36,8 +26,6 @@ import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import lombok.extern.slf4j.Slf4j;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 import se.idsec.signservice.security.sign.xml.XMLSigner;
 import se.idsec.signservice.security.sign.xml.XMLSignerResult;
@@ -46,6 +34,16 @@ import se.swedenconnect.security.algorithms.AlgorithmRegistry;
 import se.swedenconnect.security.algorithms.AlgorithmRegistrySingleton;
 import se.swedenconnect.security.algorithms.SignatureAlgorithm;
 import se.swedenconnect.security.credential.PkiCredential;
+
+import javax.xml.xpath.XPathExpressionException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.SignatureException;
+import java.security.cert.X509Certificate;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Default implementation of the {@link XMLSigner} interface.
@@ -93,7 +91,7 @@ public class DefaultXMLSigner implements XMLSigner {
 
   /**
    * Should the certificate chain/path be included in the signature (if available from
-   * {@link PkiCredential#getCertificateChain()}. The default is {@code false} (only the entity certificate is
+   * {@link PkiCredential#getCertificateChain()}). The default is {@code false} (only the entity certificate is
    * included).
    */
   private boolean includeCertificateChain = false;
@@ -107,8 +105,8 @@ public class DefaultXMLSigner implements XMLSigner {
   private AlgorithmRegistry algorithmRegistry;
 
   /** For generating ID:s. */
-  private static SecureRandom random =
-      new SecureRandom(String.valueOf(System.currentTimeMillis()).getBytes(Charset.forName("UTF-8")));
+  private static final SecureRandom random =
+      new SecureRandom(String.valueOf(System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8));
 
   /**
    * Constructor.
@@ -136,7 +134,7 @@ public class DefaultXMLSigner implements XMLSigner {
     try {
       // Create Signature ...
       //
-      XMLSignature signature =
+      final XMLSignature signature =
           new XMLSignature(document, "", this.getSignatureAlgorithm(), this.canonicalizationTransform);
 
       // Insert the Signature element into the document.
@@ -145,11 +143,11 @@ public class DefaultXMLSigner implements XMLSigner {
 
       // Setup transforms
       //
-      Transforms transforms = new Transforms(document);
+      final Transforms transforms = new Transforms(document);
       transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
       transforms.addTransform(this.canonicalizationTransform);
       if (StringUtils.isNotEmpty(this.xPathTransform)) {
-        XPathContainer xpath = new XPathContainer(document);
+        final XPathContainer xpath = new XPathContainer(document);
         xpath.setXPathNamespaceContext(XMLSignature.getDefaultPrefix(Constants.SignatureSpecNS),
             Constants.SignatureSpecNS);
         xpath.setXPath(this.xPathTransform);
@@ -175,8 +173,8 @@ public class DefaultXMLSigner implements XMLSigner {
       if (this.includeCertificateChain
           && this.signingCredential.getCertificateChain().size() > 1) {
 
-        X509Data x509data = new X509Data(document);
-        for (X509Certificate c : this.signingCredential.getCertificateChain()) {
+        final X509Data x509data = new X509Data(document);
+        for (final X509Certificate c : this.signingCredential.getCertificateChain()) {
           x509data.addCertificate(c);
         }
         signature.getKeyInfo().add(x509data);
@@ -199,12 +197,12 @@ public class DefaultXMLSigner implements XMLSigner {
       }
       return result;
     }
-    catch (XMLSecurityException e) {
+    catch (final XMLSecurityException e) {
       final String msg = String.format("Error while creating Signature - %s", e.getMessage());
       log.error("{}", msg, e);
       throw new SignatureException(msg, e);
     }
-    catch (XPathExpressionException e) {
+    catch (final XPathExpressionException e) {
       final String msg = String.format("Failed to find location where to insert Signature - %s", e.getMessage());
       log.error("{}", msg, e);
       throw new SignatureException(msg, e);
@@ -418,7 +416,7 @@ public class DefaultXMLSigner implements XMLSigner {
   public static class DefaultXMLSignerBuilder {
 
     /** The object being built. */
-    private DefaultXMLSigner signer;
+    private final DefaultXMLSigner signer;
 
     /**
      * Constructor.

@@ -15,23 +15,10 @@
  */
 package se.idsec.signservice.security.sign.pdf.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -72,13 +59,24 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import se.idsec.signservice.security.certificate.CertificateUtils;
 import se.idsec.signservice.security.sign.pdf.configuration.PDFObjectIdentifiers;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Static utilities for signed PDF documents.
@@ -102,7 +100,7 @@ public class PDFBoxSignatureUtils {
         cmsSignedAttributes = signedData.getSignerInfos().iterator().next().getEncodedSignedAttributes();
       }
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       throw new CMSException("No CMS signed attributes are available", e);
     }
     if (cmsSignedAttributes != null) {
@@ -131,7 +129,7 @@ public class PDFBoxSignatureUtils {
       final SignerInfo signerInfo = SignerInfo.getInstance(signedData.getSignerInfos().getObjectAt(0));
       return signerInfo.getAuthenticatedAttributes().getEncoded("DER");
     }
-    catch (IllegalArgumentException | NullPointerException | IOException e) {
+    catch (final IllegalArgumentException | NullPointerException | IOException e) {
       throw new CMSException("No CMS signed attributes are available", e);
     }
   }
@@ -154,18 +152,17 @@ public class PDFBoxSignatureUtils {
       //
       // Basic checks to make sure it's a PKCS#7 SignedData Object
       //
-      ASN1Primitive pkcs7 = null;
+      final ASN1Primitive pkcs7;
       try (final ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(cmsSignedData))) {
         pkcs7 = din.readObject();
       }
-      catch (IOException e) {
+      catch (final IOException e) {
         throw new CMSException("Illegal PKCS7");
       }
 
-      if (!ASN1Sequence.class.isInstance(pkcs7)) {
+      if (!(pkcs7 instanceof final ASN1Sequence signedData)) {
         throw new CMSException("Illegal PKCS7");
       }
-      final ASN1Sequence signedData = (ASN1Sequence) pkcs7;
       final ASN1ObjectIdentifier objId = (ASN1ObjectIdentifier) signedData.getObjectAt(0);
       if (!PDFObjectIdentifiers.ID_PKCS7_SIGNED_DATA.equals(objId.getId())) {
         throw new CMSException("No SignedData available");
@@ -235,7 +232,7 @@ public class PDFBoxSignatureUtils {
       nsi.add(signerInfo.getObjectAt(siCounter++));
 
       // signing certificate issuer and serial number
-      final Certificate sigCert = chain.get(0);
+      final Certificate sigCert = chain.getFirst();
       final ASN1EncodableVector issuerAndSerial = PDFBoxSignatureUtils.getIssuerAndSerial(sigCert);
       nsi.add(new DERSequence(issuerAndSerial));
       siCounter++;
@@ -270,10 +267,10 @@ public class PDFBoxSignatureUtils {
        */
       // Add the SignerInfo sequence to the SignerInfos set and add this to the SignedData sequence
       nsd.add(new DERSet(new DERSequence(nsi)));
-      // Add the SignedData sequence as a eplicitly tagged object to the pkcs7 object
+      // Add the SignedData sequence as an eplicitly tagged object to the pkcs7 object
       npkcs7.add(new DERTaggedObject(true, 0, new DERSequence(nsd)));
 
-      byte[] pkcs7Bytes = null;
+      byte[] pkcs7Bytes;
       try (final ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
         final ASN1OutputStream dout = ASN1OutputStream.create(bout, ASN1Encoding.DER);
         try {
@@ -287,7 +284,7 @@ public class PDFBoxSignatureUtils {
 
       return pkcs7Bytes;
     }
-    catch (IOException | CertificateEncodingException | NullPointerException | IllegalArgumentException e) {
+    catch (final IOException | CertificateEncodingException | NullPointerException | IllegalArgumentException e) {
       throw new CMSException("Failed to update PKCS7 - " + e.getMessage(), e);
     }
   }
@@ -303,7 +300,7 @@ public class PDFBoxSignatureUtils {
   private static ASN1EncodableVector getIssuerAndSerial(final Certificate sigCert)
       throws CertificateEncodingException, IOException {
 
-    ASN1Sequence certSeq = null;
+    final ASN1Sequence certSeq;
     try (final ASN1InputStream ain = new ASN1InputStream(sigCert.getEncoded())) {
       certSeq = (ASN1Sequence) ain.readObject();
     }
@@ -311,7 +308,7 @@ public class PDFBoxSignatureUtils {
     final ASN1Sequence tbsSeq = (ASN1Sequence) certSeq.getObjectAt(0);
 
     int counter = 0;
-    while (ASN1TaggedObject.class.isInstance(tbsSeq.getObjectAt(counter))) {
+    while (tbsSeq.getObjectAt(counter) instanceof ASN1TaggedObject) {
       counter++;
     }
 
@@ -353,7 +350,7 @@ public class PDFBoxSignatureUtils {
   public static Map<SubjectDnAttribute, String> getSubjectAttributes(final Certificate cert) throws IOException {
 
     try {
-      ASN1Sequence certSeq = null;
+      final ASN1Sequence certSeq;
       try (final ASN1InputStream ain = new ASN1InputStream(cert.getEncoded())) {
         certSeq = (ASN1Sequence) ain.readObject();
       }
@@ -365,12 +362,10 @@ public class PDFBoxSignatureUtils {
       }
       // Get subject
       final ASN1Sequence subjectDn = (ASN1Sequence) tbsSeq.getObjectAt(counter + 4);
-      final Map<SubjectDnAttribute, String> subjectDnAttributeMap =
-          PDFBoxSignatureUtils.getSubjectAttributes(subjectDn);
 
-      return subjectDnAttributeMap;
+      return PDFBoxSignatureUtils.getSubjectAttributes(subjectDn);
     }
-    catch (CertificateEncodingException e) {
+    catch (final CertificateEncodingException e) {
       throw new IOException("Failed to get subject attributes from certificate - " + e.getMessage(), e);
     }
   }
@@ -384,18 +379,16 @@ public class PDFBoxSignatureUtils {
   public static Map<SubjectDnAttribute, String> getSubjectAttributes(final ASN1Sequence subjectDn) {
     final Map<SubjectDnAttribute, String> subjectDnAttributeMap = new EnumMap<>(SubjectDnAttribute.class);
 
-    final Iterator<ASN1Encodable> subjDnIt = subjectDn.iterator();
-    while (subjDnIt.hasNext()) {
-      final ASN1Set rdnSet = (ASN1Set) subjDnIt.next();
-      final Iterator<ASN1Encodable> rdnSetIt = rdnSet.iterator();
-      while (rdnSetIt.hasNext()) {
-        final ASN1Sequence rdnSeq = (ASN1Sequence) rdnSetIt.next();
+    for (final ASN1Encodable asn1Encodable : subjectDn) {
+      final ASN1Set rdnSet = (ASN1Set) asn1Encodable;
+      for (final ASN1Encodable encodable : rdnSet) {
+        final ASN1Sequence rdnSeq = (ASN1Sequence) encodable;
         final ASN1ObjectIdentifier rdnOid = (ASN1ObjectIdentifier) rdnSeq.getObjectAt(0);
         final String oidStr = rdnOid.getId();
         final ASN1Encodable rdnVal = rdnSeq.getObjectAt(1);
         final String rdnValStr = PDFBoxSignatureUtils.getStringValue(rdnVal);
         final SubjectDnAttribute subjectDnAttr = SubjectDnAttribute.getSubjectDnFromOid(oidStr);
-        if (!subjectDnAttr.equals(SubjectDnAttribute.unknown)) {
+        if (subjectDnAttr != SubjectDnAttribute.unknown) {
           subjectDnAttributeMap.put(subjectDnAttr, rdnValStr);
         }
       }
@@ -431,12 +424,10 @@ public class PDFBoxSignatureUtils {
   }
 
   private static String getStringValue(final ASN1Encodable rdnVal) {
-    if (rdnVal instanceof DERUTF8String) {
-      final DERUTF8String utf8Str = (DERUTF8String) rdnVal;
+    if (rdnVal instanceof final DERUTF8String utf8Str) {
       return utf8Str.getString();
     }
-    if (rdnVal instanceof DERPrintableString) {
-      final DERPrintableString str = (DERPrintableString) rdnVal;
+    if (rdnVal instanceof final DERPrintableString str) {
       return str.getString();
     }
     return rdnVal.toString();
@@ -444,21 +435,15 @@ public class PDFBoxSignatureUtils {
 
   private static String getName(final Map<SubjectDnAttribute, String> subjectDnAttributeMap) {
 
-    final String commonName = subjectDnAttributeMap.containsKey(SubjectDnAttribute.cn)
-        ? subjectDnAttributeMap.get(SubjectDnAttribute.cn)
-        : null;
+    final String commonName = subjectDnAttributeMap.getOrDefault(SubjectDnAttribute.cn, null);
 
     if (commonName != null) {
       return commonName;
     }
 
-    final String surname = subjectDnAttributeMap.containsKey(SubjectDnAttribute.surname)
-        ? subjectDnAttributeMap.get(SubjectDnAttribute.surname)
-        : null;
+    final String surname = subjectDnAttributeMap.getOrDefault(SubjectDnAttribute.surname, null);
 
-    final String givenName = subjectDnAttributeMap.containsKey(SubjectDnAttribute.givenName)
-        ? subjectDnAttributeMap.get(SubjectDnAttribute.givenName)
-        : null;
+    final String givenName = subjectDnAttributeMap.getOrDefault(SubjectDnAttribute.givenName, null);
 
     if (surname != null && givenName != null) {
       return givenName + " " + surname;
@@ -477,13 +462,9 @@ public class PDFBoxSignatureUtils {
 
   private static String getLocation(final Map<SubjectDnAttribute, String> subjectDnAttributeMap) {
 
-    final String country = subjectDnAttributeMap.containsKey(SubjectDnAttribute.country)
-        ? subjectDnAttributeMap.get(SubjectDnAttribute.country)
-        : null;
+    final String country = subjectDnAttributeMap.getOrDefault(SubjectDnAttribute.country, null);
 
-    final String locality = subjectDnAttributeMap.containsKey(SubjectDnAttribute.locality)
-        ? subjectDnAttributeMap.get(SubjectDnAttribute.locality)
-        : null;
+    final String locality = subjectDnAttributeMap.getOrDefault(SubjectDnAttribute.locality, null);
 
     if (country != null && locality != null) {
       return locality + ", " + country;
@@ -522,8 +503,8 @@ public class PDFBoxSignatureUtils {
 
       final ASN1EncodableVector signedCert = new ASN1EncodableVector();
 
-      boolean essSigCertV2;
-      ASN1ObjectIdentifier signedCertOid;
+      final boolean essSigCertV2;
+      final ASN1ObjectIdentifier signedCertOid;
 
       if (digestAlgo.equals(CMSAlgorithm.SHA1)) {
         signedCertOid = new ASN1ObjectIdentifier(PDFObjectIdentifiers.ID_AA_SIGNING_CERTIFICATE_V1);
@@ -564,10 +545,10 @@ public class PDFBoxSignatureUtils {
 
       return signedCert;
     }
-    catch (NoSuchProviderException e) {
+    catch (final NoSuchProviderException e) {
       throw new SecurityException("The BC provider is not installed", e);
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       throw new CertificateException("Failed to encode certificate - " + e.getMessage(), e);
     }
   }
@@ -575,7 +556,7 @@ public class PDFBoxSignatureUtils {
   public static byte[] removeSignedAttr(final byte[] signedAttrBytes, final ASN1ObjectIdentifier[] attrOid)
       throws IOException {
 
-    ASN1Set inAttrSet = null;
+    final ASN1Set inAttrSet;
     try (final ASN1InputStream ais = new ASN1InputStream(signedAttrBytes)) {
       inAttrSet = ASN1Set.getInstance(ais.readObject());
     }
@@ -605,7 +586,7 @@ public class PDFBoxSignatureUtils {
 
   public static SignedCertRef getSignedCertRefAttribute(final byte[] signedAttrBytes) throws IOException {
 
-    ASN1Set inAttrSet = null;
+    final ASN1Set inAttrSet;
     try (final ASN1InputStream ais = new ASN1InputStream(signedAttrBytes)) {
       inAttrSet = ASN1Set.getInstance(ais.readObject());
     }

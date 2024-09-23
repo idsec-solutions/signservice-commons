@@ -15,15 +15,16 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
+import se.idsec.signservice.security.sign.SignerResult;
+
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
-import se.idsec.signservice.security.sign.SignerResult;
-
 /**
- * Abstract base class for {@link SignerResult} implementations.
- * 
+ * Abstract base class for {@link SignerResult} implementations.
+ *
+ * @param <T> the type of document signed
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -41,6 +42,12 @@ public class AbstractSignerResult<T> implements SignerResult<T> {
   /** The signer certificate chain. */
   private List<X509Certificate> signerCertificateChain;
 
+  /**
+   * Default constructor.
+   */
+  public AbstractSignerResult() {
+  }
+
   /** {@inheritDoc} */
   @Override
   public T getSignedDocument() {
@@ -49,9 +56,8 @@ public class AbstractSignerResult<T> implements SignerResult<T> {
 
   /**
    * Assigns the signed document.
-   * 
-   * @param signedDocument
-   *          the signed document
+   *
+   * @param signedDocument the signed document
    */
   public void setSignedDocument(final T signedDocument) {
     this.signedDocument = signedDocument;
@@ -65,9 +71,8 @@ public class AbstractSignerResult<T> implements SignerResult<T> {
 
   /**
    * Assigns the signing time.
-   * 
-   * @param signingTime
-   *          the siging time (in millis since epoch)
+   *
+   * @param signingTime the siging time (in millis since epoch)
    */
   public void setSigningTime(final long signingTime) {
     this.signingTime = signingTime;
@@ -81,9 +86,8 @@ public class AbstractSignerResult<T> implements SignerResult<T> {
 
   /**
    * Assigns the signer certificate.
-   * 
-   * @param signerCertificate
-   *          the signer certificate
+   *
+   * @param signerCertificate the signer certificate
    */
   public void setSignerCertificate(final X509Certificate signerCertificate) {
     this.signerCertificate = signerCertificate;
@@ -92,16 +96,15 @@ public class AbstractSignerResult<T> implements SignerResult<T> {
   /** {@inheritDoc} */
   @Override
   public List<X509Certificate> getSignerCertificateChain() {
-    return signerCertificateChain != null
+    return this.signerCertificateChain != null
         ? this.signerCertificateChain
         : this.signerCertificate != null ? Collections.singletonList(this.signerCertificate) : Collections.emptyList();
   }
 
   /**
    * Assigns the signer certificate chain.
-   * 
-   * @param signerCertificateChain
-   *          the signer certificate chain
+   *
+   * @param signerCertificateChain the signer certificate chain
    */
   public void setSignerCertificateChain(final List<X509Certificate> signerCertificateChain) {
     this.signerCertificateChain = signerCertificateChain;

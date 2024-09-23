@@ -17,7 +17,7 @@ package se.idsec.signservice.security.sign;
 
 /**
  * Marker interface for signer parameters for the {@link Signer} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */

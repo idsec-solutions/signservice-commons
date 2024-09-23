@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
-
 import se.idsec.signservice.security.sign.xml.XMLTestBase;
 import se.swedenconnect.security.credential.KeyStoreCredential;
 import se.swedenconnect.security.credential.PkiCredential;
@@ -35,10 +34,10 @@ public class DefaultXMLSignerTest extends XMLTestBase {
   @Test
   public void testDefaultSignature() {
     Assertions.assertDoesNotThrow(() -> {
-      Document document = getDocument("xml/simple.xml");
-      PkiCredential credential = getSigningCredential();
+      final Document document = getDocument("xml/simple.xml");
+      final PkiCredential credential = this.getSigningCredential();
 
-      DefaultXMLSigner operation = new DefaultXMLSigner(credential);
+      final DefaultXMLSigner operation = new DefaultXMLSigner(credential);
 
       operation.sign(document);
     });

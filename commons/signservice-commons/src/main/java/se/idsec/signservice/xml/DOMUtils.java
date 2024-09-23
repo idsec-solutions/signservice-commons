@@ -15,6 +15,21 @@
  */
 package se.idsec.signservice.xml;
 
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,22 +42,6 @@ import java.util.Queue;
 import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
 /**
  * Utilities for processing DOM documents.
  *
@@ -52,16 +51,16 @@ import org.xml.sax.SAXException;
 public class DOMUtils {
 
   /** The document builder factory. */
-  private static DocumentBuilderFactory documentBuilderFactory;
+  private static final DocumentBuilderFactory documentBuilderFactory;
 
   /** DOM transformer for pretty printing of XML nodes. */
-  private static Transformer prettyPrintTransformer;
+  private static final Transformer prettyPrintTransformer;
 
   /** DOM transformer. */
-  private static Transformer transformer;
+  private static final Transformer transformer;
 
   /** We lovingly borrow from Apache's xmlsec ... States the parser pool size. */
-  private static int parserPoolSize = Integer.getInteger("org.apache.xml.security.parser.pool-size", 20);
+  private static final int parserPoolSize = Integer.getInteger("org.apache.xml.security.parser.pool-size", 20);
 
   /** Map of classloaders and queues of document builders. */
   private static final Map<ClassLoader, Queue<DocumentBuilder>> documentBuilders = Collections.synchronizedMap(
@@ -182,7 +181,7 @@ public class DOMUtils {
       try {
         return createDocumentBuilder().parse(stream);
       }
-      catch (SAXException | IOException e) {
+      catch (final SAXException | IOException e) {
         throw new DOMException(DOMException.SYNTAX_ERR, "Failed to decode bytes into DOM document");
       }
     }
@@ -191,7 +190,7 @@ public class DOMUtils {
     try {
       return documentBuilder.parse(stream);
     }
-    catch (SAXException | IOException e) {
+    catch (final SAXException | IOException e) {
       throw new DOMException(DOMException.SYNTAX_ERR, "Failed to decode bytes into DOM document");
     }
     finally {

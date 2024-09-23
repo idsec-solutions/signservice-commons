@@ -19,39 +19,40 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
- * Representation of the result to an {@link Signer#sign(Object)} invocation. 
- * 
- * @param <T> the type of document signed 
- * 
+ * Representation of the result to an {@link Signer#sign(Object)} invocation.
+ *
+ * @param <T> the type of document signed
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public interface SignerResult<T> {
-  
+
   /**
    * Gets the signed document.
+   *
    * @return the signed document
    */
   T getSignedDocument();
-  
+
   /**
    * Gets the time of signing
+   *
    * @return the time of signing (milliseconds since 1970-01-01)
    */
   long getSigningTime();
-  
+
   /**
    * Gets the signer certificate.
-   * 
+   *
    * @return the signer certificate
    */
   X509Certificate getSignerCertificate();
 
   /**
-   * Gets the signer certificate chain. The chain starts with the signer certificate. 
-   * 
+   * Gets the signer certificate chain. The chain starts with the signer certificate.
+   *
    * @return signer certificate chain (holding at least one certificate)
    */
-  List<X509Certificate> getSignerCertificateChain();  
+  List<X509Certificate> getSignerCertificateChain();
 
 }

@@ -15,6 +15,25 @@
  */
 package se.idsec.signservice.security.sign.xml.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.X509Data;
+import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.XMLSignatureException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import se.idsec.signservice.security.certificate.CertificateUtils;
+import se.idsec.signservice.security.certificate.CertificateValidationResult;
+import se.idsec.signservice.security.certificate.CertificateValidator;
+import se.idsec.signservice.security.sign.SignatureValidationResult;
+import se.idsec.signservice.security.sign.SignatureValidationResult.Status;
+import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
+import se.idsec.signservice.security.sign.xml.XMLSignatureValidator;
+
+import javax.xml.xpath.XPathExpressionException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.security.SignatureException;
@@ -25,33 +44,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.xpath.XPathExpressionException;
-
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.X509Data;
-import org.apache.xml.security.keys.content.x509.XMLX509Certificate;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.signature.XMLSignatureException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import lombok.extern.slf4j.Slf4j;
-import se.idsec.signservice.security.certificate.CertificateUtils;
-import se.idsec.signservice.security.certificate.CertificateValidationResult;
-import se.idsec.signservice.security.certificate.CertificateValidator;
-import se.idsec.signservice.security.sign.SignatureValidationResult;
-import se.idsec.signservice.security.sign.SignatureValidationResult.Status;
-import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
-import se.idsec.signservice.security.sign.xml.XMLSignatureValidator;
-
 /**
  * Default implementation of the {@link XMLSignatureValidator} interface.
  * <p>
  * Note that this implementation only supports validation of signatures that covers the supplied document.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -81,9 +79,8 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
   /**
    * Constructor setting up the validator to require that the signature is signed using the supplied certificate.
-   * 
-   * @param acceptedSignerCertificate
-   *          required signer certificate
+   *
+   * @param acceptedSignerCertificate required signer certificate
    */
   public DefaultXMLSignatureValidator(final X509Certificate acceptedSignerCertificate) {
     this(Collections.singletonList(acceptedSignerCertificate));
@@ -92,9 +89,8 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
   /**
    * Constructor setting up the validator to require that the signature is signed using any of the supplied
    * certificates.
-   * 
-   * @param acceptedSignerCertificates
-   *          required signer certificates
+   *
+   * @param acceptedSignerCertificates required signer certificates
    */
   public DefaultXMLSignatureValidator(final List<X509Certificate> acceptedSignerCertificates) {
     this.requiredSignerCertificates = acceptedSignerCertificates;
@@ -104,9 +100,8 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
   /**
    * Constructor setting up the validator to perform a certificate validation of the signer certificate using the
    * supplied certificate validator instance.
-   * 
-   * @param certificateValidator
-   *          certificate validator instance
+   *
+   * @param certificateValidator certificate validator instance
    */
   public DefaultXMLSignatureValidator(final CertificateValidator certificateValidator) {
     this.requiredSignerCertificates = Collections.emptyList();
@@ -119,11 +114,12 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
     // First locate all signature elements ...
     //
-    NodeList signatureElements = document.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS, "Signature");
+    final NodeList signatureElements =
+        document.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS, "Signature");
     if (signatureElements.getLength() == 0) {
       throw new SignatureException("Supplied document is not signed");
     }
-    List<Element> signatures = new ArrayList<>();
+    final List<Element> signatures = new ArrayList<>();
     for (int i = 0; i < signatureElements.getLength(); i++) {
       signatures.add((Element) signatureElements.item(i));
     }
@@ -144,18 +140,16 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
       }
       return this.validate(document, Collections.singletonList(signature));
     }
-    catch (XPathExpressionException e) {
+    catch (final XPathExpressionException e) {
       throw new SignatureException(e.getMessage(), e);
     }
   }
 
   /**
    * Validates the supplied signatures.
-   * 
-   * @param document
-   *          the document containing the signatures
-   * @param signatures
-   *          the signatures
+   *
+   * @param document the document containing the signatures
+   * @param signatures the signatures
    * @return a list of result objects
    */
   protected List<SignatureValidationResult> validate(final Document document, final List<Element> signatures) {
@@ -172,25 +166,27 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
     // Verify all signatures ...
     //
-    List<SignatureValidationResult> results = new ArrayList<>();
-    for (Element signature : signatures) {
-      DefaultXMLSignatureValidationResult result = this.validateSignature(signature, signatureUriReference);
+    final List<SignatureValidationResult> results = new ArrayList<>();
+    for (final Element signature : signatures) {
+      final DefaultXMLSignatureValidationResult result = this.validateSignature(signature, signatureUriReference);
 
       // If we have a cert path validator installed, perform path validation...
       //
       if (result.isSuccess() && this.certificateValidator != null) {
         try {
-          CertificateValidationResult validatorResult = this.certificateValidator.validate(
-            result.getSignerCertificate(), result.getAdditionalCertificates(), null);
+          final CertificateValidationResult validatorResult = this.certificateValidator.validate(
+              result.getSignerCertificate(), result.getAdditionalCertificates(), null);
           result.setCertificateValidationResult(validatorResult);
         }
-        catch (CertPathBuilderException e) {
-          final String msg = String.format("Failed to build a path to a trusted root for signer certificate - %s", e.getMessage());
+        catch (final CertPathBuilderException e) {
+          final String msg =
+              String.format("Failed to build a path to a trusted root for signer certificate - %s", e.getMessage());
           log.error("{}", e.getMessage(), e);
           result.setError(Status.ERROR_NOT_TRUSTED, msg, e);
         }
-        catch (GeneralSecurityException e) {
-          final String msg = String.format("Certificate path validation failure for signer certificate - %s", e.getMessage());
+        catch (final GeneralSecurityException e) {
+          final String msg =
+              String.format("Certificate path validation failure for signer certificate - %s", e.getMessage());
           log.error("{}", e.getMessage(), e);
           result.setError(Status.ERROR_SIGNER_INVALID, msg, e);
         }
@@ -203,21 +199,20 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
   /**
    * Validates the signature value and checks that the signer certificate is accepted.
-   * 
-   * @param signature
-   *          the signature element
-   * @param signatureUriReference
-   *          the signature URI reference
+   *
+   * @param signature the signature element
+   * @param signatureUriReference the signature URI reference
    * @return a validation result
    */
-  protected DefaultXMLSignatureValidationResult validateSignature(final Element signature, final String signatureUriReference) {
+  protected DefaultXMLSignatureValidationResult validateSignature(final Element signature,
+      final String signatureUriReference) {
 
-    DefaultXMLSignatureValidationResult result = new DefaultXMLSignatureValidationResult();
+    final DefaultXMLSignatureValidationResult result = new DefaultXMLSignatureValidationResult();
     result.setSignatureElement(signature);
-        
+
     try {
       // Parse the signature element.
-      XMLSignature xmlSignature = new XMLSignature(signature, "");
+      final XMLSignature xmlSignature = new XMLSignature(signature, "");
 
       // Set the signature algorithm
       result.setSignatureAlgorithm(xmlSignature.getSignedInfo().getSignatureMethodURI());
@@ -225,8 +220,10 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
       // Make sure the signature covers the entire document.
       //
       final List<String> uris = this.getSignedInfoReferenceURIs(xmlSignature.getSignedInfo().getElement());
-      if (!uris.contains(signatureUriReference) && !uris.contains("") ) {
-        final String msg = String.format("The Signature contained the reference(s) %s - none of these covers the entire document", uris);
+      if (!uris.contains(signatureUriReference) && !uris.contains("")) {
+        final String msg =
+            String.format("The Signature contained the reference(s) %s - none of these covers the entire document",
+                uris);
         log.error(msg);
         result.setError(Status.ERROR_BAD_FORMAT, msg);
         return result;
@@ -242,7 +239,8 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
           result.setSignerCertificate(validationCertificate);
 
           // Get hold of any other certs (intermediate and roots)
-          result.setAdditionalCertificates(this.getAdditionalCertificates(xmlSignature.getKeyInfo(), validationCertificate));
+          result.setAdditionalCertificates(
+              this.getAdditionalCertificates(xmlSignature.getKeyInfo(), validationCertificate));
 
           validationKey = validationCertificate.getPublicKey();
         }
@@ -270,7 +268,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
         // Otherwise, lets try to check the signature using the required signer certificates ...
         //
         log.debug("{} - using required signer certificates to check signature ...", msg);
-        for (X509Certificate rc : this.requiredSignerCertificates) {
+        for (final X509Certificate rc : this.requiredSignerCertificates) {
           try {
             if (xmlSignature.checkSignatureValue(rc)) {
               log.debug("Certificate [{}] verified signature successfully", CertificateUtils.toLogString(rc));
@@ -279,14 +277,15 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
               return result;
             }
           }
-          catch (XMLSignatureException e) {
-            log.error("Certificate [{}] could not be used to validate signature value", CertificateUtils.toLogString(rc), e);
+          catch (final XMLSignatureException e) {
+            log.error("Certificate [{}] could not be used to validate signature value",
+                CertificateUtils.toLogString(rc), e);
           }
           log.debug("Certificate [{}] could not be used to validate signature value", CertificateUtils.toLogString(rc));
         }
         log.info("{} - And none of supplied required signer certificates verified signature", msg);
         result.setError(Status.ERROR_BAD_FORMAT,
-          msg + " - And none of supplied required signer certificates verified signature");
+            msg + " - And none of supplied required signer certificates verified signature");
         return result;
       }
       else {
@@ -294,13 +293,14 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
         //
         try {
           if (!xmlSignature.checkSignatureValue(validationKey)) {
-            final String msg = "Signature is invalid - signature value did not validate correctly or reference digest comparison failed";
+            final String msg =
+                "Signature is invalid - signature value did not validate correctly or reference digest comparison failed";
             log.info("{}", msg);
             result.setError(Status.ERROR_INVALID_SIGNATURE, msg);
             return result;
           }
         }
-        catch (XMLSignatureException e) {
+        catch (final XMLSignatureException e) {
           final String msg = "Signature is invalid - " + e.getMessage();
           log.info("{}", msg, e);
           result.setError(Status.ERROR_INVALID_SIGNATURE, msg, e);
@@ -327,7 +327,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
             log.info("No certificate checking performed - signature is regarded as valid");
             result.setStatus(Status.SUCCESS);
           }
-          for (X509Certificate rc : this.requiredSignerCertificates) {
+          for (final X509Certificate rc : this.requiredSignerCertificates) {
             if (rc.getPublicKey().equals(validationKey)) {
               log.debug("Required certificate [{}] matched key found in KeyInfo", CertificateUtils.toLogString(rc));
               result.setStatus(Status.SUCCESS);
@@ -344,7 +344,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
           return result;
         }
         else {
-          // OK, this is the most common case. The KeyInfo contained and certificate and
+          // OK, this is the most common case. The KeyInfo contained and certificate, and
           // now we just want to make sure that this certificate is listed among the required
           // certificates.
           //
@@ -357,9 +357,10 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
           }
           else {
             // Find a matching certificate ...
-            for (X509Certificate rc : this.requiredSignerCertificates) {
+            for (final X509Certificate rc : this.requiredSignerCertificates) {
               if (result.getSignerCertificate().equals(rc)) {
-                log.debug("Required certificate [{}] matched certificate found in KeyInfo", CertificateUtils.toLogString(rc));
+                log.debug("Required certificate [{}] matched certificate found in KeyInfo",
+                    CertificateUtils.toLogString(rc));
                 result.setStatus(Status.SUCCESS);
                 return result;
               }
@@ -374,7 +375,7 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
         }
       }
     }
-    catch (XMLSecurityException | SignatureException e) {
+    catch (final XMLSecurityException | SignatureException e) {
       result.setError(Status.ERROR_BAD_FORMAT, e.getMessage(), e);
       return result;
     }
@@ -382,15 +383,14 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
   /**
    * Extracts all certificates from the supplied KeyInfo except for the actual signer certificate.
-   * 
-   * @param keyInfo
-   *          the KeyInfo
-   * @param signerCertificate
-   *          the signer certificate
+   *
+   * @param keyInfo the KeyInfo
+   * @param signerCertificate the signer certificate
    * @return a list of certificates
    */
-  protected List<X509Certificate> getAdditionalCertificates(final KeyInfo keyInfo, final X509Certificate signerCertificate) {
-    List<X509Certificate> additional = new ArrayList<>();
+  protected List<X509Certificate> getAdditionalCertificates(final KeyInfo keyInfo,
+      final X509Certificate signerCertificate) {
+    final List<X509Certificate> additional = new ArrayList<>();
     for (int i = 0; i < keyInfo.lengthX509Data(); i++) {
       try {
         final X509Data x509data = keyInfo.itemX509Data(i);
@@ -407,9 +407,8 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
           }
         }
       }
-      catch (XMLSecurityException | CertificateException e) {
+      catch (final XMLSecurityException | CertificateException e) {
         log.error("Failed to extract X509Certificate from KeyInfo", e);
-        continue;
       }
     }
     return additional;
@@ -419,10 +418,11 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
   @Override
   public boolean isSigned(final Document document) throws IllegalArgumentException {
     try {
-      NodeList signatureElements = document.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS, "Signature");
+      final NodeList signatureElements =
+          document.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS, "Signature");
       return signatureElements.getLength() > 0;
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       throw new IllegalArgumentException("Invalid document", e);
     }
   }
@@ -441,22 +441,20 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
   /**
    * Sets flag that tells whether this validator should handle XAdES processing. The default is {@code true}
-   * 
-   * @param xadesProcessing
-   *          whether to process XAdES
+   *
+   * @param xadesProcessing whether to process XAdES
    */
-  public void setXadesProcessing(boolean xadesProcessing) {
+  public void setXadesProcessing(final boolean xadesProcessing) {
     this.xadesProcessing = xadesProcessing;
   }
 
   /**
-   * Looks for any {@code xades:SignedProperties} elements and registers an Id attribute for the elements that are
+   * Looks for any {@code xades:SignedProperties} elements and registers an ID attribute for the elements that are
    * found.
-   * 
-   * @param document
-   *          the document to manipulate
+   *
+   * @param document the document to manipulate
    */
-  protected void registerXadesIdNodes(Document document) {
+  protected void registerXadesIdNodes(final Document document) {
     final NodeList xadesSignedProperties = document.getElementsByTagNameNS(XADES_NAMESPACE, "SignedProperties");
     for (int i = 0; i < xadesSignedProperties.getLength(); i++) {
       final Element sp = (Element) xadesSignedProperties.item(i);
@@ -466,19 +464,18 @@ public class DefaultXMLSignatureValidator implements XMLSignatureValidator {
 
   /**
    * Utility method for getting hold of the reference URI:s of a {@code SignedInfo} element.
-   * 
-   * @param signedInfo
-   *          the signed info element
+   *
+   * @param signedInfo the signed info element
    * @return a list of one or more reference URI:s
-   * @throws SignatureException
-   *           for unmarshalling errors
+   * @throws SignatureException for unmarshalling errors
    */
   private List<String> getSignedInfoReferenceURIs(final Element signedInfo) throws SignatureException {
-    final NodeList references = signedInfo.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS, "Reference");
+    final NodeList references =
+        signedInfo.getElementsByTagNameNS(javax.xml.crypto.dsig.XMLSignature.XMLNS, "Reference");
     if (references.getLength() == 0) {
       throw new SignatureException("No Reference element found in SignedInfo of signature");
     }
-    List<String> uris = new ArrayList<>();
+    final List<String> uris = new ArrayList<>();
     for (int i = 0; i < references.getLength(); i++) {
       final Element reference = (Element) references.item(i);
       uris.add(reference.getAttribute("URI"));

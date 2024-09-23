@@ -15,12 +15,11 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
-import java.security.SignatureException;
-
 import org.w3c.dom.Document;
-
 import se.idsec.signservice.security.sign.Signer;
 import se.idsec.signservice.security.sign.VoidSignerParameters;
+
+import java.security.SignatureException;
 
 /**
  * Interface for XML signatures.
@@ -34,7 +33,8 @@ public interface XMLSigner extends Signer<Document, XMLSignerResult, VoidSignerP
    * This implementation does not support any type of parameters. Will invoke {@code sign(Document)}.
    */
   @Override
-  default XMLSignerResult sign(final Document document, final VoidSignerParameters parameters) throws SignatureException {
+  default XMLSignerResult sign(final Document document, final VoidSignerParameters parameters)
+      throws SignatureException {
     return this.sign(document);
   }
 

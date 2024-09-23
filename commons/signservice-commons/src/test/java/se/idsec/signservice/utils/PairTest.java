@@ -15,10 +15,10 @@
  */
 package se.idsec.signservice.utils;
 
-import java.util.HashMap;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 /**
  * Test cases for Pair.
@@ -30,7 +30,7 @@ public class PairTest {
 
   @SuppressWarnings("unlikely-arg-type")
   @Test
-  public void testPair() throws Exception {
+  public void testPair() {
 
     // Not much to test, but it is nice with 100% code coverage.
 

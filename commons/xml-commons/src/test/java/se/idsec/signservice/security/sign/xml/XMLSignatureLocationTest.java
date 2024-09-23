@@ -15,18 +15,17 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation.ChildPosition;
 import se.idsec.signservice.xml.DOMUtils;
+
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.xpath.XPathExpressionException;
 
 /**
  * Tests for {@code XMLSignatureLocation}.
@@ -114,13 +113,13 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       location.insertSignature(createSignatureElement(), doc);
       Assertions.fail("Expected XPathExpressionException");
     }
-    catch (final XPathExpressionException e) {
+    catch (final XPathExpressionException ignored) {
     }
     try {
       location.testInsert(doc);
       Assertions.fail("Expected XPathExpressionException");
     }
-    catch (final XPathExpressionException e) {
+    catch (final XPathExpressionException ignored) {
     }
 
     xpaths = new String[] { "/TheRoot/ElementOne", "/*/ElementOne" };
@@ -184,13 +183,13 @@ public class XMLSignatureLocationTest extends XMLTestBase {
       location.insertSignature(createSignatureElement(), doc);
       Assertions.fail("Expected XPathExpressionException");
     }
-    catch (final XPathExpressionException e) {
+    catch (final XPathExpressionException ignored) {
     }
     try {
       location.testInsert(doc);
       Assertions.fail("Expected XPathExpressionException");
     }
-    catch (final XPathExpressionException e) {
+    catch (final XPathExpressionException ignored) {
     }
   }
 
@@ -256,7 +255,7 @@ public class XMLSignatureLocationTest extends XMLTestBase {
     return node.getChildNodes().item(node.getChildNodes().getLength() - 1).getLocalName();
   }
 
-  private static Element createSignatureElement() throws Exception {
+  private static Element createSignatureElement() {
     final Document doc = DOMUtils.createDocumentBuilder().newDocument();
 
     final Element element = doc.createElementNS(XMLSignature.XMLNS, "ds:Signature");

@@ -25,32 +25,30 @@ import java.security.cert.X509Certificate;
 
 /**
  * Utilities for handling X.509 certificates.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 public class CertificateUtils {
 
   /** Factory for creating certificates. */
-  private static CertificateFactory factory = null;
+  private static final CertificateFactory factory;
 
   static {
     try {
       factory = CertificateFactory.getInstance("X.509");
     }
-    catch (CertificateException e) {
+    catch (final CertificateException e) {
       throw new SecurityException(e);
     }
   }
 
   /**
    * Decodes a {@link X509Certificate} from its encoding.
-   * 
-   * @param encoding
-   *          the certificate encoding
+   *
+   * @param encoding the certificate encoding
    * @return a X509Certificate object
-   * @throws CertificateException
-   *           for decoding errors
+   * @throws CertificateException for decoding errors
    */
   public static X509Certificate decodeCertificate(final byte[] encoding) throws CertificateException {
     return decodeCertificate(new ByteArrayInputStream(encoding));
@@ -58,12 +56,10 @@ public class CertificateUtils {
 
   /**
    * Decodes a {@link X509Certificate} from an input stream.
-   * 
-   * @param stream
-   *          the stream to read
+   *
+   * @param stream the stream to read
    * @return a X509Certificate object
-   * @throws CertificateException
-   *           for decoding errors
+   * @throws CertificateException for decoding errors
    */
   public static X509Certificate decodeCertificate(final InputStream stream) throws CertificateException {
     return (X509Certificate) factory.generateCertificate(stream);
@@ -71,12 +67,10 @@ public class CertificateUtils {
 
   /**
    * Decodes a {@link X509CRL} from its encoding.
-   * 
-   * @param encoding
-   *          the CRL encoding
+   *
+   * @param encoding the CRL encoding
    * @return a X509CRL object
-   * @throws CRLException
-   *           for decoding errors
+   * @throws CRLException for decoding errors
    */
   public static X509CRL decodeCrl(final byte[] encoding) throws CRLException {
     return decodeCrl(new ByteArrayInputStream(encoding));
@@ -84,12 +78,10 @@ public class CertificateUtils {
 
   /**
    * Decodes a {@link X509CRL} from an input stream.
-   * 
-   * @param stream
-   *          the stream to read
+   *
+   * @param stream the stream to read
    * @return a X509CRL object
-   * @throws CRLException
-   *           for decoding errors
+   * @throws CRLException for decoding errors
    */
   public static X509CRL decodeCrl(final InputStream stream) throws CRLException {
     return (X509CRL) factory.generateCRL(stream);
@@ -98,20 +90,16 @@ public class CertificateUtils {
   /**
    * The {@link X509Certificate#toString()} prints way too much for a normal log entry. This method displays the
    * subject, issuer and serial number.
-   * 
-   * @param certificate
-   *          the certificate to log
+   *
+   * @param certificate the certificate to log
    * @return a log string
    */
   public static String toLogString(final X509Certificate certificate) {
     if (certificate == null) {
       return "null";
     }
-    StringBuffer sb = new StringBuffer();
-    sb.append("subject='").append(certificate.getSubjectX500Principal().getName()).append("',");
-    sb.append("issuer='").append(certificate.getIssuerX500Principal().getName()).append("',");
-    sb.append("serial-number='").append(certificate.getSerialNumber()).append("'");
-    return sb.toString();
+    return "subject='%s', issuer='%s', serial-number='%s'".formatted(certificate.getSubjectX500Principal().getName(),
+        certificate.getIssuerX500Principal().getName(), certificate.getSerialNumber());
   }
 
   // Hidden

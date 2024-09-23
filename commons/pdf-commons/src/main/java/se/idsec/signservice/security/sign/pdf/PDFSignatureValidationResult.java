@@ -16,7 +16,6 @@
 package se.idsec.signservice.security.sign.pdf;
 
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
-
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 
 /**

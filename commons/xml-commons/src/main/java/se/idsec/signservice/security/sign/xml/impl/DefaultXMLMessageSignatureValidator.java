@@ -15,25 +15,30 @@
  */
 package se.idsec.signservice.security.sign.xml.impl;
 
-import java.security.SignatureException;
-import java.security.cert.X509Certificate;
-import java.util.List;
-
-import org.w3c.dom.Document;
-
 import lombok.extern.slf4j.Slf4j;
+import org.w3c.dom.Document;
 import se.idsec.signservice.security.sign.SignatureValidationResult;
 import se.idsec.signservice.security.sign.xml.XMLMessageSignatureValidator;
 import se.idsec.signservice.security.sign.xml.XMLSignatureLocation;
 
+import java.security.SignatureException;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 /**
  * Implementation of the {@link XMLMessageSignatureValidator} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
 @Slf4j
 public class DefaultXMLMessageSignatureValidator implements XMLMessageSignatureValidator {
+
+  /**
+   * Default constructor.
+   */
+  public DefaultXMLMessageSignatureValidator() {
+  }
 
   /** {@inheritDoc} */
   @Override
@@ -41,19 +46,19 @@ public class DefaultXMLMessageSignatureValidator implements XMLMessageSignatureV
       final List<X509Certificate> expectedSignerCertificates,
       final XMLSignatureLocation signatureLocation) throws SignatureException {
 
-    DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(expectedSignerCertificates);
+    final DefaultXMLSignatureValidator validator = new DefaultXMLSignatureValidator(expectedSignerCertificates);
     validator.setXadesProcessing(false);
 
-    List<SignatureValidationResult> result = validator.validate(document, signatureLocation);
+    final List<SignatureValidationResult> result = validator.validate(document, signatureLocation);
     if (result.size() > 1) {
       throw new SignatureException("Document contains multiple Signature elements - use XPath expression");
     }
-    if (result.get(0).isSuccess()) {
-      log.debug("Signature on XML message successfully validated: {}", result.get(0));
+    if (result.getFirst().isSuccess()) {
+      log.debug("Signature on XML message successfully validated: {}", result.getFirst());
     }
     else {
-      log.info("Signature validation on XML message failed: {}", result.get(0));
-      throw new SignatureException(result.get(0).getStatusMessage());
+      log.info("Signature validation on XML message failed: {}", result.getFirst());
+      throw new SignatureException(result.getFirst().getStatusMessage());
     }
 
   }

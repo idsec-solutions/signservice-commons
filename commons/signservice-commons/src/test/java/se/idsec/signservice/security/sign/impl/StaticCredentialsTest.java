@@ -15,15 +15,14 @@
  */
 package se.idsec.signservice.security.sign.impl;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import se.swedenconnect.security.credential.PkiCredential;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import se.swedenconnect.security.credential.PkiCredential;
 
 /**
  * Test cases for {@link StaticCredentials}.
@@ -51,11 +50,11 @@ public class StaticCredentialsTest {
       final StaticCredentials creds2 = new StaticCredentials(65, null);
       creds2.getSigningCredential("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
     });
-    Assertions.assertTrue(InvalidParameterException.class.isInstance(e.getCause()));
+    Assertions.assertTrue(e.getCause() instanceof InvalidParameterException);
   }
 
   @Test
-  public void generateRsaCustom() throws Exception {
+  public void generateRsaCustom() {
     StaticCredentials creds = new StaticCredentials(StaticCredentials.DEFAULT_RSA_KEY_SIZE, null);
 
     Assertions.assertEquals(StaticCredentials.DEFAULT_RSA_KEY_SIZE,
@@ -90,37 +89,29 @@ public class StaticCredentialsTest {
       Assertions.fail("Expected NoSuchAlgorithmException");
     }
     catch (final NoSuchAlgorithmException e) {
-      Assertions.assertTrue(InvalidAlgorithmParameterException.class.isInstance(e.getCause()));
+      Assertions.assertTrue(e.getCause() instanceof InvalidAlgorithmParameterException);
     }
   }
 
   @Test
-  public void generateEcCustom() throws Exception {
+  public void generateEcCustom() {
 
     final StaticCredentials creds = new StaticCredentials(2048, "NotACurve");
-
-    try {
-      creds.getEcKeyPair();
-      Assertions.fail("Expected InvalidAlgorithmParameterException");
-    }
-    catch (final InvalidAlgorithmParameterException e) {
-    }
+    Assertions.assertThrows(InvalidAlgorithmParameterException.class, creds::getEcKeyPair);
   }
 
   @Test
-  public void testDSAUnsupported() throws Exception {
+  public void testDSAUnsupported() {
     final StaticCredentials creds = new StaticCredentials();
-    Assertions.assertThrows(NoSuchAlgorithmException.class, () -> {
-      creds.getSigningCredential("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
-    });
+    Assertions.assertThrows(NoSuchAlgorithmException.class,
+        () -> creds.getSigningCredential("http://www.w3.org/2000/09/xmldsig#dsa-sha1"));
   }
 
   @Test
-  public void testNotASignatureAlgo() throws Exception {
+  public void testNotASignatureAlgo() {
     final StaticCredentials creds = new StaticCredentials();
-    Assertions.assertThrows(NoSuchAlgorithmException.class, () -> {
-      creds.getSigningCredential("http://www.w3.org/2001/04/xmlenc#sha256");
-    });
+    Assertions.assertThrows(NoSuchAlgorithmException.class,
+        () -> creds.getSigningCredential("http://www.w3.org/2001/04/xmlenc#sha256"));
   }
 
 }
