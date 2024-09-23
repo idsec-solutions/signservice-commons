@@ -45,10 +45,10 @@ public interface XMLMessageSignatureValidator {
    *
    * @param document the XML document to validate
    * @param expectedSignerCertificates the expected signer certificates
+   * @param signatureLocation the signature location
    * @throws SignatureException for validation errors
    */
-  void validate(final Document document,
-      final List<X509Certificate> expectedSignerCertificates,
-      XMLSignatureLocation signatureLocation) throws SignatureException;
+  void validate(final Document document, final List<X509Certificate> expectedSignerCertificates,
+      final XMLSignatureLocation signatureLocation) throws SignatureException;
 
 }

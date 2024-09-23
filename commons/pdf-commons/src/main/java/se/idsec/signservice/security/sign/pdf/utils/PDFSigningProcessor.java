@@ -121,25 +121,13 @@ public class PDFSigningProcessor {
   @Builder
   public static class Result {
 
-    /**
-     * The signed document.
-     *
-     * @return the signed document
-     */
+    /** The signed document. */
     private final byte[] document;
 
-    /**
-     * The CMS SignedData.
-     *
-     * @return the CMS SignedData
-     */
+    /** The CMS SignedData. */
     private final byte[] cmsSignedData;
 
-    /**
-     * The signed attributes.
-     *
-     * @return the signed attributes
-     */
+    /** The signed attributes. */
     private final byte[] cmsSignedAttributes;
   }
 

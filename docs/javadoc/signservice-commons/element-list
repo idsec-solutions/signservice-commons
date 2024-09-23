@@ -1,4 +1,5 @@
 se.idsec.signservice.dss
+se.idsec.signservice.security
 se.idsec.signservice.security.certificate
 se.idsec.signservice.security.certificate.impl
 se.idsec.signservice.security.sign

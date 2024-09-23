@@ -22,8 +22,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Abstract base class for {@link SignerResult} implementations.
+ * Abstract base class for {@link SignerResult} implementations.
  *
+ * @param <T> the type of document signed
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
@@ -40,6 +41,12 @@ public class AbstractSignerResult<T> implements SignerResult<T> {
 
   /** The signer certificate chain. */
   private List<X509Certificate> signerCertificateChain;
+
+  /**
+   * Default constructor.
+   */
+  public AbstractSignerResult() {
+  }
 
   /** {@inheritDoc} */
   @Override
@@ -89,7 +96,7 @@ public class AbstractSignerResult<T> implements SignerResult<T> {
   /** {@inheritDoc} */
   @Override
   public List<X509Certificate> getSignerCertificateChain() {
-    return signerCertificateChain != null
+    return this.signerCertificateChain != null
         ? this.signerCertificateChain
         : this.signerCertificate != null ? Collections.singletonList(this.signerCertificate) : Collections.emptyList();
   }

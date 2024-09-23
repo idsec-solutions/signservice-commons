@@ -66,12 +66,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
   /** Set to true if processing is done according to the PAdES profile. */
   private final boolean pades;
 
-  /**
-   * Set to true if PAdES issuer serial information should be included in the PAdES data.
-   *
-   * @param includePadesIssuerSerial whether to include the PAdES issuer and serial number information in PAdES
-   *     data
-   */
+  /** Set to true if PAdES issuer serial information should be included in the PAdES data. */
   @Setter
   private boolean includePadesIssuerSerial = false;
 
@@ -126,7 +121,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
       final Store<?> certs = new JcaCertStore(this.certificates);
       final CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
       final org.bouncycastle.asn1.x509.Certificate cert = org.bouncycastle.asn1.x509.Certificate.getInstance(
-          ASN1Primitive.fromByteArray(this.certificates.get(0).getEncoded()));
+          ASN1Primitive.fromByteArray(this.certificates.getFirst().getEncoded()));
       final ContentSigner signer =
           new JcaContentSignerBuilder(PDFAlgorithmRegistry.getSigAlgoName(this.algorithm)).build(this.privateKey);
       final JcaSignerInfoGeneratorBuilder builder =
@@ -134,7 +129,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
       if (this.pades) {
         // Add signed signer certificate signed attribute
         builder.setSignedAttributeGenerator(PDFBoxSignatureUtils.getPadesSignerInfoGenerator(
-            this.certificates.get(0),
+            this.certificates.getFirst(),
             PDFAlgorithmRegistry.getAlgorithmProperties(this.algorithm).getMessageDigestAlgorithm()
                 .getAlgorithmIdentifier().getAlgorithm(),
             this.includePadesIssuerSerial));

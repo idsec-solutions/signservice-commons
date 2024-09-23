@@ -62,6 +62,12 @@ public class SimpleCertificateValidator implements CertificateValidator {
   /** The trust anchors. */
   protected List<X509Certificate> defaultTrustAnchors;
 
+  /**
+   * Default constructor.
+   */
+  public SimpleCertificateValidator() {
+  }
+
   /** {@inheritDoc} */
   @Override
   public CertificateValidationResult validate(final X509Certificate subjectCertificate,
@@ -138,7 +144,7 @@ public class SimpleCertificateValidator implements CertificateValidator {
         log.error(msg);
         throw new CertPathBuilderException(msg);
       }
-      final X509Certificate root = additionalCertificates.get(additionalCertificates.size() - 1);
+      final X509Certificate root = additionalCertificates.getLast();
       // Make sure it is self-signed
       if (root.getSubjectX500Principal().equals(root.getIssuerX500Principal())) {
         return Collections.singleton(new TrustAnchor(root, null));

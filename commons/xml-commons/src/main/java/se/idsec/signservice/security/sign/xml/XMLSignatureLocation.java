@@ -43,7 +43,11 @@ public class XMLSignatureLocation {
    * Enum for indicating the point within a selected parent node.
    */
   public enum ChildPosition {
-    FIRST, LAST
+    /** First in the document. */
+    FIRST,
+
+    /** Last in the document. */
+    LAST
   }
 
   /** Indicator for first or last child of a selected parent node. */

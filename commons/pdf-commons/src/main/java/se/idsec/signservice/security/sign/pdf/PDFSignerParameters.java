@@ -35,22 +35,10 @@ import se.idsec.signservice.security.sign.pdf.document.VisibleSignatureImage;
 @Builder
 public class PDFSignerParameters implements SignerParameters {
 
-  /**
-   * The PAdES type of signature. A {@code null} value means no PAdES signature.
-   *
-   * @param padesType
-   *          the type of PAdES signature
-   * @return the type of PAdES signature, or null
-   */
+  /** The PAdES type of signature. A {@code null} value means no PAdES signature. */
   private AdesProfileType padesType;
 
-  /**
-   * Set if a visible PDF signature should be included in the signature.
-   *
-   * @param visibleSignatureImage
-   *          the visible image to include
-   * @return the visible image to include or null
-   */
+  /** Set if a visible PDF signature should be included in the signature. */
   private VisibleSignatureImage visibleSignatureImage;
 
 }

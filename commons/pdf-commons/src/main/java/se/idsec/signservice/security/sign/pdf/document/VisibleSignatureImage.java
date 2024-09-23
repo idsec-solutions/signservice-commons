@@ -64,84 +64,34 @@ public class VisibleSignatureImage {
   /** Contants representing "last page" (0). */
   public static final int LAST_PAGE = 0;
 
-  /**
-   * The page number where the image should be inserted. 0 means last page.
-   *
-   * @param page the page number where the image should be inserted
-   * @return the page number where the image should be inserted
-   */
+  /** The page number where the image should be inserted. 0 means last page. */
   private int page;
 
-  /**
-   * The x-axis offset in pixels where the image should be inserted.
-   *
-   * @param xOffset the x-axis offset in pixels where the image should be inserted
-   * @return the x-axis offset in pixels where the image should be inserted
-   */
+  /** The x-axis offset in pixels where the image should be inserted. */
   private int xOffset;
 
-  /**
-   * The y-axis offset in pixels where the image should be inserted.
-   *
-   * @param yOffset the y-axis offset in pixels where the image should be inserted
-   * @return the y-axis offset in pixels where the image should be inserted
-   */
+  /** The y-axis offset in pixels where the image should be inserted. */
   private int yOffset;
 
-  /**
-   * The zoom percentagy of the image, where 0 means original size.
-   *
-   * @param zoomPercent the zoom percentagy of the image
-   * @return the zoom percentagy of the image
-   */
+  /** The zoom percentagy of the image, where 0 means original size. */
   private int zoomPercent;
 
-  /**
-   * A map of name value pairs that will be included in the image (if it supports it).
-   *
-   * @param personalizationParams name-value pairs
-   * @return name-value pairs
-   */
+  /** A map of name value pairs that will be included in the image (if it supports it). */
   private Map<String, String> personalizationParams;
 
-  /**
-   * The width of the image in pixels.
-   *
-   * @param pixelImageWidth the width of the image in pixels
-   * @return the width of the image in pixels
-   */
+  /** The width of the image in pixels. */
   private int pixelImageWidth;
 
-  /**
-   * The height of the image in pixels.
-   *
-   * @param pixelImageHeight the height of the image in pixels
-   * @return the height of the image in pixels
-   */
+  /** The height of the image in pixels. */
   private int pixelImageHeight;
 
-  /**
-   * Tells whether the sign date should be included in the image.
-   *
-   * @param includeDate tells whether the sign date should be included in the image
-   * @return tells whether the sign date should be included in the image
-   */
+  /** Tells whether the sign date should be included in the image. */
   private boolean includeDate;
 
-  /**
-   * Date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}.
-   *
-   * @param dateFormat the date format for signing time
-   * @return date format for signing time
-   */
+  /** Date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}. */
   private String dateFormat;
 
-  /**
-   * The contents of the SVG image.
-   *
-   * @param svgImage the contents of the SVG image
-   * @return the contents of the SVG image
-   */
+  /** The contents of the SVG image. */
   private String svgImage;
 
   /**

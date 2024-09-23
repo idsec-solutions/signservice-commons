@@ -24,10 +24,11 @@ import java.util.List;
 
 /**
  * An interface for verifying a certificate up until a trusted root.
- *
+ * <p>
  * The interface is an abstraction of the
  * <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/certpath/CertPathProgGuide.html">Java
  * Certification Path API</a>
+ * </p>
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)

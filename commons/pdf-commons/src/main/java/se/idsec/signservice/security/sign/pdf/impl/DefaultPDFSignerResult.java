@@ -32,6 +32,12 @@ public class DefaultPDFSignerResult extends AbstractSignerResult<byte[]> impleme
   /** CMS signed data bytes. */
   private byte[] signedData;
 
+  /**
+   * Default constructor.
+   */
+  public DefaultPDFSignerResult() {
+  }
+
   /** {@inheritDoc} */
   @Override
   public byte[] getSignedAttributes() {
