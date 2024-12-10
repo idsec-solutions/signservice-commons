@@ -144,7 +144,7 @@ public class SimpleCertificateValidator implements CertificateValidator {
         log.error(msg);
         throw new CertPathBuilderException(msg);
       }
-      final X509Certificate root = additionalCertificates.getLast();
+      final X509Certificate root = additionalCertificates.get(additionalCertificates.size() - 1);
       // Make sure it is self-signed
       if (root.getSubjectX500Principal().equals(root.getIssuerX500Principal())) {
         return Collections.singleton(new TrustAnchor(root, null));

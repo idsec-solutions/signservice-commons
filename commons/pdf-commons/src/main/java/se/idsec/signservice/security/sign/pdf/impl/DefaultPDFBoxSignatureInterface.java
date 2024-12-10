@@ -121,7 +121,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
       final Store<?> certs = new JcaCertStore(this.certificates);
       final CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
       final org.bouncycastle.asn1.x509.Certificate cert = org.bouncycastle.asn1.x509.Certificate.getInstance(
-          ASN1Primitive.fromByteArray(this.certificates.getFirst().getEncoded()));
+          ASN1Primitive.fromByteArray(this.certificates.get(0).getEncoded()));
       final ContentSigner signer =
           new JcaContentSignerBuilder(PDFAlgorithmRegistry.getSigAlgoName(this.algorithm)).build(this.privateKey);
       final JcaSignerInfoGeneratorBuilder builder =
@@ -129,7 +129,7 @@ public class DefaultPDFBoxSignatureInterface implements PDFBoxSignatureInterface
       if (this.pades) {
         // Add signed signer certificate signed attribute
         builder.setSignedAttributeGenerator(PDFBoxSignatureUtils.getPadesSignerInfoGenerator(
-            this.certificates.getFirst(),
+            this.certificates.get(0),
             PDFAlgorithmRegistry.getAlgorithmProperties(this.algorithm).getMessageDigestAlgorithm()
                 .getAlgorithmIdentifier().getAlgorithm(),
             this.includePadesIssuerSerial));
