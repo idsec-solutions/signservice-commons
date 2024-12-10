@@ -232,7 +232,7 @@ public class PDFBoxSignatureUtils {
       nsi.add(signerInfo.getObjectAt(siCounter++));
 
       // signing certificate issuer and serial number
-      final Certificate sigCert = chain.getFirst();
+      final Certificate sigCert = chain.get(0);
       final ASN1EncodableVector issuerAndSerial = PDFBoxSignatureUtils.getIssuerAndSerial(sigCert);
       nsi.add(new DERSequence(issuerAndSerial));
       siCounter++;

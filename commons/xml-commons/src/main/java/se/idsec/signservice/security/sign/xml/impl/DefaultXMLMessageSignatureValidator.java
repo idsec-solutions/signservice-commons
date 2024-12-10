@@ -53,12 +53,12 @@ public class DefaultXMLMessageSignatureValidator implements XMLMessageSignatureV
     if (result.size() > 1) {
       throw new SignatureException("Document contains multiple Signature elements - use XPath expression");
     }
-    if (result.getFirst().isSuccess()) {
-      log.debug("Signature on XML message successfully validated: {}", result.getFirst());
+    if (result.get(0).isSuccess()) {
+      log.debug("Signature on XML message successfully validated: {}", result.get(0));
     }
     else {
-      log.info("Signature validation on XML message failed: {}", result.getFirst());
-      throw new SignatureException(result.getFirst().getStatusMessage());
+      log.info("Signature validation on XML message failed: {}", result.get(0));
+      throw new SignatureException(result.get(0).getStatusMessage());
     }
 
   }
