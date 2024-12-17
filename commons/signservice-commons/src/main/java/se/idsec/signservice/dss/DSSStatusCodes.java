@@ -53,6 +53,16 @@ public class DSSStatusCodes {
   public static final String DSS_MINOR_REQUESTER_ERROR_UNSUPPORTED_LOA =
       "http://id.elegnamnden.se/sig-status/1.0/unsupported-loa";
 
+  /** Sweden Connect extension. The authentication during the signature operation failed. */
+  public static final String DSS_MINOR_AUTHN_FAILED = "http://id.swedenconnect.se/sig-status/1.1/authn-failed";
+
+  /**
+   * Sweden Connect extension. The Signature Service, or Identity Provider authenticating the end user, has detected a
+   * security violation (such as a possible fraud).
+   */
+  public static final String DSS_MINOR_SECURITY_VIOLATION =
+      "http://id.swedenconnect.se/sig-status/1.1/security-violation";
+
   /**
    * A ds:Reference element is present in the ds:Signature containing a full URI, but the corresponding input document
    * is not present in the request.
