@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * Data object holding the parameters necessary to provide a signature image to a PDF document.
@@ -57,6 +58,8 @@ public class VisibleSignatureImage {
 
   /** Default date format. */
   public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm z";
+
+  public static final TimeZone DEFAULT_TIMEZONE = TimeZone.getDefault();
 
   /** Constant representing "first page" (1). */
   public static final int FIRST_PAGE = 1;
@@ -93,6 +96,9 @@ public class VisibleSignatureImage {
 
   /** The contents of the SVG image. */
   private String svgImage;
+
+  /** The time zone for signing time. The default is {@link #DEFAULT_TIMEZONE} */
+  private String timeZoneId;
 
   /**
    * Generates PDFBox signature options that includes the visible signature.
@@ -181,7 +187,14 @@ public class VisibleSignatureImage {
   }
 
   private SimpleDateFormat createDateFormatter() {
-    return this.dateFormat != null ? new SimpleDateFormat(this.dateFormat) : new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+    SimpleDateFormat createdDateFormat = this.dateFormat != null
+        ? new SimpleDateFormat(this.dateFormat)
+        : new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+    TimeZone usedTimeZone = this.timeZoneId != null
+        ? TimeZone.getTimeZone(this.timeZoneId)
+        : DEFAULT_TIMEZONE;
+    createdDateFormat.setTimeZone(usedTimeZone);
+    return createdDateFormat;
   }
 
 }
