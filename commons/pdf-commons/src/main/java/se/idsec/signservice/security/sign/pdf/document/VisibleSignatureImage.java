@@ -17,8 +17,8 @@ package se.idsec.signservice.security.sign.pdf.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderException;
@@ -38,8 +38,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -49,7 +51,6 @@ import java.util.TimeZone;
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -68,36 +69,45 @@ public class VisibleSignatureImage {
   public static final int LAST_PAGE = 0;
 
   /** The page number where the image should be inserted. 0 means last page. */
+  @Setter
   private int page;
 
   /** The x-axis offset in pixels where the image should be inserted. */
+  @Setter
   private int xOffset;
 
   /** The y-axis offset in pixels where the image should be inserted. */
+  @Setter
   private int yOffset;
 
   /** The zoom percentagy of the image, where 0 means original size. */
+  @Setter
   private int zoomPercent;
 
   /** A map of name value pairs that will be included in the image (if it supports it). */
+  @Setter
   private Map<String, String> personalizationParams;
 
   /** The width of the image in pixels. */
+  @Setter
   private int pixelImageWidth;
 
   /** The height of the image in pixels. */
+  @Setter
   private int pixelImageHeight;
 
   /** Tells whether the sign date should be included in the image. */
+  @Setter
   private boolean includeDate;
 
   /** Date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}. */
   private String dateFormat;
 
   /** The contents of the SVG image. */
+  @Setter
   private String svgImage;
 
-  /** The time zone for signing time. The default is {@link #DEFAULT_TIMEZONE} */
+  /** The time zone for signing time. The default is {@link #DEFAULT_TIMEZONE}. */
   private String timeZoneId;
 
   /**
@@ -113,6 +123,50 @@ public class VisibleSignatureImage {
    */
   public SignatureOptions getVisibleSignatureOptions(final PDDocument doc, final Date signTime) throws IOException {
     return this.getVisibleSignatureOptions(doc, signTime, 0);
+  }
+
+  /**
+   * Assigns the date format to use.
+   *
+   * @param dateFormat the date format
+   * @throws IllegalArgumentException for invalid input
+   */
+  public void setDateFormat(final String dateFormat) throws IllegalArgumentException {
+    checkDateFormat(dateFormat);
+    this.dateFormat = dateFormat;
+  }
+
+  private static void checkDateFormat(final String dateFormat) throws IllegalArgumentException {
+    try {
+      if (dateFormat != null) {
+        new SimpleDateFormat(dateFormat);
+      }
+    }
+    catch (final Exception e) {
+      throw new IllegalArgumentException("invalid date format: " + dateFormat, e);
+    }
+  }
+
+  /**
+   * Assigns the time zone ID.
+   *
+   * @param timeZoneId the time zone ID, for example "Europe/Stockholm"
+   * @throws IllegalArgumentException for invalid input
+   */
+  public void setTimeZoneId(final String timeZoneId) throws IllegalArgumentException {
+    checkTimeZoneId(timeZoneId);
+    this.timeZoneId = timeZoneId;
+  }
+
+  private static void checkTimeZoneId(final String timeZoneId) throws IllegalArgumentException {
+    try {
+      if (timeZoneId != null) {
+        ZoneId.of(timeZoneId);
+      }
+    }
+    catch (final Exception e) {
+      throw new IllegalArgumentException("Invalid time zone id: " + timeZoneId, e);
+    }
   }
 
   /**
@@ -186,15 +240,37 @@ public class VisibleSignatureImage {
     return personalizedJson;
   }
 
-  private SimpleDateFormat createDateFormatter() {
-    SimpleDateFormat createdDateFormat = this.dateFormat != null
-        ? new SimpleDateFormat(this.dateFormat)
-        : new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-    TimeZone usedTimeZone = this.timeZoneId != null
-        ? TimeZone.getTimeZone(this.timeZoneId)
-        : DEFAULT_TIMEZONE;
+  /**
+   * Creates a date formatter given the settings of the bean
+   *
+   * @return a {@link SimpleDateFormat}
+   */
+  public SimpleDateFormat createDateFormatter() {
+    final SimpleDateFormat createdDateFormat = Optional.ofNullable(this.dateFormat)
+        .map(SimpleDateFormat::new)
+        .orElseGet(() -> new SimpleDateFormat(DEFAULT_DATE_FORMAT));
+    final TimeZone usedTimeZone = Optional.ofNullable(this.timeZoneId)
+        .map(TimeZone::getTimeZone)
+        .orElse(DEFAULT_TIMEZONE);
     createdDateFormat.setTimeZone(usedTimeZone);
     return createdDateFormat;
+  }
+
+  // Lombok builder template
+  public static class VisibleSignatureImageBuilder {
+
+    public VisibleSignatureImageBuilder dateFormat(final String dateFormat) {
+      checkDateFormat(dateFormat);
+      this.dateFormat = dateFormat;
+      return this;
+    }
+
+    public VisibleSignatureImageBuilder timeZoneId(final String timeZoneId) {
+      checkTimeZoneId(timeZoneId);
+      this.timeZoneId = timeZoneId;
+      return this;
+    }
+
   }
 
 }
