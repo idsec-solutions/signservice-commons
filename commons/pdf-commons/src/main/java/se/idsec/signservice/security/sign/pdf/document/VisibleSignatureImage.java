@@ -17,6 +17,7 @@ package se.idsec.signservice.security.sign.pdf.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -70,44 +71,55 @@ public class VisibleSignatureImage {
 
   /** The page number where the image should be inserted. 0 means last page. */
   @Setter
+  @Getter
   private int page;
 
   /** The x-axis offset in pixels where the image should be inserted. */
   @Setter
+  @Getter
   private int xOffset;
 
   /** The y-axis offset in pixels where the image should be inserted. */
   @Setter
+  @Getter
   private int yOffset;
 
   /** The zoom percentagy of the image, where 0 means original size. */
   @Setter
+  @Getter
   private int zoomPercent;
 
   /** A map of name value pairs that will be included in the image (if it supports it). */
   @Setter
+  @Getter
   private Map<String, String> personalizationParams;
 
   /** The width of the image in pixels. */
   @Setter
+  @Getter
   private int pixelImageWidth;
 
   /** The height of the image in pixels. */
   @Setter
+  @Getter
   private int pixelImageHeight;
 
   /** Tells whether the sign date should be included in the image. */
   @Setter
+  @Getter
   private boolean includeDate;
 
   /** Date format for signing time. The default is {@link #DEFAULT_DATE_FORMAT}. */
+  @Getter
   private String dateFormat;
 
   /** The contents of the SVG image. */
   @Setter
+  @Getter
   private String svgImage;
 
   /** The time zone for signing time. The default is {@link #DEFAULT_TIMEZONE}. */
+  @Getter
   private String timeZoneId;
 
   /**

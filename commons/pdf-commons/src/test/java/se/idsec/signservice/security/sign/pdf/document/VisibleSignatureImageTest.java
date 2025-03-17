@@ -15,6 +15,7 @@
  */
 package se.idsec.signservice.security.sign.pdf.document;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -83,5 +84,17 @@ class VisibleSignatureImageTest {
     final VisibleSignatureImage visibleSignatureImage = new VisibleSignatureImage();
     Assertions.assertDoesNotThrow(() -> visibleSignatureImage.setDateFormat("yyyy-MM-dd HH:mm z"));
     Assertions.assertDoesNotThrow(() -> VisibleSignatureImage.builder().dateFormat("yyyy-MM-dd HH:mm z").build());
+  }
+
+  @Test
+  void testJson() throws Exception {
+    final ObjectMapper mapper = new ObjectMapper();
+    final VisibleSignatureImage visibleSignatureImage = new VisibleSignatureImage();
+    visibleSignatureImage.setSvgImage("Hello World");
+    visibleSignatureImage.setDateFormat("yyyy-MM-dd HH:mm z");
+    final String json = mapper.writeValueAsString(visibleSignatureImage);
+    final VisibleSignatureImage fromJson = mapper.readValue(json, VisibleSignatureImage.class);
+    Assertions.assertEquals("Hello World", fromJson.getSvgImage());
+    Assertions.assertEquals("yyyy-MM-dd HH:mm z", fromJson.getDateFormat());
   }
 }
