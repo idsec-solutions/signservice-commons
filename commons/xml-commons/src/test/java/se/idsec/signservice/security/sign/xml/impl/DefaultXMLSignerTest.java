@@ -17,11 +17,13 @@ package se.idsec.signservice.security.sign.xml.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 import se.idsec.signservice.security.sign.xml.XMLTestBase;
 import se.swedenconnect.security.credential.KeyStoreCredential;
 import se.swedenconnect.security.credential.PkiCredential;
+import se.swedenconnect.security.credential.factory.KeyStoreBuilder;
+
+import java.security.KeyStore;
 
 /**
  * Test cases for {@link DefaultXMLSigner}.
@@ -44,10 +46,13 @@ public class DefaultXMLSignerTest extends XMLTestBase {
   }
 
   private PkiCredential getSigningCredential() throws Exception {
-    final KeyStoreCredential cred = new KeyStoreCredential(new ClassPathResource("test-credentials.jks"),
-        "secret".toCharArray(), "test", "secret".toCharArray());
-    cred.init();
-    return cred;
+    final KeyStore keyStore = KeyStoreBuilder.builder()
+        .location("classpath:test-credentials.jks")
+        .type("JKS")
+        .password("secret")
+        .build();
+
+    return new KeyStoreCredential(keyStore, "test", "secret".toCharArray());
   }
 
 }
