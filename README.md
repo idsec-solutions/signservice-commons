@@ -97,7 +97,6 @@ Classes for PDF signing and validation of PDF signatures.
 
 Java API documentation for [signservice-pdf-commons](https://idsec-solutions.github.io/signservice-commons/javadoc/pdf-commons).
 
-
 ---
 
 Copyright &copy; 2019-2025, [IDsec Solutions AB](http://www.idsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
