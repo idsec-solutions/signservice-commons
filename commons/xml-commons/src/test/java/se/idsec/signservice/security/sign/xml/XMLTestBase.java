@@ -15,16 +15,15 @@
  */
 package se.idsec.signservice.security.sign.xml;
 
-import java.io.InputStream;
-import java.security.cert.X509Certificate;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
-
 import se.idsec.signservice.xml.DOMUtils;
 import se.swedenconnect.security.credential.utils.X509Utils;
+
+import java.io.InputStream;
+import java.security.cert.X509Certificate;
 
 /**
  * Abstract base class for XML tests.
@@ -47,7 +46,10 @@ public abstract class XMLTestBase {
   }
 
   protected X509Certificate getCertificate(final String path) throws Exception {
-    return X509Utils.decodeCertificate(new ClassPathResource(path));
+    final Resource resource = new ClassPathResource(path);
+    try (final InputStream is = resource.getInputStream()) {
+      return X509Utils.decodeCertificate(is);
+    }
   }
 
 }
