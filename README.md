@@ -18,7 +18,7 @@ A Maven BOM to be used by those including the signservice-commons artifacts.
 
 ##### Maven
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-bom)
+[![Maven Central](https://img.shields.io/maven-central/v/se.idsec.signservice.commons/signservice-bom.svg)](https://central.sonatype.com/artifact/se.idsec.signservice.commons/signservice-bom)
 
 ```
 <dependencyManagement>
@@ -42,7 +42,7 @@ A library containing utilities for JAXB and XML processing, certificate utilitie
 
 ##### Maven
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-commons)
+[![Maven Central](https://img.shields.io/maven-central/v/se.idsec.signservice.commons/signservice-commons.svg)](https://central.sonatype.com/artifact/se.idsec.signservice.commons/signservice-commons)
 
 
 ```
@@ -63,7 +63,7 @@ Classes for XML signing and validation of XML signatures.
 
 ##### Maven
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-xml-commons)
+[![Maven Central](https://img.shields.io/maven-central/v/se.idsec.signservice.commons/signservice-xml-commons.svg)](https://central.sonatype.com/artifact/se.idsec.signservice.commons/signservice-xml-commons)
 
 ```
 <dependency>
@@ -83,7 +83,7 @@ Classes for PDF signing and validation of PDF signatures.
 
 ##### Maven
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-pdf-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.idsec.signservice.commons/signservice-pdf-commons)
+[![Maven Central](https://img.shields.io/maven-central/v/se.idsec.signservice.commons/signservice-pdf-commons.svg)](https://central.sonatype.com/artifact/se.idsec.signservice.commons/signservice-pdf-commons)
 
 ```
 <dependency>
