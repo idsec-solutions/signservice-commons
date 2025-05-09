@@ -24,7 +24,7 @@
   <parent>
     <groupId>se.idsec.signservice.commons</groupId>
     <artifactId>signservice-commons-parent</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
   </parent>
 
   <name>IDsec Solutions :: SignService :: Commons :: PDF Commons</name>
@@ -100,7 +100,7 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-transcoder</artifactId>
-      <version>1.18</version>
+      <version>1.19</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -124,7 +124,7 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-codec</artifactId>
-      <version>1.18</version>
+      <version>1.19</version>
     </dependency>
 
     <dependency>
