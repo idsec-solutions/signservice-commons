@@ -48,7 +48,7 @@
   </developers>
 
   <properties>
-    <jackson.version>2.19.0</jackson.version>
+    <jackson.version>2.21.1</jackson.version>
     <pdfbox.version>3.0.5</pdfbox.version>
     <bouncy-castle.version>1.80</bouncy-castle.version>
     <slf4j.version>2.0.17</slf4j.version>
